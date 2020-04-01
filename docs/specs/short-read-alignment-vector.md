@@ -4,9 +4,7 @@
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a protocol for alignment of short sequence
-reads, intended for use with mosquito specimens individually sequenced
-to high coverage (target ~30X) with paired-end sequencing on Illumina
-machines.
+reads, intended for use with mosquito specimens.
 
 
 ## Assumptions
@@ -28,6 +26,17 @@ machines.
   the pipeline is launched for a given batch of samples. I.e., there
   is no need to consider any case where additional lanelets may arrive
   at a later time.
+
+* Sequencing will be from Illumina technology, using paired-end
+  sequencing. Mosquitoes will be sequenced individually, i.e., each
+  mosquito sample will be used to create a separate DNA library, and
+  libraries will not be pooled. Each individual mosquito will be
+  sequenced to high coverage (target ~30X). Read length may vary
+  between sequencing runs, i.e., the pipeline cannot assume the same
+  read length across all lanelets.
+
+* Trimming of adapter sequences, if necessary, will have been
+  performed prior to running this pipeline.
 
 
 ## Inputs
