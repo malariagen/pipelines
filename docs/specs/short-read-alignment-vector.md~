@@ -1,0 +1,40 @@
+# Short read alignment (vector) pipeline specification
+
+* Version: 1.1.0
+* Authors: Alistair Miles, Jim Stalker
+
+This document specifies a protocol for alignment of short sequence
+reads, intended for use with mosquito specimens individually sequenced
+to high coverage (target ~30X) with paired-end sequencing on Illumina
+machines.
+
+
+## Assumptions
+
+* The pipeline will be launched to align sequence reads from one or
+  more samples as a batch.
+
+* Any demultiplexing of multiple samples within a single sequencing
+  lane will have been resolved upstream of this pipeline. I.e., the
+  pipeline will run from demultiplexed sequence reads. The term
+  "lanelet" is used here to mean data from a single lane of sequencing
+  from a single sample.
+
+* Each sample may have data from multiple sequencing runs (lanes), and
+  the number of lanelets may vary between samples. I.e., the pipeline
+  cannot assume a fixed number of lanelets per sample.
+
+* The complete set of input data will be known ahead of time, before
+  the pipeline is launched for a given batch of samples. I.e., there
+  is no need to consider any case where additional lanelets may arrive
+  at a later time.
+
+
+## Inputs
+
+* Reference sequence - The reference genome sequence to align to, in
+  FASTA format.
+
+* Sequence reads - One 
+
+* Lanelet manifest - A tab delimited file with one row per lanelet.
