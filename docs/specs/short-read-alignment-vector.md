@@ -1,6 +1,6 @@
 # Short read alignment (vector) pipeline specification
 
-* Version: 1.1.0
+* Version: 1.1.1
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a protocol for alignment of short sequence
@@ -196,3 +196,11 @@ be achieved within this sub-pipeline by splitting the input file into
 chunks by genome region, processing each chunk in parallel, then
 merging chunks back together.
 
+
+## Change log
+
+* Version 1.1.1 - Some editing of the spec to improve clarity,
+  particularly around how lanelets and samples are processed.
+
+* Version 1.1.0 - Version ported across from MalariaGEN vector-ops
+  repo.
