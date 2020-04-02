@@ -48,9 +48,10 @@ reads, intended for use with mosquito specimens.
   sequence reads, with one file containing forward reads and one file
   containing reverse reads, in gzipped FASTQ format.
 
-* Lanelet manifest - A tab delimited file with one row per
-  lanelet. Mandatory columns are as follows, may contain any other
-  columns:
+* Lanelet manifest - A tab delimited file with one header row followed
+  by one data row per lanelet. Mandatory columns are as follows and
+  are expected to occur as the first columns in the file. Other
+  columns may be included (will be ignored).
 
     * `read1_path` - URL or local filesystem path to gzipped FASTQ
       file containing forward reads.
