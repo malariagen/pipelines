@@ -4,13 +4,14 @@ This folder contains pipeline specification documents. Each document
 provides a written specification of a pipeline, intended as a basis
 for implementation.
 
-## Versioning policy
 
-Each specification will include a three-part version number. The
-version number will be incremented as follows:
+## Specification versioning policy
 
-* Micro version bump - Add or clarify information in spec, but no
-  change to actual pipeline.
+Each specification document will include a three-part version
+number. The version number will be incremented as follows:
+
+* Major version bump - For any changes that will qualitatively change
+  outputs.
 
 * Minor version bump - For changes to pipeline that should not
   qualitatively change outputs, but may in practice produce slightly
@@ -18,10 +19,11 @@ version number will be incremented as follows:
   additional outputs, without qualitatively changing any previous
   outputs.
 
-* Major version bump - For any changes that will qualitatively change
-  outputs.
+* Micro version bump - Add or clarify information in spec, but no
+  change to actual pipeline.
 
-## Specifications
+
+## Specification documents
 
 ### Short read alignment (vector)
 
