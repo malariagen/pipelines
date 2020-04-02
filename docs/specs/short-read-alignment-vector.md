@@ -143,13 +143,16 @@ Realign reads around indels found within the alignments using the following comm
 GATK -T RealignerTargetCreator
 ```
 
-No known indels.
+Note that the RealignerTargetCreator tool has an option to input a
+list of any known indels. However, we do not have any prior list of
+known indels for our mosquito projects, and so we don't use this
+option.
 
 ```
 GATK -T IndelRealigner -targetIntervals output_of_RTCreator
 ```
 
-Defaults for LOD, model, etc.
+Default options for LOD, model, etc.
 
 
 #### Fix Mates
