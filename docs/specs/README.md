@@ -27,4 +27,4 @@ number. The version number will be incremented as follows:
 
 ### Short read alignment (vector)
 
-* [Latest version](short-read-alignment-vector.md)
+* [Version 1.1.1](https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md)
