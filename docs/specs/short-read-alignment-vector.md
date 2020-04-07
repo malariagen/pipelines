@@ -110,10 +110,10 @@ calmd:
 
 ```
 samtools view -bu output.sam 
-| samtools sort -n 
-| samtools fixmate 
-| samtools sort  
-| samtools calmd -b ref.fa > output.bam
+| samtools sort -n -
+| samtools fixmate - - 
+| samtools sort - 
+| samtools calmd -b - ref.fa > output.bam
 ```
 
 
