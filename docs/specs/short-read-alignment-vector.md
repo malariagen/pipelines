@@ -66,7 +66,7 @@ reads, intended for use with mosquito specimens.
 
 * One analysis-ready BAM file for each sample.
 
-* samtools stats output for each sample.
+* samtools stats output for each sample in TSV format.
 
 * GATK CallableLoci output for each sample.
 
