@@ -5,8 +5,6 @@
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/lh3/bwa. Default version v0.7.17.
 
-**Currently only builds for v0.7.16 and above**
-
 ### Samtools
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/samtools/samtools. Default version 1.9.
@@ -25,7 +23,7 @@ The Broad Institute provided Dockerfile for GATK can be found on [docker hub](hu
 
 ## Mosquito short read alignment pipeline
 
-- bwa 0.7.15 - unsupported
+- bwa 0.7.15 - `docker build . --tag=bwa0.7.15 --build-arg version=v0.7.15`
 - samtools 1.4.1 (htslib 1.4.1) - `docker build . --tag=samtools1.4.1 --build-arg version=1.4.1`
 - picard 2.9.2 - ` docker build . --tag=picard2.9.2 --build-arg version=2.9.2`
 - biobambam 2.0.73 - `docker build . --tag=biobambam2.0.73`
