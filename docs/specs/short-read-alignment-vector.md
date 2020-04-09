@@ -1,6 +1,6 @@
 # Short read alignment (vector) pipeline specification
 
-* Version: 1.1.1
+* Version: 1.1.2
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a protocol for alignment of short sequence
@@ -110,10 +110,10 @@ calmd:
 
 ```
 samtools view -bu output.sam 
-| samtools sort -n 
-| samtools fixmate 
-| samtools sort  
-| samtools calmd -b ref.fa > output.bam
+| samtools sort -n -
+| samtools fixmate - - 
+| samtools sort - 
+| samtools calmd -b - ref.fa > output.bam
 ```
 
 
@@ -211,6 +211,8 @@ merging chunks back together.
 
 
 ## Change log
+
+* Version 1.1.2 - Small correction to the example samtools commands in the read alignment postprocessing step.
 
 * Version 1.1.1 - Some editing of the spec to improve clarity,
   particularly around how lanelets and samples are processed.
