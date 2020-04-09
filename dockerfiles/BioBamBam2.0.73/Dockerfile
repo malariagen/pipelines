@@ -1,4 +1,5 @@
 FROM ubuntu:bionic-20191029
+#Ubuntu builds are provided by repo. Could move to alpine but would need to build ourselves
 
 RUN apt-get update \
  && apt-get install -y \
@@ -9,17 +10,15 @@ RUN apt-get update \
 
 WORKDIR /tmp
 
+ENV file=biobambam2-2.0.73-release-20170620145717-x86_64-etch-linux-gnu.tar.gz
+
 #Get biobambam2
-RUN wget https://github.com/gt1/biobambam2/releases/download/2.0.73-release-20170620145717/biobambam2-2.0.73-release-20170620145717-x86_64-etch-linux-gnu.tar.gz
+RUN wget https://github.com/gt1/biobambam2/releases/download/2.0.73-release-20170620145717/${file}
 
-RUN ls
-
-RUN tar -C /tmp/ -xvzf /tmp/biobambam2-2.0.73-release-20170620145717-x86_64-etch-linux-gnu.tar.gz \
-&& rm biobambam2-2.0.73-release-20170620145717-x86_64-etch-linux-gnu.tar.gz
+RUN tar -C /tmp/ -xvzf /tmp/${file} \
+&& rm ${file}
 
 WORKDIR /tmp/biobambam2/2.0.73-release-20170620145717/x86_64-etch-linux-gnu/
-
-RUN ls
 
 RUN cp -r bin/* /usr/local/bin
 

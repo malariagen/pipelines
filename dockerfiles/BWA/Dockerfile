@@ -1,5 +1,5 @@
-
 FROM ubuntu:bionic-20191029
+# Unable to build <0.7.16 using bashell/alpine-bash:latest or alpine + bash. Until this issue can be resolved moving to ubuntu
 
 ARG version=v0.7.17
 

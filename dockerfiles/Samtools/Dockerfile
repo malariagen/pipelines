@@ -3,7 +3,6 @@ FROM bashell/alpine-bash:latest
 ARG version=1.9
 
 RUN apk update \
- && apk upgrade \
  && apk add --no-cache \
  build-base \
  zlib-dev \
@@ -31,5 +30,3 @@ RUN apk del build-base zlib-dev ca-certificates wget
 RUN apk update \
  && apk upgrade \
  && apk add --no-cache python3
-
-ENTRYPOINT samtools
