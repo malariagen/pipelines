@@ -1,0 +1,7 @@
+sample_id	read1_path	read2_path
+AN0131-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR317/ERR317337/ERR317337_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR317/ERR317337/ERR317337_2.fastq.gz
+AN0131-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR340/ERR340933/ERR340933_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR340/ERR340933/ERR340933_2.fastq.gz
+AN0131-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR340/ERR340945/ERR340945_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR340/ERR340945/ERR340945_2.fastq.gz
+AB0252-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR327/ERR327108/ERR327108_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR327/ERR327108/ERR327108_2.fastq.gz
+AB0252-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR338/ERR338386/ERR338386_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR338/ERR338386/ERR338386_2.fastq.gz
+AB0252-C	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR338/ERR338398/ERR338398_1.fastq.gz	ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR338/ERR338398/ERR338398_2.fastq.gz
