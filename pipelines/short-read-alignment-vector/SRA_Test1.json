@@ -1,0 +1,37 @@
+{
+  "ShortReadAlignment.sample_id": "AN0131-C",
+  "ShortReadAlignment.output_basename": "SRA_Test1",
+  "ShortReadAlignment.read_group_ids": [
+    "ERR317337",
+    "ERR340933",
+    "ERR340945"
+  ],
+  "ShortReadAlignment.input_fastq1s": [
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR317337_1.fastq.gz",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR340933_1.fastq.gz",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR340945_1.fastq.gz"
+  ],
+  "ShortReadAlignment.input_fastq2s": [
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR317337_2.fastq.gz",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR340933_2.fastq.gz",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR340945_2.fastq.gz"
+  ],
+  "ShortReadAlignment.reference": {
+    "ref_fasta": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
+    "ref_fasta_index": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
+    "ref_dict": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
+    "ref_sa": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.sa",
+    "ref_amb": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
+    "ref_bwt": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
+    "ref_ann": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
+    "ref_pac": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
+  },
+  "ShortReadAlignment.runTimeSettings": {
+    "preemptible_tries": 0,
+    "gatk_docker": "broadinstitute/gatk3:3.7-0",
+    "picard_docker": "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2",
+    "bwa_docker": "us.gcr.io/broad-gotc-prod/malariagen/bwa:0.7.15",
+    "biobambam_docker": "us.gcr.io/broad-gotc-prod/malariagen/biobambam2:2.0.73",
+    "samtools_docker": "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
+  }
+}
