@@ -204,7 +204,7 @@ task MergeSamFiles {
   Int disk_size = (ceil(size(input_files, "GiB")) * 3) + 20
 
   command {
-    java -Xms3500m -jar /root/picard.jar \
+    java -Xms3500m -jar /bin/picard.jar \
       MergeSamFiles \
       INPUT=~{sep=' INPUT=' input_files} \
       OUTPUT=~{output_filename}
@@ -320,7 +320,7 @@ task FixMateInformation {
   Int disk_size = (ceil(size(input_file, "GiB")) * 3) + 20
 
   command {
-    java -Xms7000m -jar /root/picard.jar \
+    java -Xms7000m -jar /bin/picard.jar \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -354,7 +354,7 @@ task ValidateSamFile {
   Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
 
   command {
-    java -Xms3500m -jar /root/picard.jar \
+    java -Xms3500m -jar /bin/picard.jar \
       ValidateSamFile \
       INPUT=~{input_file} \
       OUTPUT=~{report_filename} \
