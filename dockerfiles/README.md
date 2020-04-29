@@ -14,7 +14,7 @@ Comes in two different flavours v2.0.73 and v2.0.106. New versions are quick to 
 
 ### Picard
 Supports the `build-arg` `version` that represents the tag name found in the repo
-https://github.com/broadinstitute/picard. Default version 2.22.3. Executed using `java -jar picard.jar`
+https://github.com/broadinstitute/picard. Default version 2.22.3. Executed using `java -jar /bin/picard.jar`
 
 ### GATK
 The Broad Institute provided Dockerfile for GATK can be found on [docker hub](https://hub.docker.com).
