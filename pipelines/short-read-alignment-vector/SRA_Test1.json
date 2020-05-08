@@ -2,9 +2,19 @@
   "ShortReadAlignment.sample_id": "AN0131-C",
   "ShortReadAlignment.output_basename": "SRA_Test1",
   "ShortReadAlignment.read_group_ids": [
-    "ERR317337",
-    "ERR340933",
-    "ERR340945"
+    "HS22_09812:4",
+    "HS16_10209:3",
+    "HS16_10209:4"
+  ],
+  "ShortReadAlignment.libraries": [
+    "A",
+    "B",
+    "C"
+  ],
+  "ShortReadAlignment.studies": [
+    "X",
+    "Y",
+    "Z"
   ],
   "ShortReadAlignment.input_fastq1s": [
     "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR317337_1.fastq.gz",

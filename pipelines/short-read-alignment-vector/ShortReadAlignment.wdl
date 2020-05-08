@@ -1,10 +1,9 @@
 version 1.0
 
-## Copyright Wellcome Sanger Institute, Oxford University and the Broad Institute 2020
+## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2020
 ##
 ## This WDL pipeline implements the Short Read Alignment Pipeline as described in
-## https://github.com/malariagen/pipelines/blob/master/docs/specs/short-read-alignment-vector.md
-##
+## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
 ## This is an initial proof of concept implementation.  It is designed to ONLY work on one sample, with ONLY its
 ## list of input fastqs.  It is currently implemented to run using Cromwell with a google cloud platform backend.
 ##
@@ -13,10 +12,12 @@ workflow ShortReadAlignment {
   String pipeline_version = "0.0.1"
 
   input {
+    String sample_id
     Array[String] read_group_ids
+    Array[String] libraries
+    Array[String] studies
     Array[File] input_fastq1s
     Array[File] input_fastq2s
-    String sample_id
     String output_basename
 
     File? known_indels_vcf
@@ -28,10 +29,12 @@ workflow ShortReadAlignment {
   scatter (idx in range(length(input_fastq1s))) {
     call ReadAlignment {
       input:
+        sample_id = sample_id,
         read_group_id = read_group_ids[idx],
+        library = libraries[idx],
+        study = studies[idx],
         fastq1 = input_fastq1s[idx],
         fastq2 = input_fastq2s[idx],
-        sample_id = sample_id,
         output_sam_basename = output_basename,
         reference = reference,
         runTimeSettings = runTimeSettings
@@ -125,9 +128,11 @@ workflow ShortReadAlignment {
 task ReadAlignment {
   input {
     String read_group_id
+    String library
+    String sample_id
+    String study
     File fastq1
     File fastq2
-    String sample_id
     String output_sam_basename
 
     ReferenceSequence reference
@@ -144,8 +149,15 @@ task ReadAlignment {
     set -o pipefail
     set -e
 
-    # TODO - need to set the read group id correctly here.
-    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+    # suggested content for the read group tag: (from Thuy):
+    # Read group identifier [ID]: full platform unit ID as the read group identifier (including the flowcell, run, lane)
+    # library [LB]: obtained from raw sequenced bam, but we can make this up for testing
+    # sample [SM]: obtained from raw sequenced bam, but we can also obtain this from the sample manifest or fastq filename
+    # sequencing centre [CN]: obtained from raw sequenced bam, but we can make this up for testing
+    # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
+    # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
+    # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
+    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tLB:~{library}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA\tDS:~{study}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   >>>
   runtime {
     docker: runTimeSettings.bwa_docker
@@ -361,14 +373,8 @@ task ValidateSamFile {
       REFERENCE_SEQUENCE=~{reference.ref_fasta} \
       ~{"MAX_OUTPUT=" + max_output} \
       IGNORE=~{default="null" sep=" IGNORE=" ignore} \
-      IGNORE=MISSING_PLATFORM_VALUE \
       IS_BISULFITE_SEQUENCED=false \
       MODE=VERBOSE
-    exitCode=$?
-    if [ $exitCode != 0 ]; then
-       echo "TODO:  It failed ValidateSameFile - but I'm letting it pass for testing."
-       exit 0
-    fi
   }
   runtime {
     docker: runTimeSettings.picard_docker
