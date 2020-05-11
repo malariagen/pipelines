@@ -1,7 +1,7 @@
 # Short read alignment (vector) pipeline specification
 
 * Version: 1.2.1
-* Authors: Alistair Miles, Jim Stalker
+* Authors: Alistair Miles, Jim Stalker, George Grant
 
 This document specifies a protocol for alignment of short sequence
 reads, intended for use with mosquito specimens.
