@@ -44,6 +44,13 @@ workflow ShortReadAlignment {
       input:
         input_sam = ReadAlignment.output_sam,
         output_bam_basename = output_basename,
+        runTimeSettings = runTimeSettings
+    }
+
+    call SetNmMdAndUqTags {
+      input:
+        input_bam = ReadAlignmentPostProcessing.output_bam,
+        output_bam_basename = output_basename,
         reference = reference,
         runTimeSettings = runTimeSettings
     }
@@ -51,7 +58,7 @@ workflow ShortReadAlignment {
 
   call MergeSamFiles {
     input:
-      input_files = ReadAlignmentPostProcessing.output_bam,
+      input_files = SetNmMdAndUqTags.output_bam,
       output_filename = output_basename + ".bam",
       runTimeSettings = runTimeSettings
   }
@@ -175,7 +182,6 @@ task ReadAlignmentPostProcessing {
   input {
     File input_sam
     String output_bam_basename
-    ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
@@ -189,8 +195,7 @@ task ReadAlignmentPostProcessing {
     /bin/samtools view -bu ~{input_sam} |
     /bin/samtools sort -n - |
     /bin/samtools fixmate - - |
-    /bin/samtools sort - |
-    /bin/samtools calmd -b - ~{reference.ref_fasta} > ~{output_bam_basename}.bam
+    /bin/samtools sort - > ~{output_bam_basename}.bam
 
   >>>
 
@@ -200,6 +205,35 @@ task ReadAlignmentPostProcessing {
     memory: "14 GiB"
     cpu: "4"
     disks: "local-disk " + disk_size + " HDD"
+  }
+  output {
+    File output_bam = "~{output_bam_basename}.bam"
+  }
+}
+
+task SetNmMdAndUqTags {
+  input {
+    File input_bam
+    String output_bam_basename
+    ReferenceSequence reference
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = (ceil(size(input_bam, "GiB")) * 3) + 20
+
+  command {
+    java -Xms3500m -jar /bin/picard.jar \
+      SetNmMdAndUqTags \
+      INPUT=~{input_bam} \
+      OUTPUT=~{output_bam_basename}.bam \
+      REFERENCE_SEQUENCE=~{reference.ref_fasta} \
+      IS_BISULFITE_SEQUENCE=false
+  }
+  runtime {
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    disks: "local-disk " + disk_size + " HDD"
+    memory: "3.75 GiB"
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"

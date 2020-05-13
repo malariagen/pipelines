@@ -1,7 +1,7 @@
 # Short read alignment (vector) pipeline specification
 
-* Version: 1.1.2
-* Authors: Alistair Miles, Jim Stalker
+* Version: 1.2.1
+* Authors: Alistair Miles, Jim Stalker, George Grant
 
 This document specifies a protocol for alignment of short sequence
 reads, intended for use with mosquito specimens.
@@ -105,15 +105,21 @@ Notes:
 
 #### Step: Read alignment post-processing
 
-Conversion of sam to bam via namesort, fixmates, coordinate sort and
-calmd:
+Conversion of sam to bam via namesort, fixmates, and coordinate sort:
 
 ```
 samtools view -bu output.sam 
 | samtools sort -n -
 | samtools fixmate - - 
-| samtools sort - 
-| samtools calmd -b - ref.fa > output.bam
+| samtools sort - > output.bam
+```
+
+#### Step: Read alignment post-processing
+
+Calculate the NM tags in the bam:
+
+```
+picard.jar SetNmMdAndUqTags input.bam
 ```
 
 
@@ -211,6 +217,8 @@ merging chunks back together.
 
 
 ## Change log
+
+* Version 1.2.1 - Replace Samtool's calmd with Picard's SetNmMdAndUqTags for calculation of NM tags
 
 * Version 1.1.2 - Small correction to the example samtools commands in the read alignment postprocessing step.
 
