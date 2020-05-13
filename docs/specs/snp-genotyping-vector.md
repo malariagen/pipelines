@@ -4,9 +4,9 @@
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a pipeline for genotyping an individual sample
-at a set of given SNP alleles, assuming the sample has already been
-aligned against the appropriate reference sequence via the short read
-alignment protocol.
+at a set of predefined SNP alleles, assuming the sample has already
+been aligned against the appropriate reference sequence via the short
+read alignment protocol.
 
 
 ## Inputs
@@ -42,7 +42,7 @@ alignment protocol.
 Genotype a single sample at given alleles using GATK UnifiedGenotyper
 with the following parameters:
 
-``bash
+```bash
 java -jar GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
     -I {sample BAM} \
@@ -127,7 +127,7 @@ function. Note the following implementation details:
 Here is an example of the appropriate function call in Python for a
 single contig (this should be called for all contigs in the genome):
 
-```
+```python
 import sys
 import allel
 import zarr
@@ -161,7 +161,7 @@ contents of the root folder of the zarr directory. E.g., if
 ``{sample}`` is the sample ID and ``{sample}.zarr`` is the name of the
 output directory used in calls to ``vcf_to_zarr()``, then do:
 
-```
+```bash
 cd {sample}.zarr
 zip -rmT0 {sample}.zarr.zip .
 ```
