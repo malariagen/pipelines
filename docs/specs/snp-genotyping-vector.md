@@ -14,7 +14,7 @@ alignment protocol.
 * Analysis-ready sequence read alignments for a single sample
   (produced by the short read alignment pipeline; BAM format)
 
-* Given alleles against which to genotype (VCF format)
+* Alleles against which to genotype (VCF format)
 
 * Reference sequence (FASTA format)
 
@@ -36,7 +36,8 @@ alignment protocol.
 
 ## Pipeline
 
-### Step: genotyping
+
+### Step: Genotyping
 
 Genotype a single sample at given alleles using GATK UnifiedGenotyper
 with the following parameters:
@@ -45,7 +46,7 @@ with the following parameters:
 java -jar GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
     -I {sample BAM} \
-    --alleles {known alleles VCF} \
+    --alleles {alleles VCF} \
     -R {reference sequence} \
     --out {output VCF} \
     --genotype_likelihoods_model BOTH \
@@ -153,7 +154,7 @@ def build_sample_zarr(input_path, output_path, contig):
 ```
 
 
-### Zip Zarr
+### Step: Zip Zarr
 
 Once the zarr conversion is complete, create a zip archive from the
 contents of the root folder of the zarr directory. E.g., if
@@ -164,3 +165,21 @@ output directory used in calls to ``vcf_to_zarr()``, then do:
 cd {sample}.zarr
 zip -rmT0 {sample}.zarr.zip .
 ```
+
+
+## Implementation notes
+
+* For all vector species we currently genotype at all sites in the
+  genome and all possible SNP alleles, which means that the set of
+  alleles provided to the genotyper comprises all genome sites where
+  the reference allele is not "N" and all possible SNP alternate
+  alleles are given in lexical order.
+
+
+## Change log
+
+* Version 1.4.0 - Updated Zarr and scikit-allel versions. Corrected
+  the fields parameters in the VCF to Zarr conversion.
+
+* Version 1.3.0 - Version ported across from MalariaGEN vector-ops
+  repo.
