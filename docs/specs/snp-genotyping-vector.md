@@ -200,7 +200,8 @@ which we don't genotype).
 ## Change log
 
 * Version 1.4.0 - Updated Zarr and scikit-allel versions. Corrected
-  the fields parameters in the VCF to Zarr conversion.
+  the fields parameters in the VCF to Zarr conversion (added
+  variants/MQ).
 
 * Version 1.3.0 - Version ported across from MalariaGEN vector-ops
   repo.
