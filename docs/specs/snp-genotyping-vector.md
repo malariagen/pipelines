@@ -176,6 +176,27 @@ zip -rmT0 {sample}.zarr.zip .
   alleles are given in lexical order.
 
 
+## Appendix: Data structures
+
+For the output of the "VCF to Zarr" conversion step, we expect that
+this will create a Zarr hierarchy with the following structure:
+
+* `/` [root group]
+  * `{chromosome}` [group]
+    * `variants` [group]
+      * `MQ` [array; int8; shape (n_sites,)]
+    * `calldata` [group]
+      * `GT` [array; int8; shape (n_sites, 1, 2)]
+      * `GQ` [array; int8; shape (n_sites, 1)]
+      * `AD` [array; int16; shape (n_sites, 1, 4)]
+
+There would be one `{chromosome}` group per chromosome, which for
+*An. gambiae* would mean five groups named "2R", "2L", "3R", "3L" and
+"X", corresponding to the five chromosomes in the AgamP4 reference
+genome (excluding the "UNKN", "Y_unplaced" and mitochondrial genomes
+which we don't genotype).
+
+
 ## Change log
 
 * Version 1.4.0 - Updated Zarr and scikit-allel versions. Corrected
