@@ -186,9 +186,9 @@ this will create a Zarr hierarchy with the following structure:
     * `variants` [group]
       * `MQ` [array; int8; shape (n_sites,)]
     * `calldata` [group]
-      * `GT` [array; int8; shape (n_sites, 1, 2)]
-      * `GQ` [array; int8; shape (n_sites, 1)]
-      * `AD` [array; int16; shape (n_sites, 1, 4)]
+      * `GT` [array; int8; shape (n_sites, 1, 2), dimensions correspond to (sites, samples, ploidy)]
+      * `GQ` [array; int8; shape (n_sites, 1), dimensions correspond to (sites, samples)]
+      * `AD` [array; int16; shape (n_sites, 1, 4), dimensions correspond to (sites, samples, alleles)]
 
 There would be one `{chromosome}` group per chromosome, which for
 *An. gambiae* would mean five groups named "2R", "2L", "3R", "3L" and
