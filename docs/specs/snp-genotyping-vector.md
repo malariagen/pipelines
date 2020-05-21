@@ -1,18 +1,20 @@
-# SNP genotyping (vector) pipeline specification
+# Mosquito SNP genotyping pipeline specification
 
 * Version: 1.4.0
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a pipeline for genotyping an individual sample
 at a set of predefined SNP alleles, assuming the sample has already
-been aligned against the appropriate reference sequence via the short
-read alignment protocol.
+been aligned against the appropriate reference sequence via the
+[mosquito short read alignment
+protocol](short-read-alignment-vector.md).
 
 
 ## Inputs
 
 * Analysis-ready sequence read alignments for a single sample
-  (produced by the short read alignment pipeline; BAM format)
+  (produced by the [mosquito short read alignment
+  pipeline](short-read-alignment-vector.md); BAM format)
 
 * Alleles against which to genotype (VCF format)
 
@@ -166,6 +168,13 @@ cd {sample}.zarr
 zip -rmT0 {sample}.zarr.zip .
 ```
 
+The options applied here are:
+
+* `-r` recurse paths
+* `-m` move, i.e. delete existing dir and contents
+* `-T` test, i.e. only delete on a successful zip
+* `-0` no compression (files are already compressed)
+
 
 ## Implementation notes
 
@@ -176,7 +185,7 @@ zip -rmT0 {sample}.zarr.zip .
   alleles are given in lexical order.
 
 
-## Appendix: Data structures
+## Data structures
 
 For the output of the "VCF to Zarr" conversion step, we expect that
 this will create a Zarr hierarchy with the following structure:
