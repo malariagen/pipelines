@@ -1,4 +1,4 @@
-# Phasing (vector) pipeline specification
+# Mosquito phasing pipeline specification
 
 * Version: 0.0.0
 * Authors: Alistair Miles, Jon Brenas
@@ -15,11 +15,13 @@ accuracy.
 * A manifest specifying a set of samples to be phased.
 
 * For each sample, a BAM file containing analysis-ready sequence read
-  alignments, produced by the short read alignment pipeline.
+  alignments, produced by the [mosquito short read alignment
+  pipeline](short-read-alignment-vector.md).
 
 * For each sample, a VCF file or zipped zarr file containing unphased
-  genotypes, produced by the SNP genotyping pipeline. (@@TODO: decide
-  which format will be more convenient to work from.)
+  genotypes, produced by the [mosquito SNP genotyping
+  pipeline](snp-genotyping-vector.md). (@@TODO: decide which format
+  will be more convenient to work from.)
 
 * A file containing the set of sites and alleles to phase (VCF or Zarr
   format, @@TODO decide which). N.B., This will be a subset of the
