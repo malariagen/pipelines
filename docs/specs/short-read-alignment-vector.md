@@ -1,4 +1,4 @@
-# Short read alignment (vector) pipeline specification
+# Mosquito short read alignment pipeline specification
 
 * Version: 1.2.1
 * Authors: Alistair Miles, Jim Stalker, George Grant
