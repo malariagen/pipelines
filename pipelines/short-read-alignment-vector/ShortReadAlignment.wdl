@@ -9,7 +9,7 @@ version 1.0
 ##
 
 workflow ShortReadAlignment {
-  String pipeline_version = "0.0.1"
+  String pipeline_version = "0.0.2"
 
   input {
     String sample_id
@@ -167,11 +167,11 @@ task ReadAlignment {
     /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tLB:~{library}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA\tDS:~{study}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   >>>
   runtime {
-    docker: runTimeSettings.bwa_docker
-    preemptible: runTimeSettings.preemptible_tries
-    memory: "3.75 GiB"
-    cpu: "1"
-    disks: "local-disk " + disk_size + " HDD"
+      singularity: runTimeSettings.bwa_singularity_image
+      memory: 1500
+      cpu: "1"
+      lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+      lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_sam = "~{output_sam_basename}.sam"
@@ -200,11 +200,11 @@ task ReadAlignmentPostProcessing {
   >>>
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    memory: "14 GiB"
-    cpu: "4"
-    disks: "local-disk " + disk_size + " HDD"
+    singularity: runTimeSettings.samtools_singularity_image
+    memory: 3000
+    cpu: "2"
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -222,7 +222,7 @@ task SetNmMdAndUqTags {
   Int disk_size = (ceil(size(input_bam, "GiB")) * 3) + 20
 
   command {
-    java -Xms3500m -jar /bin/picard.jar \
+    java -Xmx3500m -jar /bin/picard.jar \
       SetNmMdAndUqTags \
       INPUT=~{input_bam} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -230,10 +230,10 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "3.75 GiB"
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -250,16 +250,16 @@ task MergeSamFiles {
   Int disk_size = (ceil(size(input_files, "GiB")) * 3) + 20
 
   command {
-    java -Xms3500m -jar /bin/picard.jar \
+    java -Xmx3500m -jar /bin/picard.jar \
       MergeSamFiles \
       INPUT=~{sep=' INPUT=' input_files} \
       OUTPUT=~{output_filename}
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "3.75 GiB"
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -279,10 +279,10 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    docker: runTimeSettings.biobambam_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "3.75 GiB"
+    singularity: runTimeSettings.biobambam_singularity_image
+    memory: 1000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -303,7 +303,7 @@ task RealignerTargetCreator {
   Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xms3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T RealignerTargetCreator \
           -I ~{input_bam} \
@@ -312,10 +312,10 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "3.75 GiB"
+    singularity: runTimeSettings.gatk_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_interval_list_file = output_interval_list_filename
@@ -336,7 +336,7 @@ task IndelRealigner {
   Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xms7000m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx7500m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T IndelRealigner \
           -I ~{input_bam} \
@@ -346,10 +346,10 @@ task IndelRealigner {
           -o ~{output_filename}
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "7.5 GiB"
+    singularity: runTimeSettings.gatk_singularity_image
+    memory: 8000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -366,7 +366,7 @@ task FixMateInformation {
   Int disk_size = (ceil(size(input_file, "GiB")) * 3) + 20
 
   command {
-    java -Xms7000m -jar /bin/picard.jar \
+    java -Xmx7000m -jar /bin/picard.jar \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -374,10 +374,10 @@ task FixMateInformation {
       CREATE_INDEX=true
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "7.5 GiB"
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = "~{output_bam_basename}.bam"
@@ -400,7 +400,7 @@ task ValidateSamFile {
   Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
 
   command {
-    java -Xms3500m -jar /bin/picard.jar \
+    java -Xmx3500m -jar /bin/picard.jar \
       ValidateSamFile \
       INPUT=~{input_file} \
       OUTPUT=~{report_filename} \
@@ -411,10 +411,10 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    memory: "3.75 GiB"
-    disks: "local-disk " + disk_size + " HDD"
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -442,11 +442,11 @@ task SamtoolsStats {
   >>>
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    memory: "7.5 GiB"
+    singularity: runTimeSettings.samtools_singularity_image
     cpu: "1"
-    disks: "local-disk " + disk_size + " HDD"
+    memory: 1000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -465,7 +465,7 @@ task GatkCallableLoci {
   Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xms3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T CallableLoci \
           -I ~{input_bam} \
@@ -474,10 +474,10 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    disks: "local-disk " + disk_size + " HDD"
-    memory: "3.75 GiB"
+    singularity: runTimeSettings.gatk_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File summary_file = summary_filename
@@ -498,10 +498,11 @@ struct ReferenceSequence {
 }
 
 struct RunTimeSettings {
-  Int? preemptible_tries
-  String gatk_docker
-  String picard_docker
-  String bwa_docker
-  String biobambam_docker
-  String samtools_docker
+  String? lsf_group
+  String? lsf_queue
+  String bwa_singularity_image
+  String samtools_singularity_image
+  String picard_singularity_image
+  String biobambam_singularity_image
+  String gatk_singularity_image
 }
