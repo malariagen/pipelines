@@ -1,3 +1,5 @@
 sample_id	path
 AN0131-C	ftp://ngs.sanger.ac.uk/production/ag1000g/pipeline-dev/short-read-alignment-vector/fixtures/ag1000g-phase3-minimal/AN0131-C.bam
 AB0252-C	ftp://ngs.sanger.ac.uk/production/ag1000g/pipeline-dev/short-read-alignment-vector/fixtures/ag1000g-phase3-minimal/AB0252-C.bam
+AV0148-C	https://broad_share_vector_pipelines.cog.sanger.ac.uk/indelrealign/AV0148-C.bam
+AV0079-C	https://broad_share_vector_pipelines.cog.sanger.ac.uk/indelrealign/AV0079-C.bam
