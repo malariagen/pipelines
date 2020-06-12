@@ -102,7 +102,7 @@ Notes:
 
 4. Given the sites VCF file is fixed for every sample, and we wish to generalise
    to future sets of sites/alleles, the VCF file describing sites and alleles 
-   should be considered a parameter. This file is available at 
+   should be considered a parameter. This file for _A. gambiae_ (AgamP4) is available at 
    `gs://vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz`
  
 5. No further annotations or metrics need to be collected at this point.
