@@ -86,12 +86,12 @@ Notes:
    ask for when doing discovery. Reducing the number of annotations
    should reduce file size somewhat.
 
-2. I've set the '-contamination' option to zero (0.0) here rather than
-   0.05 we've used previously because I didn't realise that this
-   option down-samples only alternate alleles (I thought it
-   downsampled both alt and ref alleles), and so setting contamination
-   > 0 will create bias towards reference allele. We will deal with
-   contamination separately.
+2. The '-contamination' option is set at zero (`0.0`) here rather than
+   `0.05` used previously because of the fact that UnifiedGenotyper downsamples 
+   reads carrying _non-ref_ alleles, leading to reference bias. The ref/alt depth 
+   distribution for hets shifts from 50% to something lower. This can cause 
+   systematic calling of genotypes as hom ref that would be called as het 
+   without any downsampling.
 
 3. When genotyping given alleles, GATK ignores any variant in the
    known variants VCF that is not marked as PASS in the FILTER
@@ -99,6 +99,13 @@ Notes:
    variants VCF, regardless of what is in the FILTER column. Therefore
    the known variants VCF must be created setting FILTER to PASS for
    all variants to get this to work as desired.
+
+4. Given the sites VCF file is fixed for every sample, and we wish to generalise
+   to future sets of sites/alleles, the VCF file describing sites and alleles 
+   should be considered a parameter. This file for _A. gambiae_ (AgamP4) is available at 
+   `gs://vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz`
+ 
+5. No further annotations or metrics need to be collected at this point.
 
 
 ### Step: VCF to Zarr conversion
