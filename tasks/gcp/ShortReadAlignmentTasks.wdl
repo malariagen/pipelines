@@ -1,143 +1,12 @@
 version 1.0
 
-## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2020
-##
-## This WDL pipeline implements the Short Read Alignment Pipeline as described in
-## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## This is an initial proof of concept implementation.  It is designed to ONLY work on one sample, with ONLY its
-## list of input fastqs.  It is currently implemented to run using Cromwell with a google cloud platform backend.
-##
-
-workflow ShortReadAlignment {
-  String pipeline_version = "0.0.2"
-
-  input {
-    String sample_id
-    Array[String] read_group_ids
-    Array[String] libraries
-    Array[String] studies
-    Array[File] input_fastq1s
-    Array[File] input_fastq2s
-    String output_basename
-
-    File? known_indels_vcf
-
-    ReferenceSequence reference
-    RunTimeSettings runTimeSettings
-  }
-
-  scatter (idx in range(length(input_fastq1s))) {
-    call ReadAlignment {
-      input:
-        sample_id = sample_id,
-        read_group_id = read_group_ids[idx],
-        library = libraries[idx],
-        study = studies[idx],
-        fastq1 = input_fastq1s[idx],
-        fastq2 = input_fastq2s[idx],
-        output_sam_basename = output_basename,
-        reference = reference,
-        runTimeSettings = runTimeSettings
-    }
-
-    call ReadAlignmentPostProcessing {
-      input:
-        input_sam = ReadAlignment.output_sam,
-        output_bam_basename = output_basename,
-        runTimeSettings = runTimeSettings
-    }
-
-    call SetNmMdAndUqTags {
-      input:
-        input_bam = ReadAlignmentPostProcessing.output_bam,
-        output_bam_basename = output_basename,
-        reference = reference,
-        runTimeSettings = runTimeSettings
-    }
-  }
-
-  call MergeSamFiles {
-    input:
-      input_files = SetNmMdAndUqTags.output_bam,
-      output_filename = output_basename + ".bam",
-      runTimeSettings = runTimeSettings
-  }
-
-  call MarkDuplicates {
-    input:
-      input_bam = MergeSamFiles.output_file,
-      output_filename = output_basename + ".bam",
-      runTimeSettings = runTimeSettings
-  }
-
-  call RealignerTargetCreator {
-    input:
-      input_bam = MarkDuplicates.output_file,
-      input_bam_index = MarkDuplicates.output_index_file,
-      output_interval_list_filename = output_basename + ".intervals",
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-
-  call IndelRealigner {
-    input:
-      input_bam = MarkDuplicates.output_file,
-      input_bam_index = MarkDuplicates.output_index_file,
-      interval_list_file = RealignerTargetCreator.output_interval_list_file,
-      output_filename = output_basename + ".bam",
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-
-  call FixMateInformation {
-    input:
-      input_file = IndelRealigner.output_file,
-      output_bam_basename = output_basename,
-      runTimeSettings = runTimeSettings
-  }
-
-  call ValidateSamFile {
-    input:
-      input_file = FixMateInformation.output_file,
-      report_filename = output_basename + ".validation_report.txt",
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-
-  call SamtoolsStats {
-    input:
-      input_file = FixMateInformation.output_file,
-      report_filename = output_basename + ".samtools_stats_report.txt",
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-
-  call GatkCallableLoci {
-    input:
-      input_bam = FixMateInformation.output_file,
-      input_bam_index = FixMateInformation.output_index_file,
-      summary_filename = output_basename + ".gatk_callable_loci.summary.txt",
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-
-  output {
-    Array[File] output_sams = ReadAlignment.output_sam
-    Array[File] output_bams = ReadAlignmentPostProcessing.output_bam
-    File indel_realigner_interval_list_file = RealignerTargetCreator.output_interval_list_file
-    File output_bam = IndelRealigner.output_file
-    File validate_samfile_report_file = ValidateSamFile.report_file
-    File samtools_stats_report_file = SamtoolsStats.report_file
-    File callable_loci_summary_file = GatkCallableLoci.summary_file
-  }
-}
+import "../../structs/gcp/RunTimeSettings.wdl"
+import "../../structs/ReferenceSequence.wdl"
 
 task ReadAlignment {
   input {
     String read_group_id
-    String library
     String sample_id
-    String study
     File fastq1
     File fastq2
     String output_sam_basename
@@ -164,14 +33,14 @@ task ReadAlignment {
     # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
     # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
     # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
-    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tLB:~{library}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA\tDS:~{study}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   >>>
   runtime {
-      singularity: runTimeSettings.bwa_singularity_image
-      memory: 1500
-      cpu: "1"
-      lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-      lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.bwa_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_sam = "~{output_sam_basename}.sam"
@@ -200,11 +69,11 @@ task ReadAlignmentPostProcessing {
   >>>
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    memory: 3000
+    docker: runTimeSettings.samtools_docker
+    preemptible: runTimeSettings.preemptible_tries
     cpu: "2"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    memory: "14 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -230,10 +99,10 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -256,10 +125,11 @@ task MergeSamFiles {
       OUTPUT=~{output_filename}
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_file = output_filename
@@ -279,10 +149,11 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    singularity: runTimeSettings.biobambam_singularity_image
-    memory: 1000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.biobambam_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    disks: "local-disk " + disk_size + " HDD"
+    memory: "3.75 GiB"
   }
   output {
     File output_file = output_filename
@@ -312,10 +183,11 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.gatk_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_interval_list_file = output_interval_list_filename
@@ -346,10 +218,11 @@ task IndelRealigner {
           -o ~{output_filename}
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 8000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.gatk_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_file = output_filename
@@ -374,10 +247,11 @@ task FixMateInformation {
       CREATE_INDEX=true
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File output_file = "~{output_bam_basename}.bam"
@@ -411,10 +285,11 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File report_file = report_filename
@@ -442,11 +317,11 @@ task SamtoolsStats {
   >>>
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
+    docker: runTimeSettings.samtools_docker
+    preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
-    memory: 1000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File report_file = report_filename
@@ -474,35 +349,13 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: runTimeSettings.gatk_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File summary_file = summary_filename
   }
-}
-
-
-struct ReferenceSequence {
-  File ref_dict
-  File ref_fasta
-  File ref_fasta_index
-  File? ref_alt
-  File ref_sa
-  File ref_amb
-  File ref_bwt
-  File ref_ann
-  File ref_pac
-}
-
-struct RunTimeSettings {
-  String? lsf_group
-  String? lsf_queue
-  String bwa_singularity_image
-  String samtools_singularity_image
-  String picard_singularity_image
-  String biobambam_singularity_image
-  String gatk_singularity_image
 }
