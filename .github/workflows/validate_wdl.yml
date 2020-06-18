@@ -1,0 +1,28 @@
+# This workflow validates all pipeline WDL files (those found in the pipelines/ directory) using the 'miniwdl' tool.
+name: ValidateWdl
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  validate_wdl_job:
+    runs-on: ubuntu-latest
+    name: Validate all wdl using miniwdl
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: malariagen/pipelines
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install mini-wdl
+        run: |
+          python -m pip install --upgrade pip
+          pip3 install miniwdl
+      - name: Run miniwdl
+        run: |
+          ./scripts/validate_wdls.sh
