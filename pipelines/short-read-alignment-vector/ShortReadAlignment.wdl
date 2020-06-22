@@ -12,7 +12,7 @@ version 1.0
 # adding invalid code
 
 workflow ShortReadAlignment {
-  String pipeline_version = 0.0.2
+  String pipeline_version = "0.0.2"
 
   input {
     String sample_id
@@ -45,7 +45,7 @@ workflow ShortReadAlignment {
 
     call ReadAlignmentPostProcessing {
       input:
-        input_sam = ReadAlignment.output_sam,
+        input_sam = ReadAlignment.output_cram,
         output_bam_basename = output_basename,
         runTimeSettings = runTimeSettings
     }
