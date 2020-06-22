@@ -8,6 +8,8 @@ version 1.0
 ## list of input fastqs.  It is currently implemented to run using Cromwell with a google cloud platform backend.
 ##
 
+# Test PR to check the WDL validation github action
+
 workflow ShortReadAlignment {
   String pipeline_version = "0.0.2"
 
