@@ -9,9 +9,10 @@ version 1.0
 ##
 
 # Test PR to check the WDL validation github action
+# adding invalid code
 
 workflow ShortReadAlignment {
-  String pipeline_version = "0.0.2"
+  String pipeline_version = 0.0.2
 
   input {
     String sample_id
