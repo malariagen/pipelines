@@ -25,6 +25,15 @@ number. The version number will be incremented as follows:
 
 ## Specification documents
 
-### Short read alignment (vector)
+### Mosquito short read alignment pipeline
 
+* [Version 1.2.1[(https://github.com/malariagen/pipelines/blob/c1531ef6120021106cb0159150a297a5d8473e07/docs/specs/short-read-alignment-vector.md)
 * [Version 1.1.1](https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md)
+
+### Mosquito SNP genotyping pipeline
+
+* [Version 1.4.0](https://github.com/malariagen/pipelines/blob/c1531ef6120021106cb0159150a297a5d8473e07/docs/specs/snp-genotyping-vector.md)
+
+### Mosquito phasing pipeline
+
+* [Version 0.0.0](https://github.com/malariagen/pipelines/blob/9364efde80c6b2745290bba120b0f0a07a98def2/docs/specs/phasing-vector.md)
