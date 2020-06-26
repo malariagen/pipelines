@@ -1,6 +1,11 @@
 
 # Dockerfile images
 
+### amplicon-parasite-tools
+Contains a conda environment with all tools needed for the amplicon SNP-calling (BCL-to-VCF, "Stage1, Steps 1-3") parasite pipeline
+(except for those tools used to process manifest files, see [here](https://gitlab.com/malariagen-aspis/aspis-pipeline/-/blob/e8b35283ad70c41b4d0c9c9a3a660e31fff4431b/Docker/ManifestTools/Dockerfile)).
+Environment file copied from [here](https://gitlab.com/malariagen-aspis/aspis-pipeline/-/blob/e8b35283ad70c41b4d0c9c9a3a660e31fff4431b/Stage1-Pipeline/conda/pipe-tools.txt).
+
 ### BWA
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/lh3/bwa. Default version v0.7.17.
@@ -19,7 +24,7 @@ https://github.com/broadinstitute/picard. Default version 2.22.3. Executed using
 ### GATK
 The Broad Institute provided Dockerfile for GATK can be found on [docker hub](https://hub.docker.com).
 - For GATK 3.X use https://hub.docker.com/r/broadinstitute/gatk3
-- For GATK 4.X use https://hub.docker.com/r/broadinstitute/gatk/
+- For GATK 4.X use https://hub.docker.com/r/broadinstitute/gatk
 
 ## Mosquito short read alignment pipeline
 

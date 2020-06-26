@@ -1,0 +1,17 @@
+{
+  "AmpliconSNPCallingParasite.input_bam": "gs://broad-dsde-methods-malariagen/parasite/test-data/RCN15267.PfD37.cram",
+  "AmpliconSNPCallingParasite.input_bam_index": "gs://broad-dsde-methods-malariagen/parasite/test-data/RCN15267.PfD37.cram.crai",
+  "AmpliconSNPCallingParasite.output_basename": "RCN15267",
+  "AmpliconSNPCallingParasite.reference": {
+    "ref_fasta": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta",
+    "ref_dict": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.dict",
+    "ref_ann": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.ann",
+    "ref_sa": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.sa",
+    "ref_amb": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.amb",
+    "ref_bwt": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.bwt",
+    "ref_fasta_index": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.fai",
+    "ref_pac": "gs://broad-dsde-methods-malariagen/parasite/references/PfD37/Pfalciparum_contigs.fasta.pac"
+  },
+  "AmpliconSNPCallingParasite.mpileup_targets_vcf": "gs://broad-dsde-methods-malariagen/parasite/test-data/Pf_GRC1v1.0.PfD37.annotation.vcf",
+  "AmpliconSNPCallingParasite.docker": "us.gcr.io/broad-dsde-methods/malariagen/parasite/amplicon-parasite-tools:latest"
+}
