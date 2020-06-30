@@ -3,6 +3,7 @@
 declare -r SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 
 declare ROOT_WDL=""
+declare PLATFORM=""
 declare VERSION=""
 declare OUTPUT_DIR=""
 
@@ -31,8 +32,8 @@ function make_release() {
   sed -E 's/import "(.*)\/(.*\'${WDL_SUFFIX}')"/import "\2"/g' ${rootWdl} > ${outputVersionedPrefix}${WDL_SUFFIX}
 
   write_options ${rootWdl} ${outputVersionedPrefix}
+  echo "Hello"
   write_dependencies_zip ${rootWdl} ${outputVersionedPrefix}
-
 }
 
 function write_options() {
@@ -55,9 +56,12 @@ function write_options() {
 
 function write_dependencies_zip() {
   local -r rootWdl=${1} versioned_dependencies_zip=${2}${ZIP_SUFFIX} working_dir=$(mktemp -d)
+  echo "${rootWdl}"
   local -r -a dependencies=($(get_dependencies_for_wdl ${rootWdl} | xargs -n1 | sort -u | xargs))
+  echo "${dependencies}"
 
   for file in ${dependencies[@]}; do
+    echo "${file}"
     flattened_name=$(basename ${file})
     sed -E 's/import "(.*)\/(.*\'${WDL_SUFFIX}')"/import "\2"/g' ${file} > ${working_dir}/${flattened_name}
     zip -j ${versioned_dependencies_zip} ${working_dir}/${flattened_name}
@@ -68,15 +72,16 @@ function write_dependencies_zip() {
 function get_dependencies_for_wdl() {
   local -r wdl=${1}
 
-  local -a wdlImports=($(grep '^import ".*$' ${wdl} | cut -d ' ' -f 2 | sed 's|\.\.\/||g' | xargs -n1))
+  local -a wdlImports=($(grep '^import ".*$' ${wdl} | sed "s|<PLATFORM>|${PLATFORM}|g" | cut -d ' ' -f 2 | sed 's|\.\.\/||g' | xargs -n1))
   local -a subWorkflowImports=()
   for import in ${wdlImports[@]}; do
+    echo "$import"
     subWorkflowImports=("${subWorkflowImports[@]}" $(get_dependencies_for_wdl ${import}))
   done
   echo ${wdlImports[@]} ${subWorkflowImports[@]}
 }
 
-while getopts "w:v:o:e:" opt; do
+while getopts "w:p:v:o:" opt; do
     case ${opt} in 
       w)
         if [[ ! -f ${OPTARG} ]]; then
@@ -84,6 +89,9 @@ while getopts "w:v:o:e:" opt; do
           exit 1
         fi
         ROOT_WDL=${OPTARG}
+        ;;
+      p)
+        PLATFORM=${OPTARG}
         ;;
       v)
         VERSION=${OPTARG}
@@ -97,6 +105,21 @@ while getopts "w:v:o:e:" opt; do
         ;; 
     esac 
   done
-  shift $((OPTIND-1)) 
+  shift $((OPTIND-1))
+
+  if [[ "$ROOT_WDL" == "" ]]; then
+    >&2 echo "ROOT_WDL (w) must be specified"
+    exit 1
+  fi
+
+  if [[ "$PLATFORM" != "farm5" && "$PLATFORM" != "gcp" ]]; then
+    >&2 echo "PLATFORM (p) must be either 'farm5' or 'gcp'"
+    exit 1
+  fi
+
+  if [[ "$VERSION" == "" ]]; then
+    >&2 echo "VERSION (v) must be specified"
+    exit 1
+  fi
 
 make_release
