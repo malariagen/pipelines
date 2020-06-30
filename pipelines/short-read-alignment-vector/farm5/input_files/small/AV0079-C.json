@@ -1,30 +1,20 @@
 {
-  "ShortReadAlignment.sample_id": "AB0252-C",
-  "ShortReadAlignment.output_basename": "AB0252-C",
+  "ShortReadAlignment.sample_id": "AV0079-C",
+  "ShortReadAlignment.output_basename": "AV0079-C",
   "ShortReadAlignment.read_group_ids": [
     "HS22_09812:4",
     "HS16_10209:3",
     "HS16_10209:4"
   ],
-  "ShortReadAlignment.libraries": [
-    "A",
-    "B",
-    "C"
-  ],
-  "ShortReadAlignment.studies": [
-    "X",
-    "Y",
-    "Z"
-  ],
   "ShortReadAlignment.input_fastq1s": [
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR327108_1.fastq.gz",
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR338386_1.fastq.gz",
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR338398_1.fastq.gz"
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR779515_1.fastq.gz",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR841977_1.fastq.gz",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR841989_1.fastq.gz"
   ],
   "ShortReadAlignment.input_fastq2s": [
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR327108_2.fastq.gz",
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR338386_2.fastq.gz",
-    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR338398_2.fastq.gz"
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR779515_2.fastq.gz",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR841977_2.fastq.gz",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR841989_2.fastq.gz"
   ],
   "ShortReadAlignment.reference": {
     "ref_fasta": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
