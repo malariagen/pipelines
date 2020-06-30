@@ -3,6 +3,101 @@ version 1.0
 import "../../structs/farm5/RunTimeSettings.wdl"
 import "../../structs/ReferenceSequence.wdl"
 
+task CramToBam {
+  input {
+    File input_file
+    String output_filename
+    ReferenceSequence reference
+    RunTimeSettings runTimeSettings
+  }
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    samtools view -h -T ~{reference.ref_fasta} ~{input_file} |
+    samtools view -b -o ~{output_filename} -
+    samtools index -b ~{output_filename}
+
+  }
+
+  runtime {
+    singularity: runTimeSettings.samtools_singularity_image
+    memory: 3000
+    cpu: "2"
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+
+  output {
+    File output_file = output_filename
+    File output_file_index = "~{output_filename}.bai"
+  }
+}
+
+task RevertSam {
+  input {
+    File input_file
+    String output_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  command {
+    java -Xmx3500m -jar /bin/picard.jar \
+      RevertSam \
+      INPUT=~{input_file} \
+      OUTPUT=~{output_filename} \
+      VALIDATION_STRINGENCY=LENIENT \
+      ATTRIBUTE_TO_CLEAR=FT \
+      ATTRIBUTE_TO_CLEAR=CO \
+      ATTRIBUTE_TO_CLEAR=PA \
+      ATTRIBUTE_TO_CLEAR=OA \
+      ATTRIBUTE_TO_CLEAR=XA
+  }
+
+  runtime {
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+
+  output {
+    File output_file = output_filename
+  }
+}
+
+task SamToFastq {
+  input {
+    File input_file
+    String output_fastq1_filename
+    String output_fastq2_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  command {
+    java -Xmx3500m -jar /bin/picard.jar \
+      SamToFastq \
+      INPUT=~{input_file} \
+      FASTQ=~{output_fastq1_filename} \
+      SECOND_END_FASTQ=~{output_fastq2_filename} \
+      NON_PF=true
+  }
+
+  runtime {
+    singularity: runTimeSettings.picard_singularity_image
+    memory: 4000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+
+  output {
+    File output_fastq1 = output_fastq1_filename
+    File output_fastq2 = output_fastq2_filename
+  }
+}
+
 task ReadAlignment {
   input {
     String read_group_id
@@ -14,12 +109,6 @@ task ReadAlignment {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
-
-  Float fastq_size = size(fastq1, "GiB") + size(fastq2, "GiB")
-  Float ref_size = size(reference.ref_fasta, "GiB") + size(reference.ref_fasta_index, "GiB") + size(reference.ref_dict, "GiB")
-  Float bwa_ref_size = ref_size + size(reference.ref_amb, "GiB") + size(reference.ref_ann, "GiB") + size(reference.ref_bwt, "GiB") + size(reference.ref_pac, "GiB") + size(reference.ref_sa, "GiB")
-  Float disk_multiplier = 2.5
-  Int disk_size = ceil(fastq_size + bwa_ref_size + (disk_multiplier * fastq_size) + 20)
 
   command <<<
     set -o pipefail
@@ -54,8 +143,6 @@ task ReadAlignmentPostProcessing {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_sam, "GiB")) * 3) + 20
-
   command <<<
 
     set -e
@@ -88,8 +175,6 @@ task SetNmMdAndUqTags {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_bam, "GiB")) * 3) + 20
-
   command {
     java -Xmx3500m -jar /bin/picard.jar \
       SetNmMdAndUqTags \
@@ -116,8 +201,6 @@ task MergeSamFiles {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_files, "GiB")) * 3) + 20
-
   command {
     java -Xmx3500m -jar /bin/picard.jar \
       MergeSamFiles \
@@ -141,8 +224,6 @@ task MarkDuplicates {
     String output_filename
     RunTimeSettings runTimeSettings
   }
-
-  Int disk_size = (ceil(size(input_bam, "GiB")) * 3) + 20
 
   command {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
@@ -168,8 +249,6 @@ task RealignerTargetCreator {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
-
-  Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
@@ -202,8 +281,6 @@ task IndelRealigner {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
-
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx7500m \
           -jar /usr/GenomeAnalysisTK.jar \
@@ -232,15 +309,19 @@ task FixMateInformation {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_file, "GiB")) * 3) + 20
-
   command {
+   set -e
+   set -o pipefail
+
     java -Xmx7000m -jar /bin/picard.jar \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
       MAX_RECORDS_IN_RAM=300000 \
       CREATE_INDEX=true
+
+      # FixMateInformation creates the bam index as foo.bai, we move it to foo.bam.bai
+      mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
     singularity: runTimeSettings.picard_singularity_image
@@ -249,8 +330,8 @@ task FixMateInformation {
     lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
-    File output_file = "~{output_bam_basename}.bam"
-    File output_index_file = "~{output_bam_basename}.bai"
+    File output_bam = "~{output_bam_basename}.bam"
+    File output_bam_index = "~{output_bam_basename}.bam.bai"
   }
 }
 
@@ -264,9 +345,6 @@ task ValidateSamFile {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
-
-  Float ref_size = size(reference.ref_fasta, "GiB") + size(reference.ref_fasta_index, "GiB") + size(reference.ref_dict, "GiB")
-  Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
 
   command {
     java -Xmx3500m -jar /bin/picard.jar \
@@ -298,15 +376,69 @@ task SamtoolsStats {
     RunTimeSettings runTimeSettings
   }
 
-  Float ref_size = size(reference.ref_fasta, "GiB") + size(reference.ref_fasta_index, "GiB") + size(reference.ref_dict, "GiB")
-  Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
-
   command <<<
 
     set -e
     set -o pipefail
 
     /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
+
+  >>>
+
+  runtime {
+    singularity: runTimeSettings.samtools_singularity_image
+    cpu: "1"
+    memory: 1000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+  output {
+    File report_file = report_filename
+  }
+}
+
+task SamtoolsIdxStats {
+  input {
+    File input_bam
+    File input_bam_index
+    String report_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  command <<<
+
+    set -e
+    set -o pipefail
+
+    /bin/samtools idxstats ~{input_bam} > ~{report_filename}
+
+  >>>
+
+  runtime {
+    singularity: runTimeSettings.samtools_singularity_image
+    cpu: "1"
+    memory: 1000
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+  output {
+    File report_file = report_filename
+  }
+}
+
+task SamtoolsFlagStat {
+  input {
+    File input_bam
+    String report_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  command <<<
+
+    set -e
+    set -o pipefail
+
+    /bin/samtools flagstat ~{input_bam} > ~{report_filename}
 
   >>>
 
@@ -330,8 +462,6 @@ task GatkCallableLoci {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
-
-  Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
     java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \

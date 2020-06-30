@@ -6,6 +6,16 @@
     "HS16_10209:3",
     "HS16_10209:4"
   ],
+  "ShortReadAlignment.input_crams": [
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15155_1#3.cram",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15370_7#3.cram",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15370_8#3.cram"
+  ],
+  "ShortReadAlignment.input_bams": [
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15155_1#3.bam",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15370_7#3.bam",
+    "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/15370_8#3.bam"
+  ],
   "ShortReadAlignment.input_fastq1s": [
     "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR829643_1.fastq.gz",
     "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/ERR852742_1.fastq.gz",
