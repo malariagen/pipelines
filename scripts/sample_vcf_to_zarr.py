@@ -32,6 +32,13 @@ def zip_zarr(zarr_path, del_orig=False):
                 file_abs_path = os.path.join(curr_dir_path, file_basename)
                 zh.write(filename=file_abs_path, arcname=file_rel_path)
 
+    # reopen and test
+    with zipfile.ZipFile(file=output_zip_path, mode="r") as zh:
+        bad = zh.testzip()
+        if bad:
+            raise RuntimeError(f"zip test failed, first bad file: {bad}")
+
+    # clean up
     if del_orig:
         shutil.rmtree(zarr_path)
 
@@ -50,11 +57,11 @@ def main():
     parser.add_argument("--sample",
                         required=True,
                         help="Sample identifier.")
-    parser.add_argument("--region",
+    parser.add_argument("--contig",
                         required=True,
                         action='append',
-                        dest='regions',
-                        help="Region string in tabix format. Multiple values may be provided.")
+                        dest='contigs',
+                        help="Contig to extract. Multiple values may be provided.")
     parser.add_argument("--field",
                         required=True,
                         action='append',
@@ -86,7 +93,7 @@ def main():
                         default="tabix")
     parser.add_argument("--chunk-length",
                         help="Chunk length in number of variants.",
-                        default=2**19,
+                        default=2**18,
                         type=int)
     parser.add_argument("--chunk-width",
                         help="Chunk width in number of samples.",
@@ -112,7 +119,7 @@ def main():
     chunk_length = args.chunk_length
     chunk_width = args.chunk_width
     do_zip = args.zip
-    regions = args.regions
+    contigs = args.contigs
     fields = args.fields
     log = args.log.strip()
 
@@ -127,13 +134,13 @@ def main():
 
     try:
 
-        for region in regions:
+        for contig in contigs:
 
             allel.vcf_to_zarr(
                 input=input_vcf_path,
                 output=output_zarr_path,
-                group=f"{sample}/{region}",
-                region=region,
+                group=f"{sample}/{contig}",
+                region=contig,
                 samples=[sample],
                 compressor=zarr.Blosc(cname=compress_algo, clevel=compress_level,
                                       shuffle=compress_shuffle),
@@ -143,6 +150,8 @@ def main():
                 alt_number=alt_number,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
+                # override some default types
+                types={'variants/MQ': 'i1'},
                 log=log_file,
             )
 
