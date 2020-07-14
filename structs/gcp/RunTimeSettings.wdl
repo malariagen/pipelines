@@ -7,4 +7,6 @@ struct RunTimeSettings {
   String bwa_docker
   String biobambam_docker
   String samtools_docker
+  String vcftozarr_docker
+  String lftp_docker
 }

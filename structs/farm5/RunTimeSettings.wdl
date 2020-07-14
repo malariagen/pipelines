@@ -8,4 +8,6 @@ struct RunTimeSettings {
   String picard_singularity_image
   String biobambam_singularity_image
   String gatk_singularity_image
+  String vcftozarr_singularity_image
+  String lftp_singularity_image
 }

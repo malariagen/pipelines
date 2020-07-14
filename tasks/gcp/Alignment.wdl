@@ -16,27 +16,36 @@ workflow Alignment {
   input {
     String sample_id
     String read_group_id
-    File? input_cram
-    File? input_bam
-    File? input_fastq1
-    File? input_fastq2
+    String input_cram
+    String input_bam
+    String input_fastq1
+    String input_fastq2
     String output_file_basename
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
-  if (defined(input_cram)) {
+  # Note that the order of input_crams, input_bams, and input_fastqs are all optional.
+  # If more than one of them is provided, the order of precedence is:
+  # crams first (if found)
+  # bams next (if found)
+  # fastqs last
+  if (input_cram != "") {
+
     call Tasks.CramToBam {
       input:
-        input_file = select_first([input_cram]),
+        input_file = input_cram,
         output_filename = output_file_basename + ".bam",
         reference = reference,
         runTimeSettings = runTimeSettings
     }
   }
 
-  if (defined(input_cram) || defined(input_bam)) {
+  if ((input_cram != "") || (input_bam != "")) {
+    # input was a cram (and was converted to a bam, above
+    # OR the input is a bam
+
     call Tasks.RevertSam {
       input:
         input_file = select_first([CramToBam.output_file, input_bam]),

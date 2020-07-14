@@ -3,6 +3,75 @@ version 1.0
 import "../../structs/farm5/RunTimeSettings.wdl"
 import "../../structs/ReferenceSequence.wdl"
 
+task SplitUpInputFile {
+  input {
+    File input_file
+    String sample_id
+    RunTimeSettings runTimeSettings
+  }
+
+  String lanelet_file_prefix = "lanelet_"
+
+  command {
+    mkdir lanelet_temp
+    cd lanelet_temp
+
+    # Verify that the input_file begins with a header
+    # should look like: `sample_id	run_ena	irods_path	bam_path	cram_path	read1_path	read2_path`
+    head -1 ~{input_file} | grep '^sample_id\trun_ena'
+    exitCode=$?
+    if [ $exitCode != 0 ]; then
+      echo "Input file ~{input_file} appears malformed"
+      exit $exitCode
+    fi
+
+    # splits list of mappings into single files.  One line each.
+    grep '^~{sample_id}\t' ~{input_file} | split -l 1 - ~{lanelet_file_prefix}
+  }
+
+  runtime {
+    singularity: runTimeSettings.lftp_singularity_image
+    memory: 3000
+    cpu: "1"
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+
+  output {
+      Array[File] lanelet_files = glob("lanelet_temp/~{lanelet_file_prefix}*")
+  }
+}
+
+task Ftp {
+  input {
+    String input_string
+    String output_filename = basename(input_string)
+    RunTimeSettings runTimeSettings
+  }
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    echo get1 ~{input_string} -o ~{output_filename} > script_file
+    lftp -f script_file
+
+  }
+
+  runtime {
+    singularity: runTimeSettings.lftp_singularity_image
+    memory: 3000
+    cpu: "1"
+    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+  }
+
+  output {
+    File output_file = output_filename
+  }
+}
+
 task CramToBam {
   input {
     File input_file
@@ -110,7 +179,7 @@ task ReadAlignment {
     RunTimeSettings runTimeSettings
   }
 
-  command <<<
+  command {
     set -o pipefail
     set -e
 
@@ -122,12 +191,12 @@ task ReadAlignment {
     # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
     # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
     # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
-    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
-  >>>
+    /bwa/bwa mem -M -t 4 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+  }
   runtime {
       singularity: runTimeSettings.bwa_singularity_image
-      memory: 1500
-      cpu: "1"
+      memory: 4000
+      cpu: "4"
       lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
       lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
@@ -143,7 +212,7 @@ task ReadAlignmentPostProcessing {
     RunTimeSettings runTimeSettings
   }
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
@@ -153,7 +222,7 @@ task ReadAlignmentPostProcessing {
     /bin/samtools fixmate - - |
     /bin/samtools sort - > ~{output_bam_basename}.bam
 
-  >>>
+  }
 
   runtime {
     singularity: runTimeSettings.samtools_singularity_image
@@ -230,7 +299,7 @@ task MarkDuplicates {
   }
   runtime {
     singularity: runTimeSettings.biobambam_singularity_image
-    memory: 1000
+    memory: 2000
     lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
     lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
@@ -276,7 +345,7 @@ task IndelRealigner {
     File input_bam_index
     File? known_indels_vcf
     File interval_list_file
-    String output_filename
+    String output_bam_filename
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -289,7 +358,7 @@ task IndelRealigner {
           -R ~{reference.ref_fasta} \
           ~{"-known " + known_indels_vcf} \
           -targetIntervals ~{interval_list_file} \
-          -o ~{output_filename}
+          -o ~{output_bam_filename}
   }
   runtime {
     singularity: runTimeSettings.gatk_singularity_image
@@ -298,7 +367,7 @@ task IndelRealigner {
     lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
   output {
-    File output_file = output_filename
+    File output_bam = output_bam_filename
   }
 }
 
@@ -376,14 +445,14 @@ task SamtoolsStats {
     RunTimeSettings runTimeSettings
   }
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     singularity: runTimeSettings.samtools_singularity_image
@@ -405,19 +474,19 @@ task SamtoolsIdxStats {
     RunTimeSettings runTimeSettings
   }
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools idxstats ~{input_bam} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     singularity: runTimeSettings.samtools_singularity_image
     cpu: "1"
-    memory: 1000
+    memory: 2000
     lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
     lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
   }
@@ -433,14 +502,14 @@ task SamtoolsFlagStat {
     RunTimeSettings runTimeSettings
   }
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools flagstat ~{input_bam} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     singularity: runTimeSettings.samtools_singularity_image
