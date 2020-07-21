@@ -3,6 +3,107 @@ version 1.0
 import "../../structs/gcp/RunTimeSettings.wdl"
 import "../../structs/ReferenceSequence.wdl"
 
+task CramToBam {
+  input {
+    File input_file
+    String output_filename
+    ReferenceSequence reference
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(6 * size(input_file, "GiB"))
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    samtools view -h -T ~{reference.ref_fasta} ~{input_file} |
+    samtools view -b -o ~{output_filename} -
+    samtools index -b ~{output_filename}
+
+  }
+
+  runtime {
+    docker: runTimeSettings.samtools_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "2"
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+    File output_file = output_filename
+    File output_file_index = "~{output_filename}.bai"
+  }
+}
+
+task RevertSam {
+  input {
+    File input_file
+    String output_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(4 * size(input_file, "GiB")) + 20
+
+  command {
+    java -Xmx3500m -jar /bin/picard.jar \
+      RevertSam \
+      INPUT=~{input_file} \
+      OUTPUT=~{output_filename} \
+      VALIDATION_STRINGENCY=LENIENT \
+      ATTRIBUTE_TO_CLEAR=FT \
+      ATTRIBUTE_TO_CLEAR=CO \
+      ATTRIBUTE_TO_CLEAR=PA \
+      ATTRIBUTE_TO_CLEAR=OA \
+      ATTRIBUTE_TO_CLEAR=XA
+  }
+
+  runtime {
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+    File output_file = output_filename
+  }
+}
+
+task SamToFastq {
+  input {
+    File input_file
+    String output_fastq1_filename
+    String output_fastq2_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(4 * size(input_file, "GiB")) + 20
+
+  command {
+    java -Xmx3500m -jar /bin/picard.jar \
+      SamToFastq \
+      INPUT=~{input_file} \
+      FASTQ=~{output_fastq1_filename} \
+      SECOND_END_FASTQ=~{output_fastq2_filename} \
+      NON_PF=true
+  }
+
+  runtime {
+    docker: runTimeSettings.picard_docker
+    preemptible: runTimeSettings.preemptible_tries
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+    File output_fastq1 = output_fastq1_filename
+    File output_fastq2 = output_fastq2_filename
+  }
+}
+
 task ReadAlignment {
   input {
     String read_group_id
@@ -239,12 +340,18 @@ task FixMateInformation {
   Int disk_size = (ceil(size(input_file, "GiB")) * 3) + 20
 
   command {
+   set -e
+   set -o pipefail
+
     java -Xmx7000m -jar /bin/picard.jar \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
       MAX_RECORDS_IN_RAM=300000 \
       CREATE_INDEX=true
+
+      # FixMateInformation creates the bam index as foo.bai, we move it to foo.bam.bai
+      mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
     docker: runTimeSettings.picard_docker
@@ -254,8 +361,8 @@ task FixMateInformation {
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
-    File output_file = "~{output_bam_basename}.bam"
-    File output_index_file = "~{output_bam_basename}.bai"
+    File output_bam = "~{output_bam_basename}.bam"
+    File output_bam_index = "~{output_bam_basename}.bam.bai"
   }
 }
 
@@ -313,6 +420,67 @@ task SamtoolsStats {
     set -o pipefail
 
     /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
+
+  >>>
+
+  runtime {
+    docker: runTimeSettings.samtools_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+  output {
+    File report_file = report_filename
+  }
+}
+
+task SamtoolsIdxStats {
+  input {
+    File input_bam
+    File input_bam_index
+    String report_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(size(input_bam, "GiB")) + 20
+
+  command <<<
+
+    set -e
+    set -o pipefail
+
+    /bin/samtools idxstats ~{input_bam} > ~{report_filename}
+
+  >>>
+
+  runtime {
+    docker: runTimeSettings.samtools_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+  output {
+    File report_file = report_filename
+  }
+}
+
+task SamtoolsFlagStat {
+  input {
+    File input_bam
+    String report_filename
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(size(input_bam, "GiB")) + 20
+
+  command <<<
+
+    set -e
+    set -o pipefail
+
+    /bin/samtools flagstat ~{input_bam} > ~{report_filename}
 
   >>>
 

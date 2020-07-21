@@ -6,6 +6,16 @@
     "HS16_10209:3",
     "HS16_10209:4"
   ],
+  "ShortReadAlignment.input_crams": [
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15155_1#3.cram",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_7#3.cram",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_8#3.cram"
+  ],
+  "ShortReadAlignment.input_bams": [
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15155_1#3.bam",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_7#3.bam",
+    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_8#3.bam"
+  ],
   "ShortReadAlignment.input_fastq1s": [
     "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR829643_1.fastq.gz",
     "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR852742_1.fastq.gz",
