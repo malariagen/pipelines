@@ -1,6 +1,6 @@
 # Mosquito SNP genotyping pipeline specification
 
-* Version: 1.4.0
+* Version: 1.4.1
 * Authors: Alistair Miles, Jim Stalker
 
 This document specifies a pipeline for genotyping an individual sample
@@ -32,7 +32,7 @@ protocol](short-read-alignment-vector.md).
 ## Software
 
 * GATK version 3.7-0
-* scikit-allel version 1.2.1
+* scikit-allel version 1.3.1
 * Zarr version 2.4.0
 
 
@@ -63,7 +63,7 @@ java -jar GenomeAnalysisTK.jar \
     -stand_call_conf 0.0 \
     -contamination 0.0 \
     -A DepthPerAlleleBySample \
-    -XA RMSMappingQuality \
+    -A RMSMappingQuality \
     -XA Coverage \
     -XA ExcessHet \
     -XA InbreedingCoeff \
@@ -110,77 +110,39 @@ Notes:
 
 ### Step: VCF to Zarr conversion
 
-Convert the VCF to Zarr format via the scikit-allel
-[vcf_to_zarr()](https://scikit-allel.readthedocs.io/en/stable/io.html#allel.vcf_to_zarr)
-function. Note the following implementation details:
+Convert the VCF to Zarr format via the sample_vcf_to_zarr.py script,
+with the following arguments:
 
-* Only the ``variants/MQ``, ``calldata/GT``, ``calldata/GQ`` and
-  ``calldata/AD`` fields are required in the output.
+* ``--sample {sample_identifier}``
+* ``--field variants/MQ``
+* ``--field calldata/GT``
+* ``--field calldata/GQ``
+* ``--field calldata/AD``
 
-* Data types should be as follows: ``variants/MQ``: i1 (single byte
-  signed integer), ``calldata/GT``: i1; ``calldata/GQ``: i1;
-  ``calldata/AD``: i2
+Additionally, for *Anopheles gambiae*, the ``--contig`` argument
+should be provided once for each contig in the reference genome.
 
-* Compressor should be ``zarr.Blosc(cname='zstd', clevel=5,
-  shuffle=-1)``
-
-* Chunk length should be ``2**18``
-
-* ``alt_number`` parameter should be 3 (fix number of alt alleles)
-
-* Data should be grouped by contig (chromosome). This means calling
-  ``vcf_to_zarr()`` once for each contig in the reference genome,
-  specifying the name of the contig as the value of the ``region`` and
-  ``group`` parameters.
-
-Here is an example of the appropriate function call in Python for a
-single contig (this should be called for all contigs in the genome):
-
-```python
-import sys
-import allel
-import zarr
-
-
-def build_sample_zarr(input_path, output_path, contig):
-    allel.vcf_to_zarr(
-        input=input_path,
-        output=output_path,
-        group=contig,
-        region=contig,
-        compressor=zarr.Blosc(cname='zstd', clevel=5, shuffle=0),
-        overwrite=True,
-        fields=['calldata/GT', 'calldata/GQ', 'calldata/AD', 'variants/MQ'],
-        types={'calldata/GT': 'i1',
-               'calldata/GQ': 'i1',
-               'calldata/AD': 'i2',
-	       'variants/MQ': 'i1'},
-        alt_number=3,
-        chunk_length=2**18,
-        log=sys.stdout,
-    )
-
-```
-
-
-### Step: Zip Zarr
-
-Once the zarr conversion is complete, create a zip archive from the
-contents of the root folder of the zarr directory. E.g., if
-``{sample}`` is the sample ID and ``{sample}.zarr`` is the name of the
-output directory used in calls to ``vcf_to_zarr()``, then do:
+E.g.:
 
 ```bash
-cd {sample}.zarr
-zip -rmT0 {sample}.zarr.zip .
+python sample_vcf_to_zarr.py \
+    --input {path_to_vcf} \
+    --output {path_to_zarr} \
+    --sample {sample_identifier} \
+    --field variants/MQ \
+    --field calldata/GT \
+    --field calldata/GQ \
+    --field calldata/AD \
+    --contig 2R \
+    --contig 2L \
+    --contig 3R \
+    --contig 3L \
+    --contig X \
+    --contig Y_unplaced \
+    --contig UNKN \
+    --log {path_to_log} \
+    --zip
 ```
-
-The options applied here are:
-
-* `-r` recurse paths
-* `-m` move, i.e. delete existing dir and contents
-* `-T` test, i.e. only delete on a successful zip
-* `-0` no compression (files are already compressed)
 
 
 ## Implementation notes
@@ -214,6 +176,9 @@ which we don't genotype).
 
 
 ## Change log
+
+* Version 1.4.1 - Modified the Zarr conversion step to use a
+  script. Fixed missing MQ annotation in output VCF.
 
 * Version 1.4.0 - Updated Zarr and scikit-allel versions. Corrected
   the fields parameters in the VCF to Zarr conversion (added
