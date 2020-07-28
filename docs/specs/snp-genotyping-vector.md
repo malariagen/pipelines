@@ -63,7 +63,7 @@ java -jar GenomeAnalysisTK.jar \
     -stand_call_conf 0.0 \
     -contamination 0.0 \
     -A DepthPerAlleleBySample \
-    -XA RMSMappingQuality \
+    -A RMSMappingQuality \
     -XA Coverage \
     -XA ExcessHet \
     -XA InbreedingCoeff \
@@ -177,7 +177,8 @@ which we don't genotype).
 
 ## Change log
 
-* Version 1.4.1 - Modified the Zarr conversion step to use a script.
+* Version 1.4.1 - Modified the Zarr conversion step to use a
+  script. Fixed missing MQ annotation in output VCF.
 
 * Version 1.4.0 - Updated Zarr and scikit-allel versions. Corrected
   the fields parameters in the VCF to Zarr conversion (added
