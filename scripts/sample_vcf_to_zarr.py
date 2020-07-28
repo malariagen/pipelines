@@ -105,7 +105,8 @@ def main():
     parser.add_argument("--zip", action="store_true",
                         help="If flag exists, entire zarr folder is zipped with no "
                              "compression, and the original zarr folder is deleted. "
-                             "The zip file name is output_zarr_path appended with '.zip'.")
+                             "The zip file name is the value given for the --output "
+                             "argument, appended with '.zip'.")
 
     args = parser.parse_args()
     input_vcf_path = args.input
