@@ -5,7 +5,7 @@ alignment and SNP genotyping pipelines.
 Some notes on the selection of samples:
 
 * AN0131-C - Cameroon An. gambiae
-* AB0252-C - Burkina Fase An. gambiae
+* AB0252-C - Burkina Faso An. gambiae
 * AN0326-C - Cameroon An. gambiae, only 1 lanelet
 * AN0280-Cx - Cameroon An .gambiae, 4 lanelets
 * AA0052-C - Ghana An. coluzzii
