@@ -1,31 +1,7 @@
 {
   "ShortReadAlignment.sample_id": "AV0148-C",
   "ShortReadAlignment.output_basename": "AV0148-C",
-  "ShortReadAlignment.read_group_ids": [
-    "HS22_09812:4",
-    "HS16_10209:3",
-    "HS16_10209:4"
-  ],
-  "ShortReadAlignment.input_crams": [
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15155_1#3.cram",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_7#3.cram",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_8#3.cram"
-  ],
-  "ShortReadAlignment.input_bams": [
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15155_1#3.bam",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_7#3.bam",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/15370_8#3.bam"
-  ],
-  "ShortReadAlignment.input_fastq1s": [
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR829643_1.fastq.gz",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR852742_1.fastq.gz",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR852754_1.fastq.gz"
-  ],
-  "ShortReadAlignment.input_fastq2s": [
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR829643_2.fastq.gz",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR852742_2.fastq.gz",
-    "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/ERR852754_2.fastq.gz"
-  ],
+  "ShortReadAlignment.input_file": "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/lanelets_gs.tsv",
   "ShortReadAlignment.reference": {
     "ref_fasta": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
@@ -42,6 +18,8 @@
     "picard_docker": "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2",
     "bwa_docker": "us.gcr.io/broad-gotc-prod/malariagen/bwa:0.7.15",
     "biobambam_docker": "us.gcr.io/broad-gotc-prod/malariagen/biobambam2:2.0.73",
-    "samtools_docker": "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
+    "samtools_docker": "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1",
+    "vcftozarr_docker": "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1",
+    "lftp_docker": "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0"
   }
 }

@@ -3,6 +3,74 @@ version 1.0
 import "../../structs/gcp/RunTimeSettings.wdl"
 import "../../structs/ReferenceSequence.wdl"
 
+task SplitUpInputFile {
+  input {
+    File input_file
+    String sample_id
+    RunTimeSettings runTimeSettings
+  }
+
+  String lanelet_file_prefix = "lanelet_"
+
+  command {
+    mkdir lanelet_temp
+    cd lanelet_temp
+
+    # Verify that the input_file begins with a header
+    # should look like: `sample_id	run_ena	irods_path	bam_path	cram_path	read1_path	read2_path`
+    head -1 ~{input_file} | grep '^sample_id\trun_ena'
+    exitCode=$?
+    if [ $exitCode != 0 ]; then
+      echo "Input file ~{input_file} appears malformed"
+      exit $exitCode
+    fi
+
+    # splits list of mappings into single files.  One line each.
+    grep '^~{sample_id}\t' ~{input_file} | split -l 1 - ~{lanelet_file_prefix}
+  }
+
+  runtime {
+    docker: runTimeSettings.lftp_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+  }
+
+  output {
+      Array[File] lanelet_files = glob("lanelet_temp/~{lanelet_file_prefix}*")
+  }
+}
+
+task Ftp {
+  input {
+    String input_string
+    String output_filename = basename(input_string)
+    RunTimeSettings runTimeSettings
+  }
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    echo get1 ~{input_string} -o ~{output_filename} > script_file
+    lftp -f script_file
+
+  }
+
+  runtime {
+    docker: runTimeSettings.lftp_docker
+    preemptible: runTimeSettings.preemptible_tries
+    cpu: "1"
+    memory: "3.75 GiB"
+    disks: "local-disk 100 HDD"
+  }
+
+  output {
+    File output_file = output_filename
+  }
+}
+
 task CramToBam {
   input {
     File input_file
@@ -122,7 +190,7 @@ task ReadAlignment {
   Float disk_multiplier = 2.5
   Int disk_size = ceil(fastq_size + bwa_ref_size + (disk_multiplier * fastq_size) + 20)
 
-  command <<<
+  command {
     set -o pipefail
     set -e
 
@@ -134,13 +202,13 @@ task ReadAlignment {
     # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
     # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
     # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
-    /bwa/bwa mem -M -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
-  >>>
+    /bwa/bwa mem -M -t 16 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+  }
   runtime {
     docker: runTimeSettings.bwa_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    cpu: "16"
+    memory: "15 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -157,7 +225,7 @@ task ReadAlignmentPostProcessing {
 
   Int disk_size = (ceil(size(input_sam, "GiB")) * 3) + 20
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
@@ -167,7 +235,7 @@ task ReadAlignmentPostProcessing {
     /bin/samtools fixmate - - |
     /bin/samtools sort - > ~{output_bam_basename}.bam
 
-  >>>
+  }
 
   runtime {
     docker: runTimeSettings.samtools_docker
@@ -301,7 +369,7 @@ task IndelRealigner {
     File input_bam_index
     File? known_indels_vcf
     File interval_list_file
-    String output_filename
+    String output_bam_filename
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -316,7 +384,7 @@ task IndelRealigner {
           -R ~{reference.ref_fasta} \
           ~{"-known " + known_indels_vcf} \
           -targetIntervals ~{interval_list_file} \
-          -o ~{output_filename}
+          -o ~{output_bam_filename}
   }
   runtime {
     docker: runTimeSettings.gatk_docker
@@ -326,7 +394,7 @@ task IndelRealigner {
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
-    File output_file = output_filename
+    File output_bam = output_bam_filename
   }
 }
 
@@ -337,7 +405,7 @@ task FixMateInformation {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_file, "GiB")) * 3) + 20
+  Int disk_size = (ceil(size(input_file, "GiB")) * 8) + 20
 
   command {
    set -e
@@ -414,14 +482,14 @@ task SamtoolsStats {
   Float ref_size = size(reference.ref_fasta, "GiB") + size(reference.ref_fasta_index, "GiB") + size(reference.ref_dict, "GiB")
   Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     docker: runTimeSettings.samtools_docker
@@ -445,20 +513,20 @@ task SamtoolsIdxStats {
 
   Int disk_size = ceil(size(input_bam, "GiB")) + 20
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools idxstats ~{input_bam} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     docker: runTimeSettings.samtools_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
-    memory: "7.5 GiB"
+    memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -475,20 +543,20 @@ task SamtoolsFlagStat {
 
   Int disk_size = ceil(size(input_bam, "GiB")) + 20
 
-  command <<<
+  command {
 
     set -e
     set -o pipefail
 
     /bin/samtools flagstat ~{input_bam} > ~{report_filename}
 
-  >>>
+  }
 
   runtime {
     docker: runTimeSettings.samtools_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
-    memory: "7.5 GiB"
+    memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {

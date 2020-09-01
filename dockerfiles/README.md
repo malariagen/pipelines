@@ -26,6 +26,12 @@ The Broad Institute provided Dockerfile for GATK can be found on [docker hub](ht
 - For GATK 3.X use https://hub.docker.com/r/broadinstitute/gatk3
 - For GATK 4.X use https://hub.docker.com/r/broadinstitute/gatk
 
+### Lftp
+Contains the lftp too, a simple ftp client, used for downloading files from ena
+
+### SampleVcfToZarr
+Contains the sample_vcf_to_zarr python script
+
 ## Mosquito short read alignment pipeline
 
 - bwa 0.7.15 - `docker build . --tag=bwa:0.7.15 --build-arg version=v0.7.15`
@@ -33,3 +39,6 @@ The Broad Institute provided Dockerfile for GATK can be found on [docker hub](ht
 - picard 2.9.2 - ` docker build . --tag=picard:2.9.2 --build-arg version=2.9.2`
 - biobambam 2.0.73 - `docker build . --tag=biobambam:2.0.73`
 - GATK 3.7-0 - `docker pull broadinstitute/gatk3:3.7-0`
+- lftp - `docker build . --tag=lftp:1.0`
+- samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
+
