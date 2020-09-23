@@ -14,14 +14,12 @@ import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as Tasks
 
-workflow ReadBackedPhasing {
+workflow StatisticalPhasing {
   String pipeline_version = "0.0.0"
 
   input {
-    File sample_manifest
-    Array[File] sample_bams
-    Array[File] sample_vcfs
-    File alleles_vcf
+    String project_id
+    Array[File] sample_phased_vcfs
     File genetic_map
 
     File? haplotype_reference_panel
@@ -29,58 +27,40 @@ workflow ReadBackedPhasing {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
+
   # Step: Merge VCFs
-  call Tasks.MergeVcfs {
+  call Tasks.MergeVcfs as MergeVcfs {
     input:
-      sample_manifest = sample_manifest,
-      sample_bams = sample_bams,
-      sample_vcfs = sample_vcfs,
-      alleles_vcf = alleles_vcf,
-      genetic_map = genetic_map,
-      haplotype_reference_panel = haplotype_reference_panel,
+      sample_phased_vcfs = sample_phased_vcfs,
+      project_id = project_id,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
+
   # Step: ShapeIt4
-  call Tasks.ShapeIt4 {
+  call Tasks.ShapeIt4 as ShapeIt4 {
     input:
-      sample_manifest = sample_manifest,
-      sample_bams = sample_bams,
-      sample_vcfs = sample_vcfs,
-      alleles_vcf = alleles_vcf,
+      merged_vcf = MergeVcfs.merged_vcf,
+      project_id = project_id,
       genetic_map = genetic_map,
-      haplotype_reference_panel = haplotype_reference_panel,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Possible Step: Ligate regions (?)
   call Tasks.LigateRegions {
     input:
-      sample_manifest = sample_manifest,
-      sample_bams = sample_bams,
-      sample_vcfs = sample_vcfs,
-      alleles_vcf = alleles_vcf,
-      genetic_map = genetic_map,
-      haplotype_reference_panel = haplotype_reference_panel,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Step: VCF to Zarr
     call Tasks.VcfToZarr {
       input:
-        sample_manifest = sample_manifest,
-        sample_bams = sample_bams,
-        sample_vcfs = sample_vcfs,
-        alleles_vcf = alleles_vcf,
-        genetic_map = genetic_map,
-        haplotype_reference_panel = haplotype_reference_panel,
-        reference = reference,
-        runTimeSettings = runTimeSettings
+        phased_vcf = ShapeIt4.phased_vcf
     }
 
   output {
   # TODO: determine outputs needed (stats etc.)
-    File output_vcf = ShapeIt4.output_vcf
+    File output_vcf = ShapeIt4.phased_vcf
     File zarr_output = VcfToZarr.zarr_output
   }
 }
