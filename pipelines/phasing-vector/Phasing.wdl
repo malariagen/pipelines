@@ -19,6 +19,7 @@ workflow Phasing {
   String pipeline_version = "0.0.0"
 
   input {
+    String project_id
     File sample_manifest
     Array[File] sample_bams
     Array[File] sample_vcfs
@@ -50,20 +51,17 @@ workflow Phasing {
     }
   }
 
-  Array[File] phased_vcfs = ReadBackedPhasing.phased_vcf
+  Array[File] sample_phased_vcfs = ReadBackedPhasing.phased_vcf
 
   # Step 2: Statistical phasing
-  # TODO: determine inputs needed
   call StatisticalPhasing.StatisticalPhasing {
     input:
-      sample_manifest = sample_manifest,
-      sample_bams = sample_bams,
-      sample_vcfs = sample_vcfs,
-      alleles_vcf = alleles_vcf,
-      genetic_map = genetic_map,
-      haplotype_reference_panel = haplotype_reference_panel,
-      reference = reference,
-      runTimeSettings = runTimeSettings
+    project_id = project_id,
+    sample_phased_vcfs = sample_phased_vcfs,
+    genetic_map = genetic_map,
+    haplotype_reference_panel = haplotype_reference_panel,
+    reference = reference,
+    runTimeSettings = runTimeSettings
   }
 
   output {
