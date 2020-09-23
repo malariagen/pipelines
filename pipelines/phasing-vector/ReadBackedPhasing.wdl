@@ -22,10 +22,7 @@ workflow ReadBackedPhasing {
     File sample_bam
     File sample_vcf
     File alleles_vcf
-    File genetic_map # probably not needed for this sub-pipeline
     String output_basename
-
-    File? haplotype_reference_panel
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
