@@ -12,9 +12,8 @@ task SelectVariants {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
-#TODO: how to combine files into a single alleles vcf or pass multiple interval files
-#TODO: can this be run on zipped files, or do we needd to unzip?
-#TODO: do we need to index here or will the file be available?
+#TODO: is it better to pass individual files or combine into one alleles vcf?
+#TODO: do we need to index here or will the file be available? (needs an index file for the sample vcf, but not the intervals vcf)
   command {
     # generate index file if needed
     gatk IndexFeatureFile \
@@ -27,6 +26,7 @@ task SelectVariants {
       --select-type-to-include SNP \
       -O ~{output_basename}.vcf \
       --remove-unused-alternates true \
+      --intervals ~{alleles_vcf} \
       --intervals ~{alleles_vcf}
   }
 
@@ -42,8 +42,7 @@ task SelectVariants {
   }
 }
 
-# TODO:  try running this
-# TODO: build docker
+# TODO: try running this
 # TODO: add  --max-coverage=@@TODO
 task WhatsHapPhase {
   input {
@@ -62,7 +61,7 @@ task WhatsHapPhase {
   }
 
   runtime {
-    docker: runTimeSettings.whatshap_docker
+    docker: runTimeSettings.whatshap_docker # us.gcr.io/broad-gotc-prod/malariagen/whatshap:0.0
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
@@ -91,7 +90,7 @@ task WhatsHapStats {
   }
 
   runtime {
-    docker: runTimeSettings.whatshap_docker
+    docker: runTimeSettings.whatshap_docker # us.gcr.io/broad-gotc-prod/malariagen/whatshap:0.0
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
