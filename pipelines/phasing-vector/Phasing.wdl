@@ -44,8 +44,6 @@ workflow Phasing {
         sample_bam = sample_bams[idx],
         sample_vcf = sample_vcfs[idx],
         alleles_vcf = alleles_vcf,
-        genetic_map = genetic_map, # probably not needed for this sub-pipeline
-        haplotype_reference_panel = haplotype_reference_panel, # probably not needed for this sub-pipeline
         reference = reference,
         runTimeSettings = runTimeSettings
     }
