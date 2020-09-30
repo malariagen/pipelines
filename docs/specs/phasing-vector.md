@@ -48,7 +48,7 @@ accuracy.
 
 ## Software
 
-* [WhatsHap](https://whatshap.readthedocs.io/en/latest/) version 0.18
+* [WhatsHap](https://whatshap.readthedocs.io/en/latest/) version 1.0
 
 * [SHAPEIT4](https://odelaneau.github.io/shapeit4/) version 4.1.3
 

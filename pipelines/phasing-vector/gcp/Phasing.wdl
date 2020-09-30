@@ -21,9 +21,10 @@ workflow Phasing {
   input {
     String project_id
     File sample_manifest
-    Array[File] sample_bams
-    Array[File] sample_vcfs
-    File alleles_vcf
+    Array[File] input_bams
+    Array[File] input_bam_indicies
+    Array[File] input_vcfs
+    Array[File] phased_sites_vcfs
     File genetic_map # recombination rates
 
     File? haplotype_reference_panel
@@ -35,15 +36,24 @@ workflow Phasing {
   # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
   Array[String] sample_ids = []
 
+  # scatter over the phased_sites_vcfs (per chromosome)
+    # scatter over samples
+      # subset
+      # run whatshap
+    # merge (single chromosome for all samples
+    # run shapeit
+
+
   # Step 1: Read-backed phasing
   # TODO: scatter over samples
-  scatter(idx in range(length(sample_bams))) {
+  scatter(idx in range(length(input_bams))) {
     call ReadBackedPhasing.ReadBackedPhasing as ReadBackedPhasing {
       input:
         sample_id = sample_ids[idx],
-        sample_bam = sample_bams[idx],
-        sample_vcf = sample_vcfs[idx],
-        alleles_vcf = alleles_vcf,
+        input_bam = input_bams[idx],
+        input_bam_index = input_bam_indicies[idx],
+        input_vcf = input_vcfs[idx],
+        phased_sites_vcfs = phased_sites_vcfs,
         reference = reference,
         runTimeSettings = runTimeSettings
     }

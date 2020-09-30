@@ -19,10 +19,12 @@ workflow ReadBackedPhasing {
 
   input {
     File sample_id
-    File sample_bam
-    File sample_vcf
-    File alleles_vcf
     String output_basename
+    File input_bam
+    File input_bam_index
+    File input_vcf
+    Array[File] phased_sites_vcfs
+    Array[File] phased_sites_indicies
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -30,8 +32,9 @@ workflow ReadBackedPhasing {
   # Step 1: Genotype data preparation
   call Tasks.SelectVariants {
     input:
-      sample_vcf = sample_vcf,
-      alleles_vcf = alleles_vcf,
+      input_vcf = input_vcf,
+      phased_sites_vcfs = phased_sites_vcfs,
+      phased_sites_indicies = phased_sites_indicies,
       output_basename = output_basename,
       reference = reference,
       runTimeSettings = runTimeSettings
@@ -39,8 +42,9 @@ workflow ReadBackedPhasing {
   # Step 2: WhatsHap phase
   call Tasks.WhatsHapPhase {
     input:
-      sample_bam = sample_bam,
-      sample_subset_vcf = SelectVariants.sample_subset_vcf,
+      input_bam = input_bam,
+      input_bam_index = input_bam_index,
+      subset_vcf = SelectVariants.subset_vcf,
       output_basename = output_basename,
       reference = reference,
       runTimeSettings = runTimeSettings
@@ -48,14 +52,16 @@ workflow ReadBackedPhasing {
   # Step 3: WhatsHap stats
   call Tasks.WhatsHapStats {
     input:
-      sample_phased_vcf = WhatsHapPhase.sample_phased_vcf,
+      phased_vcf = WhatsHapPhase.phased_vcf,
       output_basename = output_basename,
       runTimeSettings = runTimeSettings
   }
 
   output {
-  # TODO: determine outputs needed (stats etc.)
+   # TODO: determine outputs needed (stats etc.)
     File output_vcf = WhatsHapPhase.output_vcf
+    File whats_hap_stats = "~{output_basename}.whatshap_stats"
+    File subset_vcf = SelectVariants.subset_vcf
   }
 }
 
