@@ -21,3 +21,4 @@ To execute this wdl (using cromshell):
 
 `cromshell submit -w releases/ShortReadAlignment/ShortReadAlignment_0.1.0.wdl pipelines/short-read-alignment-vector/farm5/input_files/small/AV0079-C.json releases/ShortReadAlignment/ShortReadAlignment_0.1.0.options.json releases/ShortReadAlignment/ShortReadAlignment_0.1.0.zip`
 
+NB:  As of cromshell > v0.3.9, cromshell will invoke womtool to validate the WDL, but it will not pass the dependencies zip.  As a result, cromshell will fail to launch the workflow due to WDL validation failure.  See https://github.com/broadinstitute/cromshell/issues/139.  In order to workaround this, ensure that womtool is not on your PATH or use cromshell v0.3.9.  
