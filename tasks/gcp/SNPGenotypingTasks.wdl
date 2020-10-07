@@ -60,6 +60,7 @@ task UnifiedGenotyper {
   }
   output {
     File output_vcf = output_vcf_filename
+    File output_vcf_index = "~{output_vcf_filename}.idx"
   }
 }
 
