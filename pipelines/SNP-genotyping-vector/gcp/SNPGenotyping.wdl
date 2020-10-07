@@ -49,6 +49,7 @@ workflow SNPGenotyping {
 
   output {
     File output_vcf = UnifiedGenotyper.output_vcf
+    File output_vcf_index = UnifiedGenotyper.output_vcf_index
     File zarr_output = VcfToZarr.zarr_output
   }
 }
