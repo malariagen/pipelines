@@ -4,10 +4,7 @@ import zarr
 import allel
 
 
-def encode_genotype(g, allow_half_missing):
-    if not allow_half_missing:
-        if np.any(g < 0):
-            g = [-1] * len(g)
+def encode_genotype(g):
     return '/'.join([encode_allele(a) for a in g])
 
 
@@ -80,6 +77,11 @@ def main():
                                                   dest_alleles)
             dest_gt = source_gt_subset.map_alleles(mapping)
 
+            # deal with half-missing
+            if not args.allow_half_missing:
+                loc_missing = np.any(dest_gt < 0, axis=2)
+                dest_gt[loc_missing] = -1
+
             # write out
             for p, r, a, g in zip(dest_pos, dest_ref, dest_alt, dest_gt[:, 0]):
                 row = [contig,  # CHROM
@@ -91,7 +93,7 @@ def main():
                        "PASS",  # FILTER
                        ".",  # INFO
                        "GT",  # FORMAT
-                       encode_genotype(g, args.allow_half_missing)]
+                       encode_genotype(g)]
                 print("\t".join(row), file=out)
 
 
