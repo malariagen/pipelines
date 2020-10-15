@@ -1,0 +1,9 @@
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	AV0148-C
+2R	1	.	A	G	.	.	.	GT	./.
+2R	2	.	C	A	0.16	.	.	GT	0/0
+2R	3	.	C	A	0.16	.	.	GT	0/1
+2R	4	.	G	A	0.16	.	.	GT	1/1
+2R	7	.	G	T	0.16	.	.	GT	0/1
+2R	8	.	T	G	0.16	.	.	GT	1/1
+2R	9	.	C	A	0.16	.	.	GT	./.
+2R	10	.	A	T	0.16	.	.	GT	./.
