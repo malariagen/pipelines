@@ -1,3 +1,5 @@
+from datetime import datetime
+from os.path import abspath
 import argparse
 import numpy as np
 import zarr
@@ -19,22 +21,19 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Subset genotypes to biallelic sites for phasing.")
-    parser.add_argument("--input",
+    parser.add_argument("--sample-genotypes",
                         required=True,
                         help="Path to input zipped zarr file with sample genotypes.")
-    parser.add_argument("--sites",
+    parser.add_argument("--sites-called",
                         required=True,
                         help="Path to input zipped zarr file with sites at which genotypes were "
                              "called.")
-    parser.add_argument("--subset-sites",
+    parser.add_argument("--sites-selected",
                         required=True,
                         help="Path to input zipped zarr file with sites to subset to.")
     parser.add_argument("--output",
                         required=True,
                         help="Path to output VCF file.")
-    parser.add_argument("--sample",
-                        required=True,
-                        help="Sample identifier.")
     parser.add_argument("--allow-half-missing", action="store_true")
     parser.add_argument("--contig",
                         required=True,
@@ -43,39 +42,64 @@ def main():
                         help="Contig to extract. Multiple values may be provided.")
 
     args = parser.parse_args()
-    with open(args.output, mode="wt", newline="\n") as out:
+    sites_called_path = abspath(args.sites_called)
+    sites_selected_path = abspath(args.sites_selected)
+    sample_genotypes_path = abspath(args.sample_genotypes)
+    output_path = abspath(args.output)
+    now = datetime.now().isoformat()
 
-        print("#@TODO VCF headers", file=out)
-        sites = zarr.open(args.sites, mode='r')
-        subset_sites = zarr.open(args.subset_sites, mode='r')
-        genotypes = zarr.open(args.input, mode='r')
+    # open inputs
+    sites_called = zarr.open(sites_called_path, mode='r')
+    sites_selected = zarr.open(sites_selected_path, mode='r')
+    sample_genotypes = zarr.open(sample_genotypes_path, mode='r')
+
+    # discover sample identifier, assume it's the top group in the sample_genotypes zarr hierarchy
+    sample_id = list(sample_genotypes)[0]
+
+    with open(output_path, mode="w", newline="\n") as out:
+
+        # write headers
+        print("##fileformat=VCFv4.3", file=out)
+        print(f"##fileDate={now}", file=out)
+        print("##source=malariagen/pipelines/scripts/sample_select_variants", file=out)
+        print(f"##sites_called={sites_called_path}", file=out)
+        print(f"##sites_selected={sites_selected_path}", file=out)
+        print(f"##sample_genotypes={sample_genotypes_path}", file=out)
+        print("##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">", file=out)
+        print(f"#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t{sample_id}", file=out)
 
         for contig in args.contigs:
 
-            # load sites data
-            source_pos = allel.SortedIndex(sites[contig]['variants/POS'][:])
-            source_ref = sites[contig]['variants/REF'][:]
-            source_alt = sites[contig]['variants/ALT'][:]
+            # load called sites data
+            source_pos = allel.SortedIndex(sites_called[contig]['variants/POS'][:])
+            source_ref = sites_called[contig]['variants/REF'][:]
+            source_alt = sites_called[contig]['variants/ALT'][:]
 
-            # load subset sites data
-            dest_pos = subset_sites[contig]['variants/POS'][:]
-            dest_ref = subset_sites[contig]['variants/REF'][:]
-            dest_alt = subset_sites[contig]['variants/ALT'][:]
+            # load selected sites data
+            dest_pos = sites_selected[contig]['variants/POS'][:]
+            dest_ref = sites_selected[contig]['variants/REF'][:]
+            dest_alt = sites_selected[contig]['variants/ALT'][:]
             dest_alleles = np.concatenate([dest_ref[:, None], dest_alt], axis=1)
 
             # load genotypes
-            source_gt = allel.GenotypeArray(genotypes[args.sample][contig]['calldata/GT'][:])
+            source_gt = allel.GenotypeArray(sample_genotypes[sample_id][contig]['calldata/GT'][:])
 
             # select sites
             loc_subset = source_pos.locate_keys(dest_pos)
             source_gt_subset = source_gt.compress(loc_subset, axis=0)
             source_ref_subset = source_ref.compress(loc_subset, axis=0)
             source_alt_subset = source_alt.compress(loc_subset, axis=0)
+            assert (
+                source_gt_subset.shape[0] ==
+                source_ref_subset.shape[0] ==
+                source_alt_subset.shape[0] ==
+                dest_alleles.shape[0]
+            )
 
             # recode alleles
             mapping = allel.create_allele_mapping(source_ref_subset, source_alt_subset,
                                                   dest_alleles)
-            dest_gt = source_gt_subset.map_alleles(mapping)
+            dest_gt = source_gt_subset.map_alleles(mapping, copy=False)
 
             # deal with half-missing
             if not args.allow_half_missing:
