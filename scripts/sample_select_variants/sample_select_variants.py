@@ -1,6 +1,7 @@
 from datetime import datetime
 from os.path import abspath
 import argparse
+import sys
 import numpy as np
 import zarr
 import allel
@@ -15,6 +16,11 @@ def encode_allele(a):
         return str(a)
     else:
         return "."
+
+
+def progress(msg):
+    print(f"{datetime.now().isoformat()} :: {msg}", file=sys.stderr)
+    sys.stderr.flush()
 
 
 def main():
@@ -47,6 +53,11 @@ def main():
         action="append",
         dest="contigs",
         help="Contig to extract. Multiple values may be provided.")
+    parser.add_argument(
+        "--progress",
+        action="store_true",
+        help="Log progress to stderr."
+    )
 
     # parse command line args
     args = parser.parse_args()
@@ -79,6 +90,9 @@ def main():
 
         for contig in args.contigs:
 
+            if args.progress:
+                progress(f"{contig} begin")
+
             # load called sites data
             source_pos = allel.SortedIndex(sites_called[contig]['variants/POS'][:])
             source_ref = sites_called[contig]['variants/REF'][:]
@@ -88,6 +102,9 @@ def main():
             dest_pos = sites_selected[contig]['variants/POS'][:]
             dest_ref = sites_selected[contig]['variants/REF'][:]
             dest_alt = sites_selected[contig]['variants/ALT'][:]
+            if dest_alt.ndim == 1:
+                # only a single ALT
+                dest_alt = dest_alt[:, None]
             dest_alleles = np.concatenate([dest_ref[:, None], dest_alt], axis=1)
 
             # load genotypes
@@ -116,18 +133,28 @@ def main():
                 dest_gt[loc_missing] = -1
 
             # write out
-            for p, r, a, g in zip(dest_pos, dest_ref, dest_alt, dest_gt[:, 0]):
+            for i, (p, r, a, g) in enumerate(zip(dest_pos, dest_ref, dest_alt, dest_gt[:, 0])):
+                if i > 0 and i % 1_000_000 == 0:
+                    if args.progress:
+                        progress(f"{contig} {p:,} ({i:,} rows)")
+                if isinstance(r, bytes):
+                    r = r.decode()
+                if isinstance(a[0], bytes):
+                    a = [x.decode() for x in a if x]
                 row = [contig,  # CHROM
                        str(p),  # POS
                        ".",  # ID
                        r,  # REF
-                       a[0],  # ALT
+                       ",".join(a),  # ALT
                        ".",  # QUAL
                        "PASS",  # FILTER
                        ".",  # INFO
                        "GT",  # FORMAT
                        encode_genotype(g)]
                 print("\t".join(row), file=out)
+
+            if args.progress:
+                progress(f"{contig} done")
 
 
 if __name__ == "__main__":
