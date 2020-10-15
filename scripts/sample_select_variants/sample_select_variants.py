@@ -21,26 +21,34 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Subset genotypes to biallelic sites for phasing.")
-    parser.add_argument("--sample-genotypes",
-                        required=True,
-                        help="Path to input zipped zarr file with sample genotypes.")
-    parser.add_argument("--sites-called",
-                        required=True,
-                        help="Path to input zipped zarr file with sites at which genotypes were "
-                             "called.")
-    parser.add_argument("--sites-selected",
-                        required=True,
-                        help="Path to input zipped zarr file with sites to subset to.")
-    parser.add_argument("--output",
-                        required=True,
-                        help="Path to output VCF file.")
-    parser.add_argument("--allow-half-missing", action="store_true")
-    parser.add_argument("--contig",
-                        required=True,
-                        action="append",
-                        dest="contigs",
-                        help="Contig to extract. Multiple values may be provided.")
+    parser.add_argument(
+        "--sample-genotypes",
+        required=True,
+        help="Path to zipped zarr file with sample genotypes.")
+    parser.add_argument(
+        "--sites-called",
+        required=True,
+        help="Path to zipped zarr file with sites and alleles at which genotypes "
+             "were called.")
+    parser.add_argument(
+        "--sites-selected",
+        required=True,
+        help="Path to zipped zarr file with sites and alleles to select.")
+    parser.add_argument(
+        "--output",
+        required=True,
+        help="Path to output VCF file.")
+    parser.add_argument(
+        "--allow-half-missing", action="store_true",
+        help="If true, output half-missing genotypes where possible.")
+    parser.add_argument(
+        "--contig",
+        required=True,
+        action="append",
+        dest="contigs",
+        help="Contig to extract. Multiple values may be provided.")
 
+    # parse command line args
     args = parser.parse_args()
     sites_called_path = abspath(args.sites_called)
     sites_selected_path = abspath(args.sites_selected)
@@ -53,7 +61,8 @@ def main():
     sites_selected = zarr.open(sites_selected_path, mode='r')
     sample_genotypes = zarr.open(sample_genotypes_path, mode='r')
 
-    # discover sample identifier, assume it's the top group in the sample_genotypes zarr hierarchy
+    # discover sample identifier, assume it's the top group in the sample_genotypes zarr
+    # hierarchy
     sample_id = list(sample_genotypes)[0]
 
     with open(output_path, mode="w", newline="\n") as out:
@@ -101,7 +110,7 @@ def main():
                                                   dest_alleles)
             dest_gt = source_gt_subset.map_alleles(mapping, copy=False)
 
-            # deal with half-missing
+            # deal with half-missing genotype calls after recoding
             if not args.allow_half_missing:
                 loc_missing = np.any(dest_gt < 0, axis=2)
                 dest_gt[loc_missing] = -1
