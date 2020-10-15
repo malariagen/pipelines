@@ -97,6 +97,9 @@ def main():
             source_pos = allel.SortedIndex(sites_called[contig]['variants/POS'][:])
             source_ref = sites_called[contig]['variants/REF'][:]
             source_alt = sites_called[contig]['variants/ALT'][:]
+            if source_alt.ndim == 1:
+                # only a single ALT
+                source_alt = source_alt[:, None]
 
             # load selected sites data
             dest_pos = sites_selected[contig]['variants/POS'][:]
@@ -109,6 +112,12 @@ def main():
 
             # load genotypes
             source_gt = allel.GenotypeArray(sample_genotypes[sample_id][contig]['calldata/GT'][:])
+            assert (
+                source_pos.shape[0] ==
+                source_ref.shape[0] ==
+                source_alt.shape[0] ==
+                source_gt.shape[0]
+            )
 
             # select sites
             loc_subset = source_pos.locate_keys(dest_pos)
@@ -134,9 +143,9 @@ def main():
 
             # write out
             for i, (p, r, a, g) in enumerate(zip(dest_pos, dest_ref, dest_alt, dest_gt[:, 0])):
-                if i > 0 and i % 1_000_000 == 0:
+                if i % 1_000_000 == 0:
                     if args.progress:
-                        progress(f"{contig} {p:,} ({i:,} rows)")
+                        progress(f"{contig} {p:,} ({i:,} rows) written")
                 if isinstance(r, bytes):
                     r = r.decode()
                 if isinstance(a[0], bytes):
@@ -154,7 +163,7 @@ def main():
                 print("\t".join(row), file=out)
 
             if args.progress:
-                progress(f"{contig} done")
+                progress(f"{contig} all done")
 
 
 if __name__ == "__main__":
