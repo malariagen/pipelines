@@ -52,4 +52,7 @@ workflow SNPGenotyping {
     File output_vcf_index = UnifiedGenotyper.output_vcf_index
     File zarr_output = VcfToZarr.zarr_output
   }
+  meta {
+    allowNestedInputs: true
+  }
 }

@@ -7,6 +7,12 @@ task SplitUpInputFile {
   input {
     File input_file
     String sample_id
+
+    String singularity_image = runTimeSettings.lftp_singularity_image
+    Int num_cpu = 1
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -30,11 +36,11 @@ task SplitUpInputFile {
   }
 
   runtime {
-    singularity: runTimeSettings.lftp_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -46,6 +52,12 @@ task Ftp {
   input {
     String input_string
     String output_filename = basename(input_string)
+
+    String singularity_image = runTimeSettings.lftp_singularity_image
+    Int num_cpu = 1
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -60,11 +72,11 @@ task Ftp {
   }
 
   runtime {
-    singularity: runTimeSettings.lftp_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -76,6 +88,12 @@ task CramToBam {
   input {
     File input_file
     String output_filename
+
+    String singularity_image = runTimeSettings.samtools_singularity_image
+    Int num_cpu = 2
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -92,11 +110,11 @@ task CramToBam {
   }
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    memory: 3000
-    cpu: "2"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -109,11 +127,17 @@ task RevertSam {
   input {
     File input_file
     String output_filename
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       RevertSam \
       INPUT=~{input_file} \
       OUTPUT=~{output_filename} \
@@ -126,10 +150,11 @@ task RevertSam {
   }
 
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -142,11 +167,17 @@ task SamToFastq {
     File input_file
     String output_fastq1_filename
     String output_fastq2_filename
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       SamToFastq \
       INPUT=~{input_file} \
       FASTQ=~{output_fastq1_filename} \
@@ -155,10 +186,11 @@ task SamToFastq {
   }
 
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -175,6 +207,11 @@ task ReadAlignment {
     File fastq2
     String output_sam_basename
 
+    String singularity_image = runTimeSettings.bwa_singularity_image
+    Int num_cpu = 4
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -194,11 +231,11 @@ task ReadAlignment {
     /bwa/bwa mem -M -t 4 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   }
   runtime {
-      singularity: runTimeSettings.bwa_singularity_image
-      memory: 4000
-      cpu: "4"
-      lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-      lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_sam = "~{output_sam_basename}.sam"
@@ -209,6 +246,12 @@ task ReadAlignmentPostProcessing {
   input {
     File input_sam
     String output_bam_basename
+
+    String singularity_image = runTimeSettings.samtools_singularity_image
+    Int num_cpu = 2
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -225,11 +268,11 @@ task ReadAlignmentPostProcessing {
   }
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    memory: 3000
-    cpu: "2"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -240,12 +283,18 @@ task SetNmMdAndUqTags {
   input {
     File input_bam
     String output_bam_basename
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       SetNmMdAndUqTags \
       INPUT=~{input_bam} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -253,10 +302,11 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -267,20 +317,27 @@ task MergeSamFiles {
   input {
     Array[File] input_files
     String output_filename
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       MergeSamFiles \
       INPUT=~{sep=' INPUT=' input_files} \
       OUTPUT=~{output_filename}
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -291,6 +348,12 @@ task MarkDuplicates {
   input {
     File input_bam
     String output_filename
+
+    String singularity_image = runTimeSettings.biobambam_singularity_image
+    Int num_cpu = 1
+    Int memory = 2000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -298,10 +361,11 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    singularity: runTimeSettings.biobambam_singularity_image
-    memory: 2000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -315,12 +379,18 @@ task RealignerTargetCreator {
     File input_bam_index
     File? known_indels_vcf
     String output_interval_list_filename
+
+    String singularity_image = runTimeSettings.gatk_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx~{memory}m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T RealignerTargetCreator \
           -I ~{input_bam} \
@@ -329,10 +399,11 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_interval_list_file = output_interval_list_filename
@@ -346,12 +417,18 @@ task IndelRealigner {
     File? known_indels_vcf
     File interval_list_file
     String output_bam_filename
+
+    String singularity_image = runTimeSettings.gatk_singularity_image
+    Int num_cpu = 1
+    Int memory = 8000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx7500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx~{memory}m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T IndelRealigner \
           -I ~{input_bam} \
@@ -361,10 +438,11 @@ task IndelRealigner {
           -o ~{output_bam_filename}
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 8000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = output_bam_filename
@@ -375,6 +453,12 @@ task FixMateInformation {
   input {
     File input_file
     String output_bam_basename
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 8000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -382,7 +466,7 @@ task FixMateInformation {
    set -e
    set -o pipefail
 
-    java -Xmx7000m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -393,10 +477,11 @@ task FixMateInformation {
       mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -411,12 +496,18 @@ task ValidateSamFile {
     String report_filename
     Int? max_output
     Array[String]? ignore
+
+    String singularity_image = runTimeSettings.picard_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx~{memory}m -jar /bin/picard.jar \
       ValidateSamFile \
       INPUT=~{input_file} \
       OUTPUT=~{report_filename} \
@@ -427,10 +518,11 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    singularity: runTimeSettings.picard_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -441,6 +533,12 @@ task SamtoolsStats {
   input {
     File input_file
     String report_filename
+
+    String singularity_image = runTimeSettings.samtools_singularity_image
+    Int num_cpu = 1
+    Int memory = 2000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -455,11 +553,11 @@ task SamtoolsStats {
   }
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    cpu: "1"
-    memory: 1000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -471,6 +569,12 @@ task SamtoolsIdxStats {
     File input_bam
     File input_bam_index
     String report_filename
+
+    String singularity_image = runTimeSettings.samtools_singularity_image
+    Int num_cpu = 1
+    Int memory = 2000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -484,11 +588,11 @@ task SamtoolsIdxStats {
   }
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    cpu: "1"
-    memory: 2000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -499,6 +603,12 @@ task SamtoolsFlagStat {
   input {
     File input_bam
     String report_filename
+
+    String singularity_image = runTimeSettings.samtools_singularity_image
+    Int num_cpu = 1
+    Int memory = 2000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -512,11 +622,11 @@ task SamtoolsFlagStat {
   }
 
   runtime {
-    singularity: runTimeSettings.samtools_singularity_image
-    cpu: "1"
-    memory: 1000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -528,12 +638,18 @@ task GatkCallableLoci {
     File input_bam
     File input_bam_index
     String summary_filename
+
+    String singularity_image = runTimeSettings.gatk_singularity_image
+    Int num_cpu = 1
+    Int memory = 4000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx~{memory}m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T CallableLoci \
           -I ~{input_bam} \
@@ -542,10 +658,11 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 4000
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File summary_file = summary_filename
