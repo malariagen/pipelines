@@ -63,6 +63,7 @@ workflow ShortReadAlignmentAndGenotyping {
     File samtools_flagstat_report_file = ShortReadAlignment.samtools_flagstat_report_file
     File callable_loci_summary_file = ShortReadAlignment.callable_loci_summary_file
     File output_vcf = SNPGenotyping.output_vcf
+    File output_vcf_index = SNPGenotyping.output_vcf_index
     File zarr_output = SNPGenotyping.zarr_output
   }
 }
