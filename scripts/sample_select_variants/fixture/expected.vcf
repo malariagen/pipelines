@@ -1,0 +1,16 @@
+##fileformat=VCFv4.3
+##fileDate=20201015
+##source=malariagen/pipelines/scripts/sample_select_variants
+##sites_called=fixture/sites_called.zarr.zip
+##sites_selected=fixture/sites_selected.zarr.zip
+##sample_genotypes=fixture/sample_genotypes.zarr.zip
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	AV0148-C
+2R	1	.	A	G	.	PASS	.	GT	./.
+2R	2	.	C	A	.	PASS	.	GT	0/0
+2R	3	.	C	A	.	PASS	.	GT	0/1
+2R	4	.	G	A	.	PASS	.	GT	1/1
+2R	7	.	G	C	.	PASS	.	GT	./.
+2R	8	.	T	G	.	PASS	.	GT	1/1
+2R	9	.	C	A	.	PASS	.	GT	./.
+2R	10	.	A	T	.	PASS	.	GT	./.
