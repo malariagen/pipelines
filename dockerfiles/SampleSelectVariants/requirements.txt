@@ -1,0 +1,3 @@
+numpy==1.19.1
+zarr==2.4.0
+scikit-allel==1.3.1
