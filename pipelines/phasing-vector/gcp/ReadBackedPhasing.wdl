@@ -23,8 +23,9 @@ workflow ReadBackedPhasing {
     File input_bam
     File input_bam_index
     File input_vcf
-    Array[File] phased_sites_vcfs
-    Array[File] phased_sites_indicies
+    File input_vcf_index
+    File phased_sites_vcf
+    File phased_sites_index
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -33,34 +34,35 @@ workflow ReadBackedPhasing {
   call Tasks.SelectVariants {
     input:
       input_vcf = input_vcf,
-      phased_sites_vcfs = phased_sites_vcfs,
-      phased_sites_indicies = phased_sites_indicies,
+      input_vcf_index = input_vcf_index,
+      phased_sites_vcfs = phased_sites_vcf,
+      phased_sites_indicies = phased_sites_index,
       output_basename = output_basename,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Step 2: WhatsHap phase
-  call Tasks.WhatsHapPhase {
-    input:
-      input_bam = input_bam,
-      input_bam_index = input_bam_index,
-      subset_vcf = SelectVariants.subset_vcf,
-      output_basename = output_basename,
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
-  # Step 3: WhatsHap stats
-  call Tasks.WhatsHapStats {
-    input:
-      phased_vcf = WhatsHapPhase.phased_vcf,
-      output_basename = output_basename,
-      runTimeSettings = runTimeSettings
-  }
+  #call Tasks.WhatsHapPhase {
+  #  input:
+  #    input_bam = input_bam,
+  #    input_bam_index = input_bam_index,
+  #    subset_vcf = SelectVariants.subset_vcf,
+  #    output_basename = output_basename,
+  #    reference = reference,
+  #    runTimeSettings = runTimeSettings
+  #}
+  ## Step 3: WhatsHap stats
+  #call Tasks.WhatsHapStats {
+  #  input:
+  #    phased_vcf = WhatsHapPhase.phased_vcf,
+  #    output_basename = output_basename,
+  #    runTimeSettings = runTimeSettings
+  #}
 
   output {
    # TODO: determine outputs needed (stats etc.)
-    File output_vcf = WhatsHapPhase.output_vcf
-    File whats_hap_stats = "~{output_basename}.whatshap_stats"
+    #File output_vcf = WhatsHapPhase.output_vcf
+    #File whats_hap_stats = "~{output_basename}.whatshap_stats"
     File subset_vcf = SelectVariants.subset_vcf
   }
 }

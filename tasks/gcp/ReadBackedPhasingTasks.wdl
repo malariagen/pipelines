@@ -7,6 +7,7 @@ task SelectVariants {
 
   input {
     File input_vcf
+    File input_vcf_index
     Array[File] phased_sites_vcfs
     Array[File] phased_sites_indicies
     String output_basename
@@ -14,18 +15,13 @@ task SelectVariants {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(input_vcf, "GiB") * 3)
+  Int mem_size = ceil(size(input_vcf, "GiB") * 3)
+  Int disk_size = ceil(size(input_vcf, "GiB") * 2)
 
   command {
-    # generate index file if needed
-    gatk IndexFeatureFile \
-      --input ~{input_vcf}
-
-    # subset the VCF
     gatk SelectVariants \
       -R ~{reference.ref_fasta} \
       -V ~{input_vcf} \
-      --select-type-to-include SNP \
       -O ~{output_basename}.subset.vcf \
       --remove-unused-alternates true \
       --intervals ~{sep=' --intervals ' phased_sites_vcfs}
@@ -35,8 +31,9 @@ task SelectVariants {
     docker: runTimeSettings.gatk_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
-    memory: "7.5 GiB"
-    disks: "local-disk ${disk_size} HDD"
+    memory: "~{mem_size} GiB"
+    disks: "local-disk ~{disk_size} HDD"
+    bootDiskSizeGb: 15
   }
 
   output {
