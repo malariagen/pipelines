@@ -22,10 +22,10 @@ workflow ReadBackedPhasing {
     String output_basename
     File input_bam
     File input_bam_index
-    File input_vcf
-    File input_vcf_index
-    File phased_sites_vcf
-    File phased_sites_index
+    File sample_zarr
+    File called_sites_zarr
+    File phased_sites_zarr
+    String contig
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -33,11 +33,11 @@ workflow ReadBackedPhasing {
   # Step 1: Genotype data preparation
   call Tasks.SelectVariants {
     input:
-      input_vcf = input_vcf,
-      input_vcf_index = input_vcf_index,
-      phased_sites_vcfs = phased_sites_vcf,
-      phased_sites_indicies = phased_sites_index,
+      sample_zarr = sample_zarr,
+      called_sites_zarr = called_sites_zarr,
+      phased_sites_zarr = phased_sites_zarr,
       output_basename = output_basename,
+      contig = contig,
       reference = reference,
       runTimeSettings = runTimeSettings
   }

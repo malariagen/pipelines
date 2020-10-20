@@ -6,34 +6,34 @@ import "../../structs/ReferenceSequence.wdl"
 task SelectVariants {
 
   input {
-    File input_vcf
-    File input_vcf_index
-    Array[File] phased_sites_vcfs
-    Array[File] phased_sites_indicies
+    File sample_zarr
+    File called_sites_zarr
+    File phased_sites_zarr
     String output_basename
+    String contig
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
-  Int mem_size = ceil(size(input_vcf, "GiB") * 3)
-  Int disk_size = ceil(size(input_vcf, "GiB") * 2)
+  Int mem_size = ceil(size(sample_zarr, "GiB") * 3)
+  Int disk_size = ceil(size(sample_zarr, "GiB") * 2)
 
   command {
-    gatk SelectVariants \
-      -R ~{reference.ref_fasta} \
-      -V ~{input_vcf} \
-      -O ~{output_basename}.subset.vcf \
-      --remove-unused-alternates true \
-      --intervals ~{sep=' --intervals ' phased_sites_vcfs}
+    python /tools/sample_select_variants.py \
+      --sample-genotypes ~{sample_zarr} \
+      --sites-called ~{called_sites_zarr} \
+      --sites-selected ~{phased_sites_zarr} \
+      --output ~{output_basename}.subset.vcf \
+      --contig ~{contig} \
+      --progress
   }
 
   runtime {
-    docker: runTimeSettings.gatk_docker
+    docker: runTimeSettings.select_variants_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
-    memory: "~{mem_size} GiB"
-    disks: "local-disk ~{disk_size} HDD"
-    bootDiskSizeGb: 15
+    memory: "3.75 GiB"
+    disks: "local-disk 100 HDD"
   }
 
   output {

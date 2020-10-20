@@ -3,22 +3,10 @@
   "ReadBackedPhasing.output_basename": "AV0148-C",
   "ReadBackedPhasing.input_bam": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ShortReadAlignmentOutput/AV0148-C.bam",
   "ReadBackedPhasing.input_bam_index": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ShortReadAlignmentOutput/AV0148-C.bam.bai",
-  "ReadBackedPhasing.input_vcf": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/SnpGenotypingOutput/AV0148-C.vcf",
-  "ReadBackedPhasing.input_vcf_index": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/SnpGenotypingOutput/AV0148-C.vcf.idx",
-  "ReadBackedPhasing.phased_sites_vcfs": [
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_2L.vcf.gz",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_2R.vcf.gz",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_3L.vcf.gz",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_3R.vcf.gz",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_X.vcf.gz"
-  ],
-  "ReadBackedPhasing.phased_sites_indicies": [
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_2L.vcf.gz.tbi",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_2R.vcf.gz.tbi",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_3L.vcf.gz.tbi",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_3R.vcf.gz.tbi",
-    "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_X.vcf.gz.tbi"
-  ],
+  "ReadBackedPhasing.sample_zarr": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/SnpGenotypingOutput/AV0148-C.zarr.zip",
+  "ReadBackedPhasing.called_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/AgamP4.allsites.nonN.zarr.zip",
+  "ReadBackedPhasing.phased_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_arab.zarr.zip",
+  "ReadBackedPhasing.contig": "3L",
   "ReadBackedPhasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
