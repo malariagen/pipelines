@@ -42,28 +42,28 @@ workflow ReadBackedPhasing {
       runTimeSettings = runTimeSettings
   }
   # Step 2: WhatsHap phase
-  #call Tasks.WhatsHapPhase {
-  #  input:
-  #    input_bam = input_bam,
-  #    input_bam_index = input_bam_index,
-  #    subset_vcf = SelectVariants.subset_vcf,
-  #    output_basename = output_basename,
-  #    reference = reference,
-  #    runTimeSettings = runTimeSettings
-  #}
-  ## Step 3: WhatsHap stats
-  #call Tasks.WhatsHapStats {
-  #  input:
-  #    phased_vcf = WhatsHapPhase.phased_vcf,
-  #    output_basename = output_basename,
-  #    runTimeSettings = runTimeSettings
-  #}
+  call Tasks.WhatsHapPhase {
+    input:
+      input_bam = input_bam,
+      input_bam_index = input_bam_index,
+      subset_vcf = SelectVariants.subset_vcf,
+      output_basename = output_basename,
+      reference = reference,
+      runTimeSettings = runTimeSettings
+  }
+  # Step 3: WhatsHap stats
+  call Tasks.WhatsHapStats {
+    input:
+      phased_vcf = WhatsHapPhase.phased_vcf,
+      output_basename = output_basename,
+      runTimeSettings = runTimeSettings
+  }
 
   output {
-   # TODO: determine outputs needed (stats etc.)
-    #File output_vcf = WhatsHapPhase.output_vcf
-    #File whats_hap_stats = "~{output_basename}.whatshap_stats"
-    File subset_vcf = SelectVariants.subset_vcf
+    File sample_subset_vcf = SelectVariants.subset_vcf
+    File sample_phased_vcf = WhatsHapPhase.phased_vcf
+    File whats_hap_stats_tsv = WhatsHapStats.whats_hap_stats_tsv
+    File whats_hap_blocks_gtf = WhatsHapStats.whats_hap_blocks_gtf
   }
 }
 

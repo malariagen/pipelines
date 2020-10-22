@@ -40,10 +40,10 @@ task SelectVariants {
     File subset_vcf = "~{output_basename}.subset.vcf"
   }
 }
+    #File subset_vcf_index = "~{output_basename}.subset.vcf.gz.tbi"
 
-# TODO: try running this
+
 # TODO: add  --max-coverage=@@TODO
-# TODO: update docker tag to be tool version number
 task WhatsHapPhase {
   input {
     File input_bam
@@ -56,7 +56,7 @@ task WhatsHapPhase {
 
   command {
     whatshap phase \
-      -o ~{output_basename}_phased.vcf \
+      -o ~{output_basename}.phased.vcf \
       --reference ~{reference.ref_fasta} \
       ~{subset_vcf} ~{input_bam}
   }
@@ -64,8 +64,8 @@ task WhatsHapPhase {
   runtime {
     docker: runTimeSettings.whatshap_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    cpu: "4"
+    memory: "30 GiB"
   }
 
   output {
@@ -74,7 +74,6 @@ task WhatsHapPhase {
 }
 
 # TODO: what is chromosome lengths??
-# TODO: run this. What is the output??
 task WhatsHapStats {
   input {
    File phased_vcf
@@ -84,7 +83,7 @@ task WhatsHapStats {
 
   command {
     whatshap stats \
-      --chr-lengths=CHR_LENGTHS \
+      #--chr-lengths=CHR_LENGTHS \
       --tsv=~{output_basename}.stats.tsv \
       --gtf=~{output_basename}.blocks.gtf \
       ~{phased_vcf}
@@ -98,6 +97,7 @@ task WhatsHapStats {
   }
 
   output {
-    File whats_hap_stats = "~{output_basename}.whatshap_stats"
+    File whats_hap_stats_tsv = "~{output_basename}.stats.tsv"
+    File whats_hap_blocks_gtf = "~{output_basename}.stats.tsv"
   }
 }
