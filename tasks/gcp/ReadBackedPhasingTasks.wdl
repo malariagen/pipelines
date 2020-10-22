@@ -80,13 +80,12 @@ task WhatsHapStats {
    String output_basename
    RunTimeSettings runTimeSettings
   }
-
+      #--chr-lengths=CHR_LENGTHS \
   command {
     whatshap stats \
-      #--chr-lengths=CHR_LENGTHS \
+      ~{phased_vcf} \
       --tsv=~{output_basename}.stats.tsv \
-      --gtf=~{output_basename}.blocks.gtf \
-      ~{phased_vcf}
+      --gtf=~{output_basename}.blocks.gtf
   }
 
   runtime {
@@ -98,6 +97,6 @@ task WhatsHapStats {
 
   output {
     File whats_hap_stats_tsv = "~{output_basename}.stats.tsv"
-    File whats_hap_blocks_gtf = "~{output_basename}.stats.tsv"
+    File whats_hap_blocks_gtf = "~{output_basename}.blocks.gtf"
   }
 }
