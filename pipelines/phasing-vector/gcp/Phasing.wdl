@@ -23,8 +23,10 @@ workflow Phasing {
     File sample_manifest
     Array[File] input_bams
     Array[File] input_bam_indicies
-    Array[File] input_vcfs
-    Array[File] phased_sites_vcfs
+    Array[File] sample_zarrs
+    File called_sites_zarr
+    File phased_sites_zarr
+    Array[String] chromosome_list
     File genetic_map # recombination rates
 
     File? haplotype_reference_panel
@@ -36,41 +38,45 @@ workflow Phasing {
   # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
   Array[String] sample_ids = []
 
-  # scatter over the phased_sites_vcfs (per chromosome)
-    # scatter over samples
-      # subset
-      # run whatshap
-    # merge (single chromosome for all samples
-    # run shapeit
-
 
   # Step 1: Read-backed phasing
-  # TODO: scatter over samples
-  scatter(idx in range(length(input_bams))) {
-    call ReadBackedPhasing.ReadBackedPhasing as ReadBackedPhasing {
+
+  # Scatter over chormosomes
+  scatter(chromosome in chromosome_list) {
+    # Scatter over samples
+    scatter(idx in range(length(sample_ids))) {
+      # Run read-backed phasing on each sample (for each chromosome)
+      call ReadBackedPhasing.ReadBackedPhasing as ReadBackedPhasing {
+        input:
+          sample_id = sample_ids[idx],
+          input_bam = input_bams[idx],
+          input_bam_index = input_bam_indicies[idx],
+          sample_zarr = sample_zarrs[idx],
+          called_sites_zarr = called_sites_zarr,
+          phased_sites_zarr = phased_sites_zarr,
+          contig = chromosome,
+          reference = reference,
+          runTimeSettings = runTimeSettings
+      }
+    }
+
+    # combine samples
+    Array[File] sample_phased_vcfs = ReadBackedPhasing.phased_vcf
+
+    # Step 2: Statistical phasing
+    # run statistical phasing for all samples (for each chromosome)
+    call StatisticalPhasing.StatisticalPhasing {
       input:
-        sample_id = sample_ids[idx],
-        input_bam = input_bams[idx],
-        input_bam_index = input_bam_indicies[idx],
-        input_vcf = input_vcfs[idx],
-        phased_sites_vcfs = phased_sites_vcfs,
-        reference = reference,
-        runTimeSettings = runTimeSettings
+      project_id = project_id,
+      sample_phased_vcfs = sample_phased_vcfs,
+      genetic_map = genetic_map,
+      haplotype_reference_panel = haplotype_reference_panel,
+      reference = reference,
+      runTimeSettings = runTimeSettings
     }
   }
 
-  Array[File] sample_phased_vcfs = ReadBackedPhasing.phased_vcf
-
-  # Step 2: Statistical phasing
-  call StatisticalPhasing.StatisticalPhasing {
-    input:
-    project_id = project_id,
-    sample_phased_vcfs = sample_phased_vcfs,
-    genetic_map = genetic_map,
-    haplotype_reference_panel = haplotype_reference_panel,
-    reference = reference,
-    runTimeSettings = runTimeSettings
-  }
+  # Combine all chromosomes
 
   output {
   # TODO: determine addtional outputs
