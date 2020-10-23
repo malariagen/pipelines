@@ -43,7 +43,7 @@ task SelectVariants {
     #File subset_vcf_index = "~{output_basename}.subset.vcf.gz.tbi"
 
 
-# TODO: add  --max-coverage=@@TODO
+# TODO: investigate values beetween 15 (default) and 20 for --max-coverage=
 task WhatsHapPhase {
   input {
     File input_bam
@@ -73,7 +73,7 @@ task WhatsHapPhase {
   }
 }
 
-# TODO: what is chromosome lengths??
+# TODO: what is the chromosome lengths file
 task WhatsHapStats {
   input {
    File phased_vcf
@@ -89,7 +89,7 @@ task WhatsHapStats {
   }
 
   runtime {
-    docker: runTimeSettings.whatshap_docker # us.gcr.io/broad-gotc-prod/malariagen/whatshap:0.0
+    docker: runTimeSettings.whatshap_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
