@@ -10,4 +10,6 @@ struct RunTimeSettings {
   String gatk_singularity_image
   String vcftozarr_singularity_image
   String lftp_singularity_image
+  String binder_singularity_image
+  String irods_singularity_image
 }
