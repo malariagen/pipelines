@@ -14,7 +14,7 @@ import pandas
 import zarr
 from ddt import ddt, data
 
-from scripts.vgc import ConcordanceResult, classify, classify_sample, classify_chromosome, \
+from scripts.vector_genotype_concordance import ConcordanceResult, classify, classify_sample, classify_chromosome, \
     compute_hom_alt_mismatch, HOMOZIGOUS_ALTERNATE_CATEGORY, MISMATCH_CATEGORY, compute_het_mismatch, \
     HETEROZIGOUS_CATEGORY, Callset, FilteringCallset, Commands, ArgumentParserBuilder, Summarizer, to_filtered_callset
 
@@ -65,14 +65,14 @@ class TestClassify(unittest.TestCase):
         self.test_creator.return_value = MagicMock()
         self.results = MagicMock()
 
-    @patch('scripts.vgc.classify_sample')
+    @patch('scripts.vector_genotype_concordance.classify_sample')
     def test_no_sample(self, classify_mock):
         classify([], SOME_CHROMOSOMES, self.control_creator, self.test_creator, self.results)
         self.control_creator.assert_not_called()
         self.test_creator.assert_not_called()
         classify_mock.assert_not_called()
 
-    @patch('scripts.vgc.classify_sample')
+    @patch('scripts.vector_genotype_concordance.classify_sample')
     def test_with_sample_and_chromosomes(self, classify_mock):
         classify(SOME_SAMPLES, SOME_CHROMOSOMES, self.control_creator, self.test_creator, self.results)
         self.assertCountEqual(classify_mock.call_args_list,
@@ -81,7 +81,7 @@ class TestClassify(unittest.TestCase):
                                call(SAMPLE_B, SOME_CHROMOSOMES, self.control_creator.return_value,
                                     self.test_creator.return_value, self.results)])
 
-    @patch('scripts.vgc.classify_sample')
+    @patch('scripts.vector_genotype_concordance.classify_sample')
     def test_no_chromosomes(self, classify_mock):
         classify(SOME_SAMPLES, [], self.control_creator, self.test_creator, self.results)
         self.assertCountEqual(classify_mock.call_args_list,
@@ -116,12 +116,12 @@ class TestClassifySample(unittest.TestCase):
         test_map = {CHROMOSOME_1: self.test_gt_chromosome_1, CHROMOSOME_2: self.test_gt_chromosome_2}
         self.test.gt.side_effect = lambda chrom: test_map[chrom]
 
-    @patch('scripts.vgc.classify_chromosome')
+    @patch('scripts.vector_genotype_concordance.classify_chromosome')
     def test_no_chromosomes(self, classify_mock):
         classify_sample(SAMPLE_A, [], self.control, self.test, self.results)
         classify_mock.assert_not_called()
 
-    @patch('scripts.vgc.classify_chromosome')
+    @patch('scripts.vector_genotype_concordance.classify_chromosome')
     def test_with_chromosomes(self, classify_mock):
         classify_sample(SAMPLE_A, SOME_CHROMOSOMES, self.control, self.test, self.results)
         self.assertCountEqual(classify_mock.call_args_list,
@@ -139,9 +139,9 @@ class TestClassifyChromosome(unittest.TestCase):
         self.het_mismatch = 12
         self.hom_alt_mismatch = 9
 
-    @patch('scripts.vgc._classify_non_mismatch')
-    @patch('scripts.vgc.compute_hom_alt_mismatch')
-    @patch('scripts.vgc.compute_het_mismatch')
+    @patch('scripts.vector_genotype_concordance._classify_non_mismatch')
+    @patch('scripts.vector_genotype_concordance.compute_hom_alt_mismatch')
+    @patch('scripts.vector_genotype_concordance.compute_het_mismatch')
     def test_classify_chromosome(self, het_mock, hom_alt_mock, non_mismatch_mock):
         het_mock.return_value = self.het_mismatch
         hom_alt_mock.return_value = self.hom_alt_mismatch
@@ -221,7 +221,7 @@ class TestCallset(unittest.TestCase):
         actual = under_test.gt(CHROMOSOME_2)
         self.assertTrue((allel.GenotypeVector(CHROMOSOME_2_GT) == actual).all())
 
-    @patch('scripts.vgc.zarr.open')
+    @patch('scripts.vector_genotype_concordance.zarr.open')
     def test_new_instance(self, mock):
         expected = MagicMock()
 
@@ -251,7 +251,7 @@ class TestFilteredCallset(unittest.TestCase):
         actual = under_test.gt(CHROMOSOME_2)
         self.assertTrue((allel.GenotypeVector([[0, 0], [2, 0]]) == actual).all())
 
-    @patch('scripts.vgc.zarr.open')
+    @patch('scripts.vector_genotype_concordance.zarr.open')
     def test_new_instance(self, mock):
         site_filter_path = "A_PATH"
         callset = MagicMock()
@@ -275,8 +275,8 @@ class TestToFilteredCallset(unittest.TestCase):
         self.filtered_callset_mock = MagicMock()
         self.a_file_path_format = "A_FILE_PATH_FORMAT"
 
-    @patch('scripts.vgc.Callset.new_instance')
-    @patch('scripts.vgc.FilteringCallset.new_instance')
+    @patch('scripts.vector_genotype_concordance.Callset.new_instance')
+    @patch('scripts.vector_genotype_concordance.FilteringCallset.new_instance')
     def test_to_filtered_callset(self, filtered_callset_mock, callset_mock):
         callset_mock.side_effect = self._callset_mock_side_effect()
         filtered_callset_mock.side_effect = self.filtered_callset_mock_side_effect()
@@ -699,3 +699,6 @@ class TestSummarization(unittest.TestCase):
         self.assertEqual(match, local['match'])
         self.assertAlmostEqual(total, local['total'], delta=0.000001)
         self.assertAlmostEqual(concordance, local['concordance'], delta=0.000001)
+
+if __name__ == '__main__':
+    unittest.main()
