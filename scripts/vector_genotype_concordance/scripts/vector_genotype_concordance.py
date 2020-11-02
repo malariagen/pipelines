@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-# runtime: ['wheel', 'intake', 'zarr', 'numpy', 'pandas', 'scikit-allel', 'requests', 'aiohttp', 'gcsfs']
-# scikit-allel requires linux python3-dev package: sudo apt-get install python3-dev
-# tests: ['nose >= 1.3', 'ddt']
-# Example use:
-# count: vector_genotype_concordance.py count -c '/path/to/zarrs/{sample}/{sample}.genotypes.zarr.zip' -t '/path/to/zarrs/{sample}.zarr.zip'  -s AA0052-C AB0252-C AC0010-C AJ0037-C AN0131-C AN0280-Cx AN0326-C AR0078-C AZ0156-C BL0358-C -o /some/dir/results.csv 
-# summary: vector_genotype_concordance.py summarize -i results.*.csv -o /some/dir/10_samples
 
 import argparse
 import sys
@@ -38,6 +32,7 @@ CHROMOSOME_HEADER = 'chromosome'
 CONTROL_HEADER = 'control'
 TEST_HEADER = 'test'
 COUNT = 'count'
+
 
 class ChromosomeConcordanceResultRecorder:
     """
@@ -236,6 +231,7 @@ class ArgumentParserBuilder:
     def get_arguments(self):
         return dict(vars(self.parser.parse_args()))
 
+
 class Summarizer:
     """Summarizer manipulates the statistics collected and prints concordance based on various groupings"""
 
@@ -333,6 +329,7 @@ class Summarizer:
     def print_dataframe(output, dataframe):
         print(dataframe.to_string(index=False), file=output, flush=True)
 
+
 def to_streams(out):
     def to_stream(name_format, file):
         return open(name_format.format(file), 'w')
@@ -345,6 +342,7 @@ def to_streams(out):
             'sample': to_stream("{}.samples.txt", out),
             'total': to_stream("{}.totals.txt", out)
             }
+
 
 def main():
     arguments = ArgumentParserBuilder.new_instance().with_count().with_summarize().get_arguments()

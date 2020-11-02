@@ -1,8 +1,3 @@
-
-# runtime: ['intake', 'zarr', 'numpy', 'pandas', 'scikit-allel', 'requests', 'aiohttp', 'gcsfs']
-# tests: ['nose >= 1.3', 'ddt']
-
-
 import argparse
 import io
 import unittest
@@ -10,7 +5,6 @@ from io import StringIO
 from unittest.mock import Mock, patch, MagicMock, call
 
 import allel
-import pandas
 import zarr
 from ddt import ddt, data
 
@@ -699,6 +693,7 @@ class TestSummarization(unittest.TestCase):
         self.assertEqual(match, local['match'])
         self.assertAlmostEqual(total, local['total'], delta=0.000001)
         self.assertAlmostEqual(concordance, local['concordance'], delta=0.000001)
+
 
 if __name__ == '__main__':
     unittest.main()
