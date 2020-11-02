@@ -1,7 +1,7 @@
 {
 
-  "ImportShortReadAlignment.batch_sample_manifest_file": "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/lanelets_farm5_local.tsv",
-  "ImportShortReadAlignment.reference": {
+  "BatchImportShortReadAlignmentAndGenotyping.batch_sample_manifest_file": "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/lanelets_farm5_local.tsv",
+  "BatchImportShortReadAlignmentAndGenotyping.reference": {
     "ref_fasta": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
     "ref_dict": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
@@ -11,7 +11,9 @@
     "ref_ann": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
     "ref_pac": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
   },
-  "ImportShortReadAlignment.runTimeSettings": {
+  "BatchImportShortReadAlignmentAndGenotyping.alleles_vcf": "/lustre/scratch118/malaria/team112/personal/gg18/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz",
+  "BatchImportShortReadAlignmentAndGenotyping.alleles_vcf_index": "/lustre/scratch118/malaria/team112/personal/gg18/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz.tbi",
+  "BatchImportShortReadAlignmentAndGenotyping.runTimeSettings": {
     "lsf_group": "malaria-dk",
     "lsf_queue": "normal",
     "bwa_singularity_image": "bwa.0.7.15_v0.1.2.sif",
@@ -24,4 +26,6 @@
     "irods_singularity_image" : "irods_4.1.12.img",
     "binder_singularity_image" : "binder2.4.3.img "
   }
+
+
 }
