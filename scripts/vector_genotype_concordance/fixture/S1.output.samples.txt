@@ -1,0 +1,19 @@
+sample  control      test     total     match  concordance
+    S1      het       het    111403      7116     6.387620
+    S1      het   hom_alt    111403     19541    17.540820
+    S1      het   hom_ref    111403      6457     5.796074
+    S1      het  mismatch    111403     71748    64.404011
+    S1      het   missing    111403      6541     5.871476
+    S1  hom_alt       het     33562     23692    70.591741
+    S1  hom_alt   hom_alt     33562      1966     5.857815
+    S1  hom_alt   hom_ref     33562      1955     5.825040
+    S1  hom_alt  mismatch     33562      3993    11.897384
+    S1  hom_alt   missing     33562      1956     5.828020
+    S1  hom_ref       het  72935737      7826     0.010730
+    S1  hom_ref   hom_alt  72935737      1954     0.002679
+    S1  hom_ref   hom_ref  72935737  72925299    99.985689
+    S1  hom_ref   missing  72935737       658     0.000902
+    S1  missing       het     10948      7717    70.487760
+    S1  missing   hom_alt     10948      1937    17.692729
+    S1  missing   hom_ref     10948       655     5.982828
+    S1  missing   missing     10948       639     5.836682
