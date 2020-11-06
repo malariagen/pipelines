@@ -4,7 +4,9 @@ version 1.0
 ##
 ## This WDL pipeline implements the Short Read Alignment Pipeline as described in
 ## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## This initial version of the pipeline is designed to work on a batch of samples
+## This version of the pipeline is designed to work on a batch of samples
+## specified in a manifest with fields:
+## sample_id, run_ena, irods_path
 ## It can take a list of input_crams, input_bams or input_fastqs (paired).
 ## If more than one of these lists of files are provided, the pipeline will use in order:
 ## input_crams first, input_bams second (if input_crams not provided), and input_fastqs lastly.
