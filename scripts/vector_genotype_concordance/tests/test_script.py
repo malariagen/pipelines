@@ -18,16 +18,16 @@ class TestScript(unittest.TestCase):
     def test_count(self):
         with tempfile.TemporaryDirectory() as directory:
             self._generate_data(directory)
-            generated_output_file = directory + '/S1.count.csv'
+            generated_output_file = directory + '/S1.count.tsv'
             self._run_process(self._generate_count_command_line(directory, generated_output_file))
-            expected_output_file = self.project_dir + "/fixture/expected.S1.count.csv"
+            expected_output_file = self.project_dir + "/fixture/expected.S1.count.tsv"
             self._compare_output_files(expected_output_file, generated_output_file)
 
     def test_summarize(self):
         with tempfile.TemporaryDirectory() as directory:
             self._run_process(self._generate_summarize_command_line(directory))
-            for file in ['S1.output.categories.txt', 'S1.output.chromosomes.txt', 'S1.output.count.csv',
-                         'S1.output.samples.txt', 'S1.output.totals.txt']:
+            for file in ['S1.output.categories.tsv', 'S1.output.chromosomes.tsv', 'S1.output.count.tsv',
+                         'S1.output.samples.tsv', 'S1.output.totals.tsv']:
                 self._compare_output_files(directory + '/' + file, self.project_dir + "/fixture/" + file)
 
     def _generate_data(self, directory):
@@ -46,7 +46,7 @@ class TestScript(unittest.TestCase):
 
     def _generate_summarize_command_line(self, directory):
         return ["python", (self.project_dir + "/scripts/vector_genotype_concordance.py"), 'summarize',
-                '-i', self.project_dir + "/fixture/expected.S1.count.csv",
+                '-i', self.project_dir + "/fixture/expected.S1.count.tsv",
                 '-o', directory + '/S1.output'
                 ]
 

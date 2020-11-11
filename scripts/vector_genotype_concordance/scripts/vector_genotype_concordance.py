@@ -2,6 +2,7 @@
 
 
 import argparse
+import re
 import sys
 from enum import Enum
 from functools import partial
@@ -14,6 +15,7 @@ import pandas
 import zarr
 
 # ZARR paths
+ONLY_ONE_SAMPLE_IN_VECTOR_GT_ZARR = 0
 FILTER_PASS_PATH_FORMAT = '{chromosome}/variants/filter_pass'
 GT_PATH_FORMAT = '{sample}/{chromosome}/calldata/GT'
 
@@ -68,10 +70,10 @@ class ConcordanceResult:
         return ChromosomeConcordanceResultRecorder(self, sample, chromosome)
 
     def print(self, path_or_stream):
-        self.df.to_csv(path_or_buf=path_or_stream, index=False)
+        print(to_tab_string(self.df), file=path_or_stream, flush=True)
 
 
-class Callset:
+class VectorGenotypeCallset:
     """
     Wrapper class around a genotype callset stored in zarr
     """
@@ -79,7 +81,7 @@ class Callset:
     @staticmethod
     def new_instance(*, sample: str, file_path_format: str):
         callset = zarr.open(file_path_format.format(sample=sample), mode='r')
-        return Callset(sample=sample, callset=callset)
+        return VectorGenotypeCallset(sample=sample, callset=callset)
 
     def __init__(self, *, sample, callset):
         self.sample = sample
@@ -87,24 +89,24 @@ class Callset:
 
     def gt(self, chromosome: str) -> allel.GenotypeVector:
         gt = self.callset[GT_PATH_FORMAT.format(sample=self.sample, chromosome=chromosome)]
-        return allel.GenotypeVector(gt[:, 0])
+        return allel.GenotypeVector(gt[:, ONLY_ONE_SAMPLE_IN_VECTOR_GT_ZARR])
 
 
-class FilteringCallset:
+class FilteringVectorGenotypeCallset:
     """
     Wrapper class around callset that applies a pass site filter
     """
 
     @staticmethod
-    def new_test_instance(*, site_filter_path: str, callset: Callset):
+    def new_test_instance(*, site_filter_path: str, callset: VectorGenotypeCallset):
         site_filters = zarr.open(site_filter_path, mode='r')
-        return FilteringCallset(site_filters=site_filters, callset=callset)
+        return FilteringVectorGenotypeCallset(site_filters=site_filters, callset=callset)
 
     @staticmethod
-    def new_instance(*, url: str, path: str, callset: Callset):
+    def new_instance(*, url: str, path: str, callset: VectorGenotypeCallset):
         cat = intake.open_catalog(url)
         site_filters = cat[path].to_zarr()
-        return FilteringCallset(site_filters=site_filters, callset=callset)
+        return FilteringVectorGenotypeCallset(site_filters=site_filters, callset=callset)
 
     def __init__(self, *, site_filters, callset):
         self.site_filters = site_filters
@@ -124,8 +126,8 @@ def to_filtered_callset(url: str, filter_path: str, file_path_format: str, sampl
     """
     A factory of filtered callset
     """
-    callset = Callset.new_instance(sample=sample, file_path_format=file_path_format)
-    return FilteringCallset.new_instance(url=url, path=filter_path, callset=callset)
+    callset = VectorGenotypeCallset.new_instance(sample=sample, file_path_format=file_path_format)
+    return FilteringVectorGenotypeCallset.new_instance(url=url, path=filter_path, callset=callset)
 
 
 def classify_chromosome(*, control: allel.GenotypeVector, test: allel.GenotypeVector,
@@ -177,6 +179,14 @@ def classify(samples, chromosomes, control_callset_factory, test_callset_factory
         test_callset = test_callset_factory(sample)
         classify_sample(sample, chromosomes, control_callset, test_callset, results)
 
+def to_tab_string(dataframe):
+    # deserves a comment.  The dataframe.round method rounds NaN to 0
+    # I couldn't figure a way to preserves NaN and could not format numbers in tabs at column level properly
+    # Thus used to string with a bit of regex
+    replace_spaces_by_tabs = re.sub(' +', '\t', dataframe.to_string(index=False))
+    front_spaces_removed = re.sub('\n\t+', '\n', replace_spaces_by_tabs)
+    front_spaces_removed = re.sub('^\t+', '', front_spaces_removed)
+    return front_spaces_removed
 
 class Commands(Enum):
     COUNT = 1
@@ -237,7 +247,7 @@ class Summarizer:
 
     @staticmethod
     def to_dataframe(stream):
-        return pandas.read_csv(stream, dtype={SAMPLE_HEADER: 'str', CHROMOSOME_HEADER: 'str', CONTROL_HEADER: 'str',
+        return pandas.read_csv(stream, sep='\t', dtype={SAMPLE_HEADER: 'str', CHROMOSOME_HEADER: 'str', CONTROL_HEADER: 'str',
                                               TEST_HEADER: 'str', COUNT: 'int64'})
 
     def __init__(self, dataframes):
@@ -327,7 +337,7 @@ class Summarizer:
 
     @staticmethod
     def print_dataframe(output, dataframe):
-        print(dataframe.to_string(index=False), file=output, flush=True)
+        print(to_tab_string(dataframe), file=output, flush=True)
 
 
 def to_streams(out):
@@ -336,11 +346,11 @@ def to_streams(out):
 
     if out is None:
         return {'category': stdout, 'chromosome': stdout, 'count': stdout, 'sample': stdout, 'total': stdout}
-    return {'category': to_stream("{}.categories.txt", out),
-            'chromosome': to_stream("{}.chromosomes.txt", out),
-            'count': to_stream("{}.count.csv", out),
-            'sample': to_stream("{}.samples.txt", out),
-            'total': to_stream("{}.totals.txt", out)
+    return {'category': to_stream("{}.categories.tsv", out),
+            'chromosome': to_stream("{}.chromosomes.tsv", out),
+            'count': to_stream("{}.count.tsv", out),
+            'sample': to_stream("{}.samples.tsv", out),
+            'total': to_stream("{}.totals.tsv", out)
             }
 
 
@@ -352,7 +362,7 @@ def main():
         test_callset_factory = partial(to_filtered_callset, arguments['url'], arguments['path'], arguments['test'])
         results = ConcordanceResult()
         classify(arguments['samples'], arguments['chromosomes'], control_callset_factory, test_callset_factory, results)
-        results.print(stdout if arguments['output'] is None else arguments['output'])
+        results.print(stdout if arguments['output'] is None else open(arguments['output'], 'w'))
     elif arguments.get('command', None) == Commands.SUMMARIZE:
         dataframes = [Summarizer.to_dataframe(i) for i in arguments['inputs']]
         summarizer = Summarizer(dataframes)

@@ -10,7 +10,7 @@ from ddt import ddt, data
 
 from scripts.vector_genotype_concordance import ConcordanceResult, classify, classify_sample, classify_chromosome, \
     compute_hom_alt_mismatch, HOMOZIGOUS_ALTERNATE_CATEGORY, MISMATCH_CATEGORY, compute_het_mismatch, \
-    HETEROZIGOUS_CATEGORY, Callset, FilteringCallset, Commands, ArgumentParserBuilder, Summarizer, to_filtered_callset
+    HETEROZIGOUS_CATEGORY, VectorGenotypeCallset, FilteringVectorGenotypeCallset, Commands, ArgumentParserBuilder, Summarizer, to_filtered_callset
 
 A_URL = "A_URL"
 A_FILTER_PATH = "A_FILTER_PATH"
@@ -44,10 +44,10 @@ class TestSampleConcordanceResult(unittest.TestCase):
 
         stream = io.StringIO()
         r.print(stream)
-        self.assertEqual("""sample,chromosome,control,test,count
-SAMPLE,CHROMOSOME,LEFT,RIGHT,20
-SAMPLE,CHROMOSOME,LEFT1,RIGHT1,201
-SAMPLE2,OTHER_CHROMOSOME,OLEFT,ORIGHT,10
+        self.assertEqual("""sample\tchromosome\tcontrol\ttest\tcount
+SAMPLE\tCHROMOSOME\tLEFT\tRIGHT\t20
+SAMPLE\tCHROMOSOME\tLEFT1\tRIGHT1\t201
+SAMPLE2\tOTHER_CHROMOSOME\tOLEFT\tORIGHT\t10
 """, stream.getvalue())
 
 
@@ -209,7 +209,7 @@ class TestCallset(unittest.TestCase):
 
     def test_call_set(self):
         zarr_group = generate_gt_data(SAMPLE_A, SOME_CHROMOSOMES_GT)
-        under_test = Callset(sample=SAMPLE_A, callset=zarr_group)
+        under_test = VectorGenotypeCallset(sample=SAMPLE_A, callset=zarr_group)
         actual = under_test.gt(CHROMOSOME_1)
         self.assertTrue((allel.GenotypeVector(CHROMOSOME_1_GT) == actual).all())
         actual = under_test.gt(CHROMOSOME_2)
@@ -226,7 +226,7 @@ class TestCallset(unittest.TestCase):
 
         mock.side_effect = side_effect
 
-        actual = Callset.new_instance(sample=SAMPLE_A, file_path_format="{sample}")
+        actual = VectorGenotypeCallset.new_instance(sample=SAMPLE_A, file_path_format="{sample}")
         self.assertEqual(expected, actual.callset)
         self.assertEqual(SAMPLE_A, actual.sample)
 
@@ -239,7 +239,7 @@ class TestFilteredCallset(unittest.TestCase):
 
     def test_call_filtered_set(self):
         site_filters = generate_filter(SOME_CHROMOSOMES_FILTERS)
-        under_test = FilteringCallset(site_filters=site_filters, callset=self.callset)
+        under_test = FilteringVectorGenotypeCallset(site_filters=site_filters, callset=self.callset)
         actual = under_test.gt(CHROMOSOME_1)
         self.assertTrue((allel.GenotypeVector([[1, 1]]) == actual).all())
         actual = under_test.gt(CHROMOSOME_2)
@@ -257,7 +257,7 @@ class TestFilteredCallset(unittest.TestCase):
             return None
 
         mock.side_effect = side_effect
-        actual = FilteringCallset.new_test_instance(site_filter_path=site_filter_path, callset=callset)
+        actual = FilteringVectorGenotypeCallset.new_test_instance(site_filter_path=site_filter_path, callset=callset)
         self.assertEqual(callset, actual.callset)
         self.assertEqual(expected, actual.site_filters)
 
@@ -269,8 +269,8 @@ class TestToFilteredCallset(unittest.TestCase):
         self.filtered_callset_mock = MagicMock()
         self.a_file_path_format = "A_FILE_PATH_FORMAT"
 
-    @patch('scripts.vector_genotype_concordance.Callset.new_instance')
-    @patch('scripts.vector_genotype_concordance.FilteringCallset.new_instance')
+    @patch('scripts.vector_genotype_concordance.VectorGenotypeCallset.new_instance')
+    @patch('scripts.vector_genotype_concordance.FilteringVectorGenotypeCallset.new_instance')
     def test_to_filtered_callset(self, filtered_callset_mock, callset_mock):
         callset_mock.side_effect = self._callset_mock_side_effect()
         filtered_callset_mock.side_effect = self.filtered_callset_mock_side_effect()
@@ -468,82 +468,82 @@ def generate_filter(chromosome_bool: dict):
     return root
 
 
-SUMMARY_AA0052 = """sample,chromosome,control,test,count
-AA0052-C,2L,het,mismatch,0
-AA0052-C,2L,hom_alt,mismatch,0
-AA0052-C,2L,hom_ref,hom_ref,31905424
-AA0052-C,2L,hom_ref,het,11
-AA0052-C,2L,hom_ref,hom_alt,0
-AA0052-C,2L,hom_ref,missing,35
-AA0052-C,2L,het,hom_ref,15
-AA0052-C,2L,het,het,317310
-AA0052-C,2L,het,hom_alt,16
-AA0052-C,2L,het,missing,0
-AA0052-C,2L,hom_alt,hom_ref,0
-AA0052-C,2L,hom_alt,het,9
-AA0052-C,2L,hom_alt,hom_alt,248559
-AA0052-C,2L,hom_alt,missing,0
-AA0052-C,2L,missing,hom_ref,55
-AA0052-C,2L,missing,het,0
-AA0052-C,2L,missing,hom_alt,1
-AA0052-C,2L,missing,missing,58548
-AA0052-C,2R,het,mismatch,0
-AA0052-C,2R,hom_alt,mismatch,0
-AA0052-C,2R,hom_ref,hom_ref,39944849
-AA0052-C,2R,hom_ref,het,12
-AA0052-C,2R,hom_ref,hom_alt,0
-AA0052-C,2R,hom_ref,missing,27
-AA0052-C,2R,het,hom_ref,12
-AA0052-C,2R,het,het,371735
-AA0052-C,2R,het,hom_alt,3
-AA0052-C,2R,het,missing,0
-AA0052-C,2R,hom_alt,hom_ref,0
-AA0052-C,2R,hom_alt,het,4
-AA0052-C,2R,hom_alt,hom_alt,175609
-AA0052-C,2R,hom_alt,missing,0
-AA0052-C,2R,missing,hom_ref,38
-AA0052-C,2R,missing,het,0
-AA0052-C,2R,missing,hom_alt,1
-AA0052-C,2R,missing,missing,69377
+SUMMARY_AA0052 = """sample\tchromosome\tcontrol\ttest\tcount
+AA0052-C\t2L\thet\tmismatch\t0
+AA0052-C\t2L\thom_alt\tmismatch\t0
+AA0052-C\t2L\thom_ref\thom_ref\t31905424
+AA0052-C\t2L\thom_ref\thet\t11
+AA0052-C\t2L\thom_ref\thom_alt\t0
+AA0052-C\t2L\thom_ref\tmissing\t35
+AA0052-C\t2L\thet\thom_ref\t15
+AA0052-C\t2L\thet\thet\t317310
+AA0052-C\t2L\thet\thom_alt\t16
+AA0052-C\t2L\thet\tmissing\t0
+AA0052-C\t2L\thom_alt\thom_ref\t0
+AA0052-C\t2L\thom_alt\thet\t9
+AA0052-C\t2L\thom_alt\thom_alt\t248559
+AA0052-C\t2L\thom_alt\tmissing\t0
+AA0052-C\t2L\tmissing\thom_ref\t55
+AA0052-C\t2L\tmissing\thet\t0
+AA0052-C\t2L\tmissing\thom_alt\t1
+AA0052-C\t2L\tmissing\tmissing\t58548
+AA0052-C\t2R\thet\tmismatch\t0
+AA0052-C\t2R\thom_alt\tmismatch\t0
+AA0052-C\t2R\thom_ref\thom_ref\t39944849
+AA0052-C\t2R\thom_ref\thet\t12
+AA0052-C\t2R\thom_ref\thom_alt\t0
+AA0052-C\t2R\thom_ref\tmissing\t27
+AA0052-C\t2R\thet\thom_ref\t12
+AA0052-C\t2R\thet\thet\t371735
+AA0052-C\t2R\thet\thom_alt\t3
+AA0052-C\t2R\thet\tmissing\t0
+AA0052-C\t2R\thom_alt\thom_ref\t0
+AA0052-C\t2R\thom_alt\thet\t4
+AA0052-C\t2R\thom_alt\thom_alt\t175609
+AA0052-C\t2R\thom_alt\tmissing\t0
+AA0052-C\t2R\tmissing\thom_ref\t38
+AA0052-C\t2R\tmissing\thet\t0
+AA0052-C\t2R\tmissing\thom_alt\t1
+AA0052-C\t2R\tmissing\tmissing\t69377
 """
 
-SUMMARY_AA0053 = """sample,chromosome,control,test,count
-AA0053-C,2L,het,mismatch,0
-AA0053-C,2L,hom_alt,mismatch,0
-AA0053-C,2L,hom_ref,hom_ref,25437963
-AA0053-C,2L,hom_ref,het,9
-AA0053-C,2L,hom_ref,hom_alt,0
-AA0053-C,2L,hom_ref,missing,46
-AA0053-C,2L,het,hom_ref,7
-AA0053-C,2L,het,het,268531
-AA0053-C,2L,het,hom_alt,3
-AA0053-C,2L,het,missing,0
-AA0053-C,2L,hom_alt,hom_ref,0
-AA0053-C,2L,hom_alt,het,2
-AA0053-C,2L,hom_alt,hom_alt,113941
-AA0053-C,2L,hom_alt,missing,0
-AA0053-C,2L,missing,hom_ref,18
-AA0053-C,2L,missing,het,0
-AA0053-C,2L,missing,hom_alt,0
-AA0053-C,2L,missing,missing,48865
-AA0053-C,2R,het,mismatch,0
-AA0053-C,2R,hom_alt,mismatch,0
-AA0053-C,2R,hom_ref,hom_ref,32809697
-AA0053-C,2R,hom_ref,het,11
-AA0053-C,2R,hom_ref,hom_alt,0
-AA0053-C,2R,hom_ref,missing,55
-AA0053-C,2R,het,hom_ref,19
-AA0053-C,2R,het,het,365106
-AA0053-C,2R,het,hom_alt,8
-AA0053-C,2R,het,missing,4
-AA0053-C,2R,hom_alt,hom_ref,0
-AA0053-C,2R,hom_alt,het,1
-AA0053-C,2R,hom_alt,hom_alt,151264
-AA0053-C,2R,hom_alt,missing,0
-AA0053-C,2R,missing,hom_ref,26
-AA0053-C,2R,missing,het,0
-AA0053-C,2R,missing,hom_alt,1
-AA0053-C,2R,missing,missing,64670
+SUMMARY_AA0053 = """sample\tchromosome\tcontrol\ttest\tcount
+AA0053-C\t2L\thet\tmismatch\t0
+AA0053-C\t2L\thom_alt\tmismatch\t0
+AA0053-C\t2L\thom_ref\thom_ref\t25437963
+AA0053-C\t2L\thom_ref\thet\t9
+AA0053-C\t2L\thom_ref\thom_alt\t0
+AA0053-C\t2L\thom_ref\tmissing\t46
+AA0053-C\t2L\thet\thom_ref\t7
+AA0053-C\t2L\thet\thet\t268531
+AA0053-C\t2L\thet\thom_alt\t3
+AA0053-C\t2L\thet\tmissing\t0
+AA0053-C\t2L\thom_alt\thom_ref\t0
+AA0053-C\t2L\thom_alt\thet\t2
+AA0053-C\t2L\thom_alt\thom_alt\t113941
+AA0053-C\t2L\thom_alt\tmissing\t0
+AA0053-C\t2L\tmissing\thom_ref\t18
+AA0053-C\t2L\tmissing\thet\t0
+AA0053-C\t2L\tmissing\thom_alt\t0
+AA0053-C\t2L\tmissing\tmissing\t48865
+AA0053-C\t2R\thet\tmismatch\t0
+AA0053-C\t2R\thom_alt\tmismatch\t0
+AA0053-C\t2R\thom_ref\thom_ref\t32809697
+AA0053-C\t2R\thom_ref\thet\t11
+AA0053-C\t2R\thom_ref\thom_alt\t0
+AA0053-C\t2R\thom_ref\tmissing\t55
+AA0053-C\t2R\thet\thom_ref\t19
+AA0053-C\t2R\thet\thet\t365106
+AA0053-C\t2R\thet\thom_alt\t8
+AA0053-C\t2R\thet\tmissing\t4
+AA0053-C\t2R\thom_alt\thom_ref\t0
+AA0053-C\t2R\thom_alt\thet\t1
+AA0053-C\t2R\thom_alt\thom_alt\t151264
+AA0053-C\t2R\thom_alt\tmissing\t0
+AA0053-C\t2R\tmissing\thom_ref\t26
+AA0053-C\t2R\tmissing\thet\t0
+AA0053-C\t2R\tmissing\thom_alt\t1
+AA0053-C\t2R\tmissing\tmissing\t64670
 """
 
 

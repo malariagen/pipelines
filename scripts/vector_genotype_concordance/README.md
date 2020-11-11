@@ -47,11 +47,11 @@ Count usage:
 vector_genotype_concordance.py count -c '/path/to/zarrs/{sample}/{sample}.genotypes.zarr.zip' \
                                      -t '/path/to/zarrs/{sample}.zarr.zip'  \
                                      -s AA0052-C AB0252-C AC0010-C AJ0037-C AN0131-C AN0280-Cx AN0326-C AR0078-C \
-                                     -o /some/dir/results.csv 
+                                     -o /some/dir/results.tsv 
 ```
 Summary usage:
 ```
-vector_genotype_concordance.py summarize -i results.*.csv -o /some/dir/10_samples
+vector_genotype_concordance.py summarize -i results.*.tsv -o /some/dir/10_samples
 ```
 
 ## License
