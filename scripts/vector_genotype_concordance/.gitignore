@@ -1,0 +1,8 @@
+# emacs
+*~
+# pycharm
+.idea
+venv
+.eggs
+__pycache__
+*.egg-info/
