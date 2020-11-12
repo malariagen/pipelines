@@ -1,4 +1,7 @@
 ---
+# Will only catch tags starting with v.
+# Creates a github release and attach the production pipeline for vector genotypes to it
+
 name: "tagged-release"
 
 on:
@@ -10,11 +13,10 @@ jobs:
   tagged-release:
     name: "Tagged Release"
     runs-on: "ubuntu-latest"
-
     steps:
       - name: chekout
         uses: actions/checkout@v2
-      - name: Branch name
+      - name: Workout names of branch, source and tag
         id: branch_name
         run: |
           echo "SOURCE_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
@@ -23,11 +25,12 @@ jobs:
           echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
           echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
-      - name: "Build & test"
+      - name: Build the pipeline
         run: |
           sudo apt-get install -yq zip
           ./scripts/build_pipeline_release.sh -v "${SOURCE_TAG}" -o ./artefacts -w ./pipelines/batch-import-short-read-alignment-and-genotyping-vector/farm5/BatchImportShortReadAlignmentAndGenotyping.wdl
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Create the github release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
