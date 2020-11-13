@@ -29,6 +29,7 @@ jobs:
         run: |
           sudo apt-get install -yq zip
           ./scripts/build_pipeline_release.sh -v "${SOURCE_TAG}" -o ./artefacts -w ./pipelines/batch-import-short-read-alignment-and-genotyping-vector/farm5/BatchImportShortReadAlignmentAndGenotyping.wdl
+          ( cd artefacts; mv BatchImportShortReadAlignmentAndGenotyping BatchImportShortReadAlignmentAndGenotyping-"${SOURCE_TAG}"; tar czf BatchImportShortReadAlignmentAndGenotyping-"${SOURCE_TAG}".tar.gz BatchImportShortReadAlignmentAndGenotyping-"${SOURCE_TAG}")
       - name: Create the github release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -36,4 +37,4 @@ jobs:
           prerelease: false
           automatic_release_tag: "${{ steps.branch_name.outputs.SOURCE_TAG }}"
           files: |
-            artefacts/BatchImportShortReadAlignmentAndGenotyping/*
+            artefacts/*.tar.gz
