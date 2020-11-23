@@ -21,7 +21,6 @@ workflow Alignment {
     String input_fastq1
     String input_fastq2
     String output_file_basename
-
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -90,5 +89,8 @@ workflow Alignment {
 
   output {
     File output_bam = SetNmMdAndUqTags.output_bam
+  }
+  meta {
+    allowNestedInputs: true
   }
 }

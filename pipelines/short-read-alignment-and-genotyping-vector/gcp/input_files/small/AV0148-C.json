@@ -1,7 +1,7 @@
 {
   "ShortReadAlignmentAndGenotyping.sample_id": "AV0148-C",
   "ShortReadAlignmentAndGenotyping.output_basename": "AV0148-C",
-  "ShortReadAlignmentAndGenotyping.input_file": "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/lanelets.tsv",
+  "ShortReadAlignmentAndGenotyping.input_file": "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase1-minimal/lanelets_gs.tsv",
   "ShortReadAlignmentAndGenotyping.alleles_vcf": "gs://broad-gotc-dev-storage/malariaGEN/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz",
   "ShortReadAlignmentAndGenotyping.alleles_vcf_index": "gs://broad-gotc-dev-storage/malariaGEN/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz.tbi",
   "ShortReadAlignmentAndGenotyping.reference": {

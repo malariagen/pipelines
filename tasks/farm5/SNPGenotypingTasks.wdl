@@ -10,12 +10,18 @@ task UnifiedGenotyper {
     File alleles_vcf
     File alleles_vcf_index
     String output_vcf_filename
+
+    String singularity_image = runTimeSettings.gatk_singularity_image
+    Int num_cpu = 4
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx~{memory}m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T UnifiedGenotyper \
           -I ~{input_bam} \
@@ -50,11 +56,11 @@ task UnifiedGenotyper {
           -XA ReadPosRankSumTest
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_vcf = output_vcf_filename
@@ -68,6 +74,12 @@ task VcfToZarr {
     String sample_id
     String output_zarr_file_name
     String output_log_file_name
+
+    String singularity_image = runTimeSettings.vcftozarr_singularity_image
+    Int num_cpu = 2
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -91,11 +103,11 @@ task VcfToZarr {
         --zip
   }
   runtime {
-    singularity: runTimeSettings.vcftozarr_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
   output {
     File output_log_file = output_log_file_name

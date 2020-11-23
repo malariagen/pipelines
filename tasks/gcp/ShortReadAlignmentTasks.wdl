@@ -7,6 +7,10 @@ task SplitUpInputFile {
   input {
     File input_file
     String sample_id
+
+    String docker = runTimeSettings.lftp_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -30,9 +34,9 @@ task SplitUpInputFile {
   }
 
   runtime {
-    docker: runTimeSettings.lftp_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
   }
 
@@ -45,6 +49,10 @@ task Ftp {
   input {
     String input_string
     String output_filename = basename(input_string)
+
+    String docker = runTimeSettings.lftp_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -59,9 +67,9 @@ task Ftp {
   }
 
   runtime {
-    docker: runTimeSettings.lftp_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk 100 HDD"
   }
@@ -75,6 +83,10 @@ task CramToBam {
   input {
     File input_file
     String output_filename
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -93,9 +105,9 @@ task CramToBam {
   }
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "2"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -110,6 +122,10 @@ task RevertSam {
   input {
     File input_file
     String output_filename
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -129,8 +145,9 @@ task RevertSam {
   }
 
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -145,6 +162,10 @@ task SamToFastq {
     File input_file
     String output_fastq1_filename
     String output_fastq2_filename
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -160,8 +181,9 @@ task SamToFastq {
   }
 
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -180,6 +202,9 @@ task ReadAlignment {
     File fastq2
     String output_sam_basename
 
+    String docker = runTimeSettings.bwa_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 16
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -205,9 +230,9 @@ task ReadAlignment {
     /bwa/bwa mem -M -t 16 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   }
   runtime {
-    docker: runTimeSettings.bwa_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "16"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "15 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -220,6 +245,10 @@ task ReadAlignmentPostProcessing {
   input {
     File input_sam
     String output_bam_basename
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
     RunTimeSettings runTimeSettings
   }
 
@@ -238,9 +267,9 @@ task ReadAlignmentPostProcessing {
   }
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "2"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "14 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -253,6 +282,10 @@ task SetNmMdAndUqTags {
   input {
     File input_bam
     String output_bam_basename
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -268,8 +301,9 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -282,6 +316,10 @@ task MergeSamFiles {
   input {
     Array[File] input_files
     String output_filename
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -294,9 +332,9 @@ task MergeSamFiles {
       OUTPUT=~{output_filename}
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -309,6 +347,10 @@ task MarkDuplicates {
   input {
     File input_bam
     String output_filename
+
+    String docker = runTimeSettings.biobambam_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -318,9 +360,9 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    docker: runTimeSettings.biobambam_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     disks: "local-disk " + disk_size + " HDD"
     memory: "3.75 GiB"
   }
@@ -336,6 +378,10 @@ task RealignerTargetCreator {
     File input_bam_index
     File? known_indels_vcf
     String output_interval_list_filename
+
+    String docker = runTimeSettings.gatk_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -352,9 +398,9 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -370,6 +416,10 @@ task IndelRealigner {
     File? known_indels_vcf
     File interval_list_file
     String output_bam_filename
+
+    String docker = runTimeSettings.gatk_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -387,9 +437,9 @@ task IndelRealigner {
           -o ~{output_bam_filename}
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -402,6 +452,10 @@ task FixMateInformation {
   input {
     File input_file
     String output_bam_basename
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -422,9 +476,9 @@ task FixMateInformation {
       mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -441,6 +495,10 @@ task ValidateSamFile {
     String report_filename
     Int? max_output
     Array[String]? ignore
+
+    String docker = runTimeSettings.picard_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -460,9 +518,9 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    docker: runTimeSettings.picard_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -475,6 +533,10 @@ task SamtoolsStats {
   input {
     File input_file
     String report_filename
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -493,8 +555,8 @@ task SamtoolsStats {
 
   runtime {
     docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -508,6 +570,10 @@ task SamtoolsIdxStats {
     File input_bam
     File input_bam_index
     String report_filename
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -523,9 +589,9 @@ task SamtoolsIdxStats {
   }
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -538,6 +604,10 @@ task SamtoolsFlagStat {
   input {
     File input_bam
     String report_filename
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -553,9 +623,9 @@ task SamtoolsFlagStat {
   }
 
   runtime {
-    docker: runTimeSettings.samtools_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -569,6 +639,10 @@ task GatkCallableLoci {
     File input_bam
     File input_bam_index
     String summary_filename
+
+    String docker = runTimeSettings.gatk_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -585,9 +659,9 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
