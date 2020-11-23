@@ -43,7 +43,7 @@ task SelectVariants {
     #File subset_vcf_index = "~{output_basename}.subset.vcf.gz.tbi"
 
 
-# TODO: investigate values beetween 15 (default) and 20 for --max-coverage=
+# TODO:  --max-coverage
 task WhatsHapPhase {
   input {
     File input_bam
@@ -73,7 +73,7 @@ task WhatsHapPhase {
   }
 }
 
-# TODO: what is the chromosome lengths file
+# TODO: chromosome lengths
 task WhatsHapStats {
   input {
    File phased_vcf
