@@ -8,7 +8,7 @@ task SplitUpInputFile {
     File input_file
     String sample_id
 
-    String singularity_image = runTimeSettings.lftp_singularity_image
+    String docker_tag = "malaria-lftp:4.8.3"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group
@@ -36,7 +36,7 @@ task SplitUpInputFile {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -53,7 +53,7 @@ task Ftp {
     String input_string
     String output_filename = basename(input_string)
 
-    String singularity_image = runTimeSettings.lftp_singularity_image
+    String docker_tag = "malaria-lftp:4.8.3"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group
@@ -72,7 +72,7 @@ task Ftp {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -89,7 +89,7 @@ task CramToBam {
     File input_file
     String output_filename
 
-    String singularity_image = runTimeSettings.samtools_singularity_image
+    String docker_tag = "malaria-samtools:1.4.1"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -110,7 +110,7 @@ task CramToBam {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -128,7 +128,7 @@ task RevertSam {
     File input_file
     String output_filename
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -150,7 +150,7 @@ task RevertSam {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -168,7 +168,7 @@ task SamToFastq {
     String output_fastq1_filename
     String output_fastq2_filename
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -186,7 +186,7 @@ task SamToFastq {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -207,7 +207,7 @@ task ReadAlignment {
     File fastq2
     String output_sam_basename
 
-    String singularity_image = runTimeSettings.bwa_singularity_image
+    String docker_tag = "malaria-bwa:0.7.15"
     Int num_cpu = 4
     Int memory = 4000
     String? lsf_group
@@ -231,7 +231,7 @@ task ReadAlignment {
     /bwa/bwa mem -M -K 100000000 -t 4 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -247,7 +247,7 @@ task ReadAlignmentPostProcessing {
     File input_sam
     String output_bam_basename
 
-    String singularity_image = runTimeSettings.samtools_singularity_image
+    String docker_tag = "malaria-samtools:1.4.1"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -268,7 +268,7 @@ task ReadAlignmentPostProcessing {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -284,7 +284,7 @@ task SetNmMdAndUqTags {
     File input_bam
     String output_bam_basename
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -302,7 +302,7 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -318,7 +318,7 @@ task MergeSamFiles {
     Array[File] input_files
     String output_filename
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -333,7 +333,7 @@ task MergeSamFiles {
       OUTPUT=~{output_filename}
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -349,7 +349,7 @@ task MarkDuplicates {
     File input_bam
     String output_filename
 
-    String singularity_image = runTimeSettings.biobambam_singularity_image
+    String docker_tag = "malaria-biobambam:2.0.73"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -361,7 +361,7 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -380,7 +380,7 @@ task RealignerTargetCreator {
     File? known_indels_vcf
     String output_interval_list_filename
 
-    String singularity_image = runTimeSettings.gatk_singularity_image
+    String docker_tag = "malaria-gatk3:3.7.0"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -399,7 +399,7 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -418,7 +418,7 @@ task IndelRealigner {
     File interval_list_file
     String output_bam_filename
 
-    String singularity_image = runTimeSettings.gatk_singularity_image
+    String docker_tag = "malaria-gatk3:3.7.0"
     Int num_cpu = 1
     Int memory = 8000
     String? lsf_group
@@ -438,7 +438,7 @@ task IndelRealigner {
           -o ~{output_bam_filename}
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -454,7 +454,7 @@ task FixMateInformation {
     File input_file
     String output_bam_basename
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 8000
     String? lsf_group
@@ -477,7 +477,7 @@ task FixMateInformation {
       mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -497,7 +497,7 @@ task ValidateSamFile {
     Int? max_output
     Array[String]? ignore
 
-    String singularity_image = runTimeSettings.picard_singularity_image
+    String docker_tag = "malaria-picard:2.9.2"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -518,7 +518,7 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -534,7 +534,7 @@ task SamtoolsStats {
     File input_file
     String report_filename
 
-    String singularity_image = runTimeSettings.samtools_singularity_image
+    String docker_tag = "malaria-samtools:1.4.1"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -553,7 +553,7 @@ task SamtoolsStats {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -570,7 +570,7 @@ task SamtoolsIdxStats {
     File input_bam_index
     String report_filename
 
-    String singularity_image = runTimeSettings.samtools_singularity_image
+    String docker_tag = "malaria-samtools:1.4.1"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -588,7 +588,7 @@ task SamtoolsIdxStats {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -604,7 +604,7 @@ task SamtoolsFlagStat {
     File input_bam
     String report_filename
 
-    String singularity_image = runTimeSettings.samtools_singularity_image
+    String docker_tag = "malaria-samtools:1.4.1"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -622,7 +622,7 @@ task SamtoolsFlagStat {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -639,7 +639,7 @@ task GatkCallableLoci {
     File input_bam_index
     String summary_filename
 
-    String singularity_image = runTimeSettings.gatk_singularity_image
+    String docker_tag = "malaria-gatk3:3.7.0"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -658,7 +658,7 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
