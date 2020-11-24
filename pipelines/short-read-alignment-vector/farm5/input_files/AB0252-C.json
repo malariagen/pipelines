@@ -13,7 +13,7 @@
     "ref_pac": "/nfs/pathogen/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
   },
   "ShortReadAlignment.runTimeSettings": {
-    "lsf_group": "malaria-dk",
+    "lsf_group": "pathdev",
     "lsf_queue": "normal",
     "bwa_singularity_image": "bwa.0.7.15_v0.1.2.sif",
     "samtools_singularity_image": "samtools.1.4.1_v0.1.2.sif",
