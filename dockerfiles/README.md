@@ -38,6 +38,9 @@ Contains the sample_select_variants python script
 ### WhatsHap
 Contains the latest version of WhatsHap https://whatshap.readthedocs.io/en/latest/
 
+### Import
+A farm5-specific docker image, providing dependencies for the iRODS import and batch processing workflows.
+
 ## Mosquito short read alignment pipeline
 
 - bwa 0.7.15 - `docker build . --tag=bwa:0.7.15 --build-arg version=v0.7.15`
@@ -49,4 +52,5 @@ Contains the latest version of WhatsHap https://whatshap.readthedocs.io/en/lates
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
 - sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
 - whatshap - `docker build . --tag=whatshap:1.0`
+- import - `docker build . --tag=sangerpathogens/irods:4.1.12`
 
