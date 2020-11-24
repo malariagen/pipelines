@@ -11,7 +11,7 @@ task UnifiedGenotyper {
     File alleles_vcf_index
     String output_vcf_filename
 
-    String singularity_image = runTimeSettings.gatk_singularity_image
+    String docker_tag = "malaria-gatk3:3.7.0"
     Int num_cpu = 4
     Int memory = 3000
     String? lsf_group
@@ -56,7 +56,7 @@ task UnifiedGenotyper {
           -XA ReadPosRankSumTest
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -75,7 +75,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String singularity_image = runTimeSettings.vcftozarr_singularity_image
+    String docker_tag = "malaria-samplevcftozarr:1.0.0"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -103,7 +103,7 @@ task VcfToZarr {
         --zip
   }
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     cpu: num_cpu
     memory: memory
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
