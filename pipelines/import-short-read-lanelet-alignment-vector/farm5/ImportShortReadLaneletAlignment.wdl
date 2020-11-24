@@ -57,4 +57,8 @@ workflow ImportShortReadLaneletAlignment {
   output {
     Array[File] output_bam = LaneletAlignment.output_bam
   }
+
+  meta {
+    allowNestedInputs: true
+  }
 }
