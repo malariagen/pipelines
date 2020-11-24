@@ -83,13 +83,23 @@ This step takes as inputs:
   decide which).
 
 * A file specifying the subset of sites and alleles at which to phase,
-  as either VCF or Zarr (@@TODO: decide which).
+  as Zarr.
 
 This step then applies a subsetting and allele recoding operation to
 the input genotypes, outputting a VCF file with biallelic genotypes
-for a single sample.
+for a single sample via the sample_select_variants.py script.
 
-@@TODO figure out which tool and command to use
+E.g.:
+
+```bash
+python sample_select_variants.py \
+      --sample-genotypes ~{sample_zarr} \
+      --sites-called ~{called_sites_zarr} \
+      --sites-selected ~{phased_sites_zarr} \
+      --output ~{output_basename}.subset.vcf \
+      --contig ~{contig} \
+      --progress
+```
 
 
 #### Step: WhatsHap phase
