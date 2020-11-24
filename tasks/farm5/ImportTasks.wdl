@@ -7,6 +7,11 @@ task ImportIRODS {
     String irods_path
     String sample_id
 
+    String singularity_image = runTimeSettings.irods_singularity_image
+    Int num_cpu = 1
+    Int memory = 1000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -25,11 +30,11 @@ task ImportIRODS {
   }
 
   runtime {
-    singularity: runTimeSettings.irods_singularity_image
-    memory: 1000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image
+    memory: memory
+    cpu: num_cpu
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
@@ -50,6 +55,11 @@ task BatchSplitUpInputFile {
   input {
     File batch_sample_manifest_file
 
+    String singularity_image = runTimeSettings.binder_singularity_image
+    Int num_cpu = 1
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -74,11 +84,11 @@ task BatchSplitUpInputFile {
   >>>
 
   runtime {
-    singularity: runTimeSettings.binder_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    singularity: singularity_image 
+    memory: memory
+    cpu: num_cpu
+    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
+    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
   }
 
   output {
