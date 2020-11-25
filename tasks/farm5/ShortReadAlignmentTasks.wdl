@@ -260,10 +260,10 @@ task ReadAlignmentPostProcessing {
     set -e
     set -o pipefail
 
-    /bin/samtools view -bu ~{input_sam} |
-    /bin/samtools sort -n - |
-    /bin/samtools fixmate - - |
-    /bin/samtools sort - > ~{output_bam_basename}.bam
+    samtools view -bu ~{input_sam} |
+    samtools sort -n - |
+    samtools fixmate - - |
+    samtools sort - > ~{output_bam_basename}.bam
 
   }
 
@@ -548,7 +548,7 @@ task SamtoolsStats {
     set -e
     set -o pipefail
 
-    /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
+    samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
 
   }
 
@@ -583,7 +583,7 @@ task SamtoolsIdxStats {
     set -e
     set -o pipefail
 
-    /bin/samtools idxstats ~{input_bam} > ~{report_filename}
+    samtools idxstats ~{input_bam} > ~{report_filename}
 
   }
 
@@ -617,7 +617,7 @@ task SamtoolsFlagStat {
     set -e
     set -o pipefail
 
-    /bin/samtools flagstat ~{input_bam} > ~{report_filename}
+    samtools flagstat ~{input_bam} > ~{report_filename}
 
   }
 
