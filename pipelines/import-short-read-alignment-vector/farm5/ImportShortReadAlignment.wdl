@@ -130,4 +130,8 @@ workflow ImportShortReadAlignment {
     File samtools_flagstat_report_file = SamtoolsFlagStat.report_file
     File callable_loci_summary_file = GatkCallableLoci.summary_file
   }
+
+  meta {
+    allowNestedInputs: true
+  }
 }

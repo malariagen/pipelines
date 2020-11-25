@@ -81,4 +81,8 @@ workflow BatchImportShortReadAlignmentAndGenotyping {
     Array[File] output_vcf_index = SNPGenotyping.output_vcf_index
     Array[File] zarr_output = SNPGenotyping.zarr_output
   }
+
+  meta {
+    allowNestedInputs: true
+  }
 }
