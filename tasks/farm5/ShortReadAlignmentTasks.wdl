@@ -39,8 +39,8 @@ task SplitUpInputFile {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -75,8 +75,8 @@ task Ftp {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -113,8 +113,8 @@ task CramToBam {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -153,8 +153,8 @@ task RevertSam {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -189,8 +189,8 @@ task SamToFastq {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -234,8 +234,8 @@ task ReadAlignment {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_sam = "~{output_sam_basename}.sam"
@@ -271,8 +271,8 @@ task ReadAlignmentPostProcessing {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -305,8 +305,8 @@ task SetNmMdAndUqTags {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -336,8 +336,8 @@ task MergeSamFiles {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -364,8 +364,8 @@ task MarkDuplicates {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_file = output_filename
@@ -402,8 +402,8 @@ task RealignerTargetCreator {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_interval_list_file = output_interval_list_filename
@@ -441,8 +441,8 @@ task IndelRealigner {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_bam = output_bam_filename
@@ -480,8 +480,8 @@ task FixMateInformation {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_bam = "~{output_bam_basename}.bam"
@@ -521,8 +521,8 @@ task ValidateSamFile {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -556,8 +556,8 @@ task SamtoolsStats {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -591,8 +591,8 @@ task SamtoolsIdxStats {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -625,8 +625,8 @@ task SamtoolsFlagStat {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File report_file = report_filename
@@ -661,8 +661,8 @@ task GatkCallableLoci {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File summary_file = summary_filename

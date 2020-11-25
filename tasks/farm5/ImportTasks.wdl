@@ -33,8 +33,8 @@ task ImportIRODS {
     singularity: singularity_image
     memory: memory
     cpu: num_cpu
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -87,8 +87,8 @@ task BatchSplitUpInputFile {
     singularity: singularity_image 
     memory: memory
     cpu: num_cpu
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {

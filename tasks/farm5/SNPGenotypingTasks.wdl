@@ -59,8 +59,8 @@ task UnifiedGenotyper {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_vcf = output_vcf_filename
@@ -106,8 +106,8 @@ task VcfToZarr {
     singularity: singularity_image
     cpu: num_cpu
     memory: memory
-    lsf_group: select_first([lsf_group, runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([lsf_queue, runTimeSettings.lsf_queue, "normal"])
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_log_file = output_log_file_name
