@@ -64,7 +64,7 @@ task WhatsHapPhase {
     docker: runTimeSettings.whatshap_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "2"
-    memory: "15 GiB"
+    memory: "30 GiB"
   }
 
   output {
