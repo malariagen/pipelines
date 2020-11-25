@@ -32,6 +32,12 @@ Contains the lftp too, a simple ftp client, used for downloading files from ena
 ### SampleVcfToZarr
 Contains the sample_vcf_to_zarr python script
 
+### SampleSelectVariants
+Contains the sample_select_variants python script
+
+### WhatsHap
+Contains the latest version of WhatsHap https://whatshap.readthedocs.io/en/latest/
+
 ## Mosquito short read alignment pipeline
 
 - bwa 0.7.15 - `docker build . --tag=bwa:0.7.15 --build-arg version=v0.7.15`
@@ -41,4 +47,6 @@ Contains the sample_vcf_to_zarr python script
 - GATK 3.7-0 - `docker pull broadinstitute/gatk3:3.7-0`
 - lftp - `docker build . --tag=lftp:1.0`
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
+- sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
+- whatshap - `docker build . --tag=whatshap:1.0`
 

@@ -9,4 +9,6 @@ struct RunTimeSettings {
   String samtools_docker
   String vcftozarr_docker
   String lftp_docker
+  String select_variants_docker
+  String whatshap_docker
 }
