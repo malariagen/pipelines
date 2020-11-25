@@ -27,6 +27,6 @@
     "vcftozarr_docker": "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1",
     "lftp_docker": "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0",
     "select_variants_docker": "us.gcr.io/broad-gotc-prod/malariagen/sampleselectvariants:1.0",
-    "whatshap_docker": " us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
+    "whatshap_docker": "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
   }
 }

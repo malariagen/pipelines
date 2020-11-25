@@ -40,7 +40,6 @@ task SelectVariants {
     File subset_vcf = "~{output_basename}.subset.vcf"
   }
 }
-    #File subset_vcf_index = "~{output_basename}.subset.vcf.gz.tbi"
 
 
 # TODO:  --max-coverage
@@ -64,8 +63,8 @@ task WhatsHapPhase {
   runtime {
     docker: runTimeSettings.whatshap_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "4"
-    memory: "30 GiB"
+    cpu: "2"
+    memory: "15 GiB"
   }
 
   output {
