@@ -137,7 +137,7 @@ task RevertSam {
   }
 
   command {
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       RevertSam \
       INPUT=~{input_file} \
       OUTPUT=~{output_filename} \
@@ -177,7 +177,7 @@ task SamToFastq {
   }
 
   command {
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       SamToFastq \
       INPUT=~{input_file} \
       FASTQ=~{output_fastq1_filename} \
@@ -294,7 +294,7 @@ task SetNmMdAndUqTags {
   }
 
   command {
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       SetNmMdAndUqTags \
       INPUT=~{input_bam} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -327,7 +327,7 @@ task MergeSamFiles {
   }
 
   command {
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       MergeSamFiles \
       INPUT=~{sep=' INPUT=' input_files} \
       OUTPUT=~{output_filename}
@@ -466,7 +466,7 @@ task FixMateInformation {
    set -e
    set -o pipefail
 
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       FixMateInformation \
       INPUT=~{input_file} \
       OUTPUT=~{output_bam_basename}.bam \
@@ -507,7 +507,7 @@ task ValidateSamFile {
   }
 
   command {
-    java -Xmx~{memory}m -jar /bin/picard.jar \
+    picard -Xmx~{memory}m \
       ValidateSamFile \
       INPUT=~{input_file} \
       OUTPUT=~{report_filename} \
