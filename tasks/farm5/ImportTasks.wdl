@@ -7,7 +7,7 @@ task ImportIRODS {
     String irods_path
     String sample_id
 
-    String singularity_image = runTimeSettings.irods_singularity_image
+    String docker_tag = "malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
     Int num_cpu = 1
     Int memory = 1000
     String? lsf_group
@@ -30,7 +30,7 @@ task ImportIRODS {
   }
 
   runtime {
-    singularity: singularity_image
+    docker: docker_tag
     memory: memory
     cpu: num_cpu
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
@@ -55,7 +55,7 @@ task BatchSplitUpInputFile {
   input {
     File batch_sample_manifest_file
 
-    String singularity_image = runTimeSettings.binder_singularity_image
+    String docker_tag = "malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group
@@ -84,7 +84,7 @@ task BatchSplitUpInputFile {
   >>>
 
   runtime {
-    singularity: singularity_image 
+    docker: docker_tag 
     memory: memory
     cpu: num_cpu
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
