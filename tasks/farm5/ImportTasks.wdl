@@ -7,7 +7,7 @@ task ImportIRODS {
     String irods_path
     String sample_id
 
-    String docker_tag = "malaria-irods:4.1.12"
+    String docker_tag = "malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
     Int num_cpu = 1
     Int memory = 1000
     String? lsf_group
@@ -55,7 +55,7 @@ task BatchSplitUpInputFile {
   input {
     File batch_sample_manifest_file
 
-    String docker_tag = "malaria-irods:4.1.12"
+    String docker_tag = "malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group

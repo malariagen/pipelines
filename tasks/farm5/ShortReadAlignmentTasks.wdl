@@ -8,7 +8,7 @@ task SplitUpInputFile {
     File input_file
     String sample_id
 
-    String docker_tag = "malaria-lftp:4.8.3"
+    String docker_tag = "malaria-lftp@sha256:08f6ecb84d21a09f248749e65d5c90686030a99423c8e31101e9c98fe4992745"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group
@@ -53,7 +53,7 @@ task Ftp {
     String input_string
     String output_filename = basename(input_string)
 
-    String docker_tag = "malaria-lftp:4.8.3"
+    String docker_tag = "malaria-lftp@sha256:08f6ecb84d21a09f248749e65d5c90686030a99423c8e31101e9c98fe4992745"
     Int num_cpu = 1
     Int memory = 3000
     String? lsf_group
@@ -89,7 +89,7 @@ task CramToBam {
     File input_file
     String output_filename
 
-    String docker_tag = "malaria-samtools:1.4.1"
+    String docker_tag = "malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -128,7 +128,7 @@ task RevertSam {
     File input_file
     String output_filename
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -168,7 +168,7 @@ task SamToFastq {
     String output_fastq1_filename
     String output_fastq2_filename
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -207,7 +207,7 @@ task ReadAlignment {
     File fastq2
     String output_sam_basename
 
-    String docker_tag = "malaria-bwa:0.7.15"
+    String docker_tag = "malaria-bwa@sha256:1504f6bacc2a2b8b5583f0782c9cd89c1a9c7db8d31bd5bbcfccc8470f24f5e0"
     Int num_cpu = 4
     Int memory = 4000
     String? lsf_group
@@ -247,7 +247,7 @@ task ReadAlignmentPostProcessing {
     File input_sam
     String output_bam_basename
 
-    String docker_tag = "malaria-samtools:1.4.1"
+    String docker_tag = "malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -284,7 +284,7 @@ task SetNmMdAndUqTags {
     File input_bam
     String output_bam_basename
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -318,7 +318,7 @@ task MergeSamFiles {
     Array[File] input_files
     String output_filename
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -349,7 +349,7 @@ task MarkDuplicates {
     File input_bam
     String output_filename
 
-    String docker_tag = "malaria-biobambam:2.0.73"
+    String docker_tag = "malaria-biobambam@sha256:b185800c292be69ad5928489b530b9a46b2057dea2380f845ba6925591fe62fc"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -380,7 +380,7 @@ task RealignerTargetCreator {
     File? known_indels_vcf
     String output_interval_list_filename
 
-    String docker_tag = "malaria-gatk3:3.7.0"
+    String docker_tag = "malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -418,7 +418,7 @@ task IndelRealigner {
     File interval_list_file
     String output_bam_filename
 
-    String docker_tag = "malaria-gatk3:3.7.0"
+    String docker_tag = "malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
     Int memory = 8000
     String? lsf_group
@@ -454,7 +454,7 @@ task FixMateInformation {
     File input_file
     String output_bam_basename
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 8000
     String? lsf_group
@@ -497,7 +497,7 @@ task ValidateSamFile {
     Int? max_output
     Array[String]? ignore
 
-    String docker_tag = "malaria-picard:2.9.2"
+    String docker_tag = "malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
@@ -534,7 +534,7 @@ task SamtoolsStats {
     File input_file
     String report_filename
 
-    String docker_tag = "malaria-samtools:1.4.1"
+    String docker_tag = "malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -570,7 +570,7 @@ task SamtoolsIdxStats {
     File input_bam_index
     String report_filename
 
-    String docker_tag = "malaria-samtools:1.4.1"
+    String docker_tag = "malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -604,7 +604,7 @@ task SamtoolsFlagStat {
     File input_bam
     String report_filename
 
-    String docker_tag = "malaria-samtools:1.4.1"
+    String docker_tag = "malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
     Int memory = 2000
     String? lsf_group
@@ -639,7 +639,7 @@ task GatkCallableLoci {
     File input_bam_index
     String summary_filename
 
-    String docker_tag = "malaria-gatk3:3.7.0"
+    String docker_tag = "malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
     Int memory = 4000
     String? lsf_group
