@@ -11,7 +11,7 @@ task UnifiedGenotyper {
     File alleles_vcf_index
     String output_vcf_filename
 
-    String docker_tag = "malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
+    String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 4
     Int memory = 3000
     String? lsf_group
@@ -75,7 +75,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "malaria-samplevcftozarr@sha256:1baec1f2b253311bf834f8c5bf8c8169e765f738ac1972100027cbfa28329f2f"
+    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:1baec1f2b253311bf834f8c5bf8c8169e765f738ac1972100027cbfa28329f2f"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
