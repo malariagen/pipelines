@@ -7,6 +7,11 @@ task ImportIRODS {
     String irods_path
     String sample_id
 
+    String docker_tag = "sangerpathogens/malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
+    Int num_cpu = 1
+    Int memory = 1000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -25,11 +30,11 @@ task ImportIRODS {
   }
 
   runtime {
-    singularity: runTimeSettings.irods_singularity_image
-    memory: 1000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: docker_tag
+    memory: memory
+    cpu: num_cpu
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {
@@ -50,6 +55,11 @@ task BatchSplitUpInputFile {
   input {
     File batch_sample_manifest_file
 
+    String docker_tag = "sangerpathogens/malaria-irods@sha256:adadaf506ac1d99dfc9a0eb2d8f4cad4527e1a0d00fbf18d8864155ce16038d8"
+    Int num_cpu = 1
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -74,11 +84,11 @@ task BatchSplitUpInputFile {
   >>>
 
   runtime {
-    singularity: runTimeSettings.binder_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: docker_tag 
+    memory: memory
+    cpu: num_cpu
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
 
   output {

@@ -66,4 +66,7 @@ workflow ShortReadAlignmentAndGenotyping {
     File output_vcf_index = SNPGenotyping.output_vcf_index
     File zarr_output = SNPGenotyping.zarr_output
   }
+  meta {
+    allowNestedInputs: true
+  }
 }

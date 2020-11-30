@@ -1,4 +1,4 @@
 {
-  "read_from_cache": true,
-  "write_to_cache": true
+  "read_from_cache": false,
+  "write_to_cache": false
 }
