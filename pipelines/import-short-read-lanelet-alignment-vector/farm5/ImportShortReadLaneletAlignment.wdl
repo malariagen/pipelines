@@ -4,8 +4,13 @@ version 1.0
 ##
 ## This WDL pipeline implements the Short Read Alignment Pipeline as described in
 ## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## Takes an input bam or cram for a lanelet and aligns it using bwa.
-##
+## Imports multiple lanelet bams/crams for the same sample from IRODS.
+## BWA aligns the lanelet bams/crams.  Processes each lanelet in parallel.
+## Lanelet refers a lane of a sample that has been multiplexed into multiple
+## sequencing lanes.
+## Expects that the per_sample_manifest_file contains only the lanelets for a single sample
+## and each lanelet has its own row.
+## Columns:  sample, run_ena, irods_path
 
 import "../../../structs/farm5/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
