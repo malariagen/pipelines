@@ -10,6 +10,10 @@ task UnifiedGenotyper {
     File alleles_vcf
     File alleles_vcf_index
     String output_vcf_filename
+
+    String docker = runTimeSettings.gatk_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 4
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -52,10 +56,10 @@ task UnifiedGenotyper {
           -XA ReadPosRankSumTest
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "15 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -70,6 +74,10 @@ task VcfToZarr {
     String sample_id
     String output_zarr_file_name
     String output_log_file_name
+
+    String docker = runTimeSettings.vcftozarr_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -95,10 +103,10 @@ task VcfToZarr {
         --zip
   }
   runtime {
-    docker: runTimeSettings.vcftozarr_docker
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {

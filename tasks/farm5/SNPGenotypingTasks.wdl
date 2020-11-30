@@ -10,12 +10,18 @@ task UnifiedGenotyper {
     File alleles_vcf
     File alleles_vcf_index
     String output_vcf_filename
+
+    String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
+    Int num_cpu = 4
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx3500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx~{memory}m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T UnifiedGenotyper \
           -I ~{input_bam} \
@@ -50,11 +56,11 @@ task UnifiedGenotyper {
           -XA ReadPosRankSumTest
   }
   runtime {
-    singularity: runTimeSettings.gatk_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: docker_tag
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_vcf = output_vcf_filename
@@ -68,6 +74,12 @@ task VcfToZarr {
     String sample_id
     String output_zarr_file_name
     String output_log_file_name
+
+    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:1baec1f2b253311bf834f8c5bf8c8169e765f738ac1972100027cbfa28329f2f"
+    Int num_cpu = 2
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
     RunTimeSettings runTimeSettings
   }
 
@@ -91,11 +103,11 @@ task VcfToZarr {
         --zip
   }
   runtime {
-    singularity: runTimeSettings.vcftozarr_singularity_image
-    memory: 3000
-    cpu: "1"
-    lsf_group: select_first([runTimeSettings.lsf_group, "malaria-dk"])
-    lsf_queue: select_first([runTimeSettings.lsf_queue, "normal"])
+    docker: docker_tag
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
     File output_log_file = output_log_file_name
