@@ -20,7 +20,8 @@ workflow StatisticalPhasing {
   input {
     String project_id
     Array[File] sample_phased_vcfs
-    File genetic_map
+    Array[File] sample_phased_vcf_indices
+#    File genetic_map
 
     File? haplotype_reference_panel
 
@@ -28,16 +29,16 @@ workflow StatisticalPhasing {
     RunTimeSettings runTimeSettings
   }
 
-  # Step: Merge VCFs
+  # Step 1: Merge VCFs
   call Tasks.MergeVcfs as MergeVcfs {
     input:
       sample_phased_vcfs = sample_phased_vcfs,
+      sample_phased_vcf_indices = sample_phased_vcf_indices,
       project_id = project_id,
-      reference = reference,
       runTimeSettings = runTimeSettings
   }
 
-  # Step: ShapeIt4
+  # Step 2: ShapeIt4
   call Tasks.ShapeIt4 as ShapeIt4 {
     input:
       merged_vcf = MergeVcfs.merged_vcf,

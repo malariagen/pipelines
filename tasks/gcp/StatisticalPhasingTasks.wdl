@@ -6,15 +6,17 @@ import "../../structs/ReferenceSequence.wdl"
 task MergeVcfs {
   input {
     Array[File] sample_phased_vcfs
+    Array[File] sample_phased_vcf_indices
     String project_id
-    ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
   command {
-
+    bcftools merge \
+      -o ~{project_id}_merged.vcf \
+      ~{sep=' ' sample_phased_vcfs}
   }
   runtime {
-    docker: runTimeSettings.gatk_docker
+    docker: runTimeSettings.bcftools_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
@@ -60,7 +62,7 @@ task ShapeIt4 {
 
   output {
       File phased_vcf =  "~{project_id}_phased.vcf.gz"
-      Array[File] phasing_logs = glob("lanelet_temp/~{lanelet_file_prefix}*")
+#      Array[File] phasing_logs = glob("lanelet_temp/~{lanelet_file_prefix}*")
   }
 }
 

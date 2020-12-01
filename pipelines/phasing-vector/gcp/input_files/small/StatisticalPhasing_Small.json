@@ -1,13 +1,14 @@
 {
-  "ReadBackedPhasing.sample_id": "AV0148-C",
-  "ReadBackedPhasing.output_basename": "AV0148-C",
-  "ReadBackedPhasing.input_bam": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ShortReadAlignmentOutput/AV0148-C.bam",
-  "ReadBackedPhasing.input_bam_index": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ShortReadAlignmentOutput/AV0148-C.bam.bai",
-  "ReadBackedPhasing.sample_zarr": "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/SnpGenotypingOutput/AV0148-C.zarr.zip",
-  "ReadBackedPhasing.called_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/AgamP4.allsites.nonN.zarr.zip",
-  "ReadBackedPhasing.phased_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_arab.zarr.zip",
-  "ReadBackedPhasing.contig": "3L",
-  "ReadBackedPhasing.reference": {
+  "StatisticalPhasing.project_id": "small",
+  "StatisticalPhasing.sample_phased_vcfs": [
+    "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz",
+    "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz"
+  ],
+  "StatisticalPhasing.sample_phased_vcf_indices": [
+    "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz.tbi",
+    "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz.tbi"
+  ],
+  "StatisticalPhasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
     "ref_dict": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
@@ -17,7 +18,7 @@
     "ref_ann": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
     "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
   },
-  "ReadBackedPhasing.runTimeSettings": {
+  "StatisticalPhasing.runTimeSettings": {
     "preemptible_tries": 0,
     "gatk_docker": "broadinstitute/gatk3:3.7-0",
     "picard_docker": "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2",

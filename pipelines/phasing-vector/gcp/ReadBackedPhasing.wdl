@@ -51,7 +51,15 @@ workflow ReadBackedPhasing {
       reference = reference,
       runTimeSettings = runTimeSettings
   }
-  # Step 3: WhatsHap stats
+
+  # Step 3: bgzip the phased_vcf (needed for bcftools merge in statistical phasing pipeline)
+  call Tasks.BgzipAndTabix {
+    input:
+      input_vcf = WhatsHapPhase.phased_vcf,
+      output_basename = output_basename + ".phased",
+      runTimeSettings = runTimeSettings
+  }
+  # Step 4: WhatsHap stats
   call Tasks.WhatsHapStats {
     input:
       phased_vcf = WhatsHapPhase.phased_vcf,
@@ -61,7 +69,8 @@ workflow ReadBackedPhasing {
 
   output {
     File sample_subset_vcf = SelectVariants.subset_vcf
-    File sample_phased_vcf = WhatsHapPhase.phased_vcf
+    File sample_phased_vcf = BgzipAndTabix.vcf
+    File sample_phased_vcf_index = BgzipAndTabix.vcf_index
     File whats_hap_stats_tsv = WhatsHapStats.whats_hap_stats_tsv
     File whats_hap_blocks_gtf = WhatsHapStats.whats_hap_blocks_gtf
   }
