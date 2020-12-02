@@ -61,7 +61,7 @@ workflow ImportShortReadLaneletAlignment {
         runTimeSettings = runTimeSettings
     }
 
-    String read_group = read_string(ExtractReadGroup.read_group_filename)
+    String read_group = read_string(ExtractReadGroup.read_group_file)
     String align_basename = sample_id + "." + irods_basename + ".align"
 
     call LaneletAlignmentTask.Alignment as LaneletAlignment {
