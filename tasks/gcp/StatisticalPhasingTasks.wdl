@@ -31,30 +31,36 @@ task ShapeIt4 {
   input {
     File merged_vcf
     String project_id
-    File genetic_map
-    ReferenceSequence reference
+    # TODO - this is not an option
+    File? genetic_map
+    String contig
+    Float window = 2.5
+    Int num_threads = 1
+    String mcmc_iterations = "5b,1p,1b,1p,1b,1p,5m"
+    Int pbwt_depth = 4
+    # TODO - how to handle refence as an option
+    ReferenceSequence? reference
     RunTimeSettings runTimeSettings
   }
 
   command {
+    #TODO - handle reference...
     shapeit4 \
         --input ~{merged_vcf} \
-        --map ~{genetic_map} \
-        --region REGION \
-        --window WINDOW \
-        --thread N_THREADS \
-        --mcmc-iterations MCMC_ITERATIONS \
-        --pbwt-depth PBWT_DEPTH \
-        --window WINDOW \
+        ~{"--map " + genetic_map} \
+        --region ~{contig} \
+        ~{"--window " + window} \
+        ~{"--thread " + num_threads} \
+        ~{"--mcmc-iterations " + mcmc_iterations} \
+        ~{"--pbwt-depth " + pbwt_depth} \
         --sequencing \
-        --reference REFERENCE.vcf \
         --use-PS 0.0001 \
         --log phased.log \
         --output ~{project_id}_phased.vcf.gz
   }
 
   runtime {
-    docker: runTimeSettings.shapeit4
+    docker: runTimeSettings.shapeit4_docker
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
@@ -62,7 +68,7 @@ task ShapeIt4 {
 
   output {
       File phased_vcf =  "~{project_id}_phased.vcf.gz"
-#      Array[File] phasing_logs = glob("lanelet_temp/~{lanelet_file_prefix}*")
+      File log_file =  "phased.log"
   }
 }
 

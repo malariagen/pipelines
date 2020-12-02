@@ -21,9 +21,8 @@ workflow StatisticalPhasing {
     String project_id
     Array[File] sample_phased_vcfs
     Array[File] sample_phased_vcf_indices
-#    File genetic_map
-
-    File? haplotype_reference_panel
+    File? genetic_map
+    String contig
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -44,24 +43,25 @@ workflow StatisticalPhasing {
       merged_vcf = MergeVcfs.merged_vcf,
       project_id = project_id,
       genetic_map = genetic_map,
+      contig = contig,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Possible Step: Ligate regions (?)
-  call Tasks.LigateRegions {
-    input:
-      reference = reference,
-      runTimeSettings = runTimeSettings
-  }
+#  call Tasks.LigateRegions {
+#    input:
+#      reference = reference,
+#      runTimeSettings = runTimeSettings
+#  }
   # Step: VCF to Zarr
-    call Tasks.VcfToZarr {
-      input:
-        phased_vcf = ShapeIt4.phased_vcf
-    }
+#    call Tasks.VcfToZarr {
+#      input:
+#        phased_vcf = ShapeIt4.phased_vcf
+#    }
 
   output {
   # TODO: determine outputs needed (stats etc.)
     File output_vcf = ShapeIt4.phased_vcf
-    File zarr_output = VcfToZarr.zarr_output
+#    File zarr_output = VcfToZarr.zarr_output
   }
 }

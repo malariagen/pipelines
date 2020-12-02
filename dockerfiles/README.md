@@ -38,6 +38,9 @@ Contains the sample_select_variants python script
 ### WhatsHap
 Contains the latest version of WhatsHap https://whatshap.readthedocs.io/en/latest/
 
+### Shapeit4
+Contains the latest version of Shapeit4 https://odelaneau.github.io/shapeit4/
+
 ### Import
 A farm5-specific docker image, providing dependencies for the iRODS import and batch processing workflows.
 
@@ -52,5 +55,6 @@ A farm5-specific docker image, providing dependencies for the iRODS import and b
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
 - sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
 - whatshap - `docker build . --tag=whatshap:1.0`
+- shapeit4 - `docker build . --tag=shapeit4:4.1.3`
 - import - `docker build . --tag=sangerpathogens/irods:4.1.12`
 

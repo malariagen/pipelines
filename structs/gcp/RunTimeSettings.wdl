@@ -12,4 +12,5 @@ struct RunTimeSettings {
   String lftp_docker
   String select_variants_docker
   String whatshap_docker
+  String shapeit4_docker
 }
