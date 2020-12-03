@@ -1,6 +1,6 @@
 {
   "StatisticalPhasing.project_id": "small",
-  "StatisticalPhasing.contig": "3L",
+
   "StatisticalPhasing.sample_phased_vcfs": [
     "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz",
     "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz"
@@ -9,6 +9,8 @@
     "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz.tbi",
     "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz.tbi"
   ],
+  "StatisticalPhasing.contig": "3L",
+  "StatisticalPhasing.genetic_map": "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3L.gmap",
   "StatisticalPhasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",

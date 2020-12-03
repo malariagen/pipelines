@@ -12,7 +12,8 @@ version 1.0
 
 import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
-import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as Tasks
+import "../../../tasks/gcp/Tasks.wdl" as Tasks
+import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as StatisticalPhasingTasks
 
 workflow StatisticalPhasing {
   String pipeline_version = "0.0.0"
@@ -21,15 +22,15 @@ workflow StatisticalPhasing {
     String project_id
     Array[File] sample_phased_vcfs
     Array[File] sample_phased_vcf_indices
-    File? genetic_map
     String contig
+    File genetic_map
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   # Step 1: Merge VCFs
-  call Tasks.MergeVcfs as MergeVcfs {
+  call StatisticalPhasingTasks.MergeVcfs as MergeVcfs {
     input:
       sample_phased_vcfs = sample_phased_vcfs,
       sample_phased_vcf_indices = sample_phased_vcf_indices,
@@ -37,24 +38,33 @@ workflow StatisticalPhasing {
       runTimeSettings = runTimeSettings
   }
 
-  # Step 2: ShapeIt4
-  call Tasks.ShapeIt4 as ShapeIt4 {
+  # Step 2: bgzip the merg (needed for bcftools merge in statistical phasing pipeline)
+  call Tasks.BgzipAndTabix {
     input:
-      merged_vcf = MergeVcfs.merged_vcf,
+      input_vcf = MergeVcfs.merged_vcf,
+      output_basename = project_id + "_merged",
+      runTimeSettings = runTimeSettings
+  }
+
+  # Step 3: ShapeIt4
+  call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
+    input:
+      merged_vcf = BgzipAndTabix.vcf,
+      merged_vcf_index = BgzipAndTabix.vcf_index,
       project_id = project_id,
-      genetic_map = genetic_map,
       contig = contig,
+      genetic_map = genetic_map,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Possible Step: Ligate regions (?)
-#  call Tasks.LigateRegions {
+#  call StatisticalPhasingTasks.LigateRegions {
 #    input:
 #      reference = reference,
 #      runTimeSettings = runTimeSettings
 #  }
   # Step: VCF to Zarr
-#    call Tasks.VcfToZarr {
+#    call StatisticalPhasingTasks.VcfToZarr {
 #      input:
 #        phased_vcf = ShapeIt4.phased_vcf
 #    }

@@ -30,12 +30,12 @@ task MergeVcfs {
 task ShapeIt4 {
   input {
     File merged_vcf
+    File merged_vcf_index
     String project_id
-    # TODO - this is not an option
-    File? genetic_map
     String contig
+    File genetic_map
     Float window = 2.5
-    Int num_threads = 1
+    Int num_threads = 2
     String mcmc_iterations = "5b,1p,1b,1p,1b,1p,5m"
     Int pbwt_depth = 4
     # TODO - how to handle refence as an option
@@ -43,8 +43,9 @@ task ShapeIt4 {
     RunTimeSettings runTimeSettings
   }
 
-  command {
+    command {
     #TODO - handle reference...
+    touch ~{merged_vcf_index}
     shapeit4 \
         --input ~{merged_vcf} \
         ~{"--map " + genetic_map} \
@@ -62,8 +63,8 @@ task ShapeIt4 {
   runtime {
     docker: runTimeSettings.shapeit4_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    cpu: "2"
+    memory: "7.5 GiB"
   }
 
   output {

@@ -12,7 +12,8 @@ version 1.0
 
 import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
-import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as Tasks
+import "../../../tasks/gcp/Tasks.wdl" as Tasks
+import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
 
 workflow ReadBackedPhasing {
   String pipeline_version = "0.0.0"
@@ -31,7 +32,7 @@ workflow ReadBackedPhasing {
     RunTimeSettings runTimeSettings
   }
   # Step 1: Genotype data preparation
-  call Tasks.SelectVariants {
+  call ReadBackedPhasingTasks.SelectVariants {
     input:
       sample_zarr = sample_zarr,
       called_sites_zarr = called_sites_zarr,
@@ -42,7 +43,7 @@ workflow ReadBackedPhasing {
       runTimeSettings = runTimeSettings
   }
   # Step 2: WhatsHap phase
-  call Tasks.WhatsHapPhase {
+  call ReadBackedPhasingTasks.WhatsHapPhase {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
@@ -60,7 +61,7 @@ workflow ReadBackedPhasing {
       runTimeSettings = runTimeSettings
   }
   # Step 4: WhatsHap stats
-  call Tasks.WhatsHapStats {
+  call ReadBackedPhasingTasks.WhatsHapStats {
     input:
       phased_vcf = WhatsHapPhase.phased_vcf,
       output_basename = output_basename,
