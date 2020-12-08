@@ -168,7 +168,7 @@ task ExtractReadGroup {
   }
 
   output {
-    File read_group_file = "~{read_group_filename}"
+    File read_group_file = read_group_filename
   }
 }
 
@@ -249,7 +249,7 @@ task SamToFastq {
 }
 
 # User must supply either one of read_group_id or read_group
-# If they supply read_group_id, a fake read_group_id will  be generated as
+# If they supply read_group_id, a fake read_group will  be generated as
 # @RG  ID:~{read_group_id} SM:~{sample_id} CN:SC PL:ILLUMINA
 task ReadAlignment {
   input {

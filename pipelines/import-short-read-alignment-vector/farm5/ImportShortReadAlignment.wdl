@@ -80,7 +80,7 @@ workflow ImportShortReadAlignment {
   call SampleAlignmentTask.FixMateInformation {
     input:
       input_file = IndelRealigner.output_bam,
-      output_bam_basename = sample_id + ".fixmate.bam",
+      output_bam_basename = sample_id + ".fixmate",
       runTimeSettings = runTimeSettings
   }
 

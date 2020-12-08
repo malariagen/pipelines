@@ -6,7 +6,7 @@ This folder contains the pipeline wdl and workflow inputs for the combined Vecto
 There are farm5-specific directories which contain versions specific to farm5 (Sanger LSF) backed instances of cromwell.  These pipelines import multiple lanelet bams/crams from Sanger IRODS file system for multiple samples in parallel.
 
 The BatchImportShortReadAlignmentAndGenotyping pipeline takes as input:
-- batch_sample_manifest_file: A tab-delimited file with columns for sample_id, run_ena, irods_path.  Detailed below
+- batch_sample_manifest_file: A tab-delimited file with columns for sample_id, irods_path.  Detailed below
 - known_indels_vcf: An optional file of known indels for the tasks RealignerTargetCreator and IndelRealigner
 - alleles_vcf: The alleles VCF for use by the task UnifiedGenotyper
 - alleles_vcf_index: The index file of the alleles VCF
@@ -14,18 +14,21 @@ The BatchImportShortReadAlignmentAndGenotyping pipeline takes as input:
 - runTimeSettings: A wdl structure containing run time settings.
 
 batch_sample_manifest_file: The input file is a tab-delimited file.  There is a header, and after that, each line represents a 'lanelet'.  The file can contain lanelets for multiple samples.  The pipeline will separate each sample into separate manifest files to be processed in parallel.
-The fields are:
-- sample_id: The Id/name of the sample.  The pipeline will only parse lines out of the input_file where the sample_id matches the wdl input 'sample_id'
-- run_ena: The ena for the lanelet.  Only used to name the intermediate aligned lanelet files.
-- irods_path: The irods path for the lanelet data.  This can be a cram or a bam
+
+
+The mandatory fields are:
+- sample_id: The Id/name of the sample.
+- irods_path: The irods path for the lanelet data.  This can be a cram or a bam.  The basename will be used as the read group ID in the output aligned bam.
+
+Additional fields may be specified, but they will not be used directly in the pipeline.
 
 Example File:
 The first couple of lines for an example input file are specified here:
 
-| sample_id 	| run_ena   	| irods_path                |
-|-----------	|-----------	|---------------------------|
-| AN0131-C  	| ERR317337 	| /seq/9812/9812_4#48.bam   	|
-| AN0131-C  	| ERR340933 	| /seq/10209/10209_3#48.bam   |
-| AN0131-C  	| ERR340945 	| /seq/10209/10209_4#48.bam   |
-| AB0252-C  	| ERR327108 	| /seq/9953/9953_2#68.bam     |
-| AB0252-C  	| ERR338386 	| /seq/10061/10061_1#68.bam 	|
+| sample_id 	| irods_path                |
+|-----------	|---------------------------|
+| AN0131-C  	| /seq/9812/9812_4#48.bam   	|
+| AN0131-C  	| /seq/10209/10209_3#48.bam   |
+| AN0131-C  	| /seq/10209/10209_4#48.bam   |
+| AB0252-C  	| /seq/9953/9953_2#68.bam     |
+| AB0252-C  	| /seq/10061/10061_1#68.bam 	|
