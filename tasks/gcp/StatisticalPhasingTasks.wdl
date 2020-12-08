@@ -10,6 +10,7 @@ task MergeVcfs {
     String project_id
     RunTimeSettings runTimeSettings
   }
+  #TODO - touch all the index files to avoid the annoying warning
   command {
     bcftools merge \
       -o ~{project_id}_merged.vcf \

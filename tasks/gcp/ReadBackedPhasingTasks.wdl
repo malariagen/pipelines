@@ -33,7 +33,7 @@ task SelectVariants {
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
-    disks: "local-disk 100 HDD"
+    disks: "local-disk " + disk_size + " HDD"
   }
 
   output {
@@ -53,6 +53,8 @@ task WhatsHapPhase {
     RunTimeSettings runTimeSettings
   }
 
+  Int disk_size = ceil(size(subset_vcf, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
+
   command {
     whatshap phase \
       -o ~{output_basename}.phased.vcf \
@@ -65,6 +67,7 @@ task WhatsHapPhase {
     preemptible: runTimeSettings.preemptible_tries
     cpu: "2"
     memory: "30 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
 
   output {
