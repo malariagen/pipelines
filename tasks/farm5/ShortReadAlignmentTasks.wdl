@@ -123,6 +123,55 @@ task CramToBam {
   }
 }
 
+# Sometimes the existing read group ID doesn't give useful info.
+# Replace the read group ID with the bam/cram basename without the extension.
+# Replaces the tabs with "\t" so that it can be used directly as a string
+# parameter -R in bwa mem.
+# Write out the new read group ID to file.
+# Most useful where bam/cram has run, lane, tag information in its filename.
+task ExtractReadGroup {
+  input {
+    File input_file
+    String sample_id
+    String read_group_filename
+
+    String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
+    Int num_cpu = 1
+    Int memory = 100
+    String? lsf_group
+    String? lsf_queue
+    RunTimeSettings runTimeSettings
+  }
+
+  Boolean is_cram = sub(basename(input_file), ".*\\.", "") == "cram"
+  String read_group_id = if is_cram then basename(input_file, ".cram")  else basename(input_file, ".bam")
+
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    read_group=$( samtools view -H ~{input_file} | grep '^@RG')
+    echo "$read_group" | sed -e "s/ID:\S*\s/ID:~{read_group_id}\t/" | \
+      sed -e "s/SM:\S*\s/SM:~{sample_id}\t/" | \
+      sed -e "s/\t/\\\\t/g" > ~{read_group_filename}
+
+  }
+
+  runtime {
+    docker: docker_tag
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
+  }
+
+  output {
+    File read_group_file = read_group_filename
+  }
+}
+
 task RevertSam {
   input {
     File input_file
@@ -199,9 +248,13 @@ task SamToFastq {
   }
 }
 
+# User must supply either one of read_group_id or read_group
+# If they supply read_group_id, a fake read_group will  be generated as
+# @RG  ID:~{read_group_id} SM:~{sample_id} CN:SC PL:ILLUMINA
 task ReadAlignment {
   input {
-    String read_group_id
+    String? read_group_id
+    String? read_group
     String sample_id
     File fastq1
     File fastq2
@@ -216,19 +269,23 @@ task ReadAlignment {
     RunTimeSettings runTimeSettings
   }
 
+  # suggested content for the read group tag: (from Thuy):
+  # Read group identifier [ID]: full platform unit ID as the read group identifier (including the flowcell, run, lane)
+  # library [LB]: obtained from raw sequenced bam, but we can make this up for testing
+  # sample [SM]: obtained from raw sequenced bam, but we can also obtain this from the sample manifest or fastq filename
+  # sequencing centre [CN]: obtained from raw sequenced bam, but we can make this up for testing
+  # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
+  # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
+  # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
+  String full_read_group_id = select_first([read_group_id, output_sam_basename])
+  String autogen_read_group = "@RG\tID:" + full_read_group_id + "\tSM:" + sample_id + "\tCN:SC\tPL:ILLUMINA"
+  String full_read_group = select_first([read_group, autogen_read_group])
+
   command {
     set -o pipefail
     set -e
 
-    # suggested content for the read group tag: (from Thuy):
-    # Read group identifier [ID]: full platform unit ID as the read group identifier (including the flowcell, run, lane)
-    # library [LB]: obtained from raw sequenced bam, but we can make this up for testing
-    # sample [SM]: obtained from raw sequenced bam, but we can also obtain this from the sample manifest or fastq filename
-    # sequencing centre [CN]: obtained from raw sequenced bam, but we can make this up for testing
-    # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
-    # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
-    # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
-    bwa mem -M -K 100000000 -t 4 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+    bwa mem -M -K 100000000 -t 4 -T 0 -R '~{full_read_group}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   }
   runtime {
     docker: docker_tag

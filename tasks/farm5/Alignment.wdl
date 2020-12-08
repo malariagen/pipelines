@@ -15,7 +15,8 @@ workflow Alignment {
 
   input {
     String sample_id
-    String read_group_id
+    String? read_group_id
+    String? read_group
     String input_cram
     String input_bam
     String input_fastq1
@@ -65,6 +66,7 @@ workflow Alignment {
     input:
       sample_id = sample_id,
       read_group_id = read_group_id,
+      read_group = read_group,
       fastq1 = select_first([SamToFastq.output_fastq1, input_fastq1]),
       fastq2 = select_first([SamToFastq.output_fastq2, input_fastq2]),
       output_sam_basename = output_file_basename,

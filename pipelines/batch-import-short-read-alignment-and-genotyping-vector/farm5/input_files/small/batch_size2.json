@@ -1,6 +1,6 @@
 {
 
-  "BatchImportShortReadAlignmentAndGenotyping.batch_sample_manifest_file": "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/lanelets_farm5_local.tsv",
+  "BatchImportShortReadAlignmentAndGenotyping.batch_sample_manifest_file": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/test/assets/ag3.1-minimal/batch_sample_size_2_lanelets.tsv",
   "BatchImportShortReadAlignmentAndGenotyping.reference": {
     "ref_fasta": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
@@ -15,7 +15,7 @@
   "BatchImportShortReadAlignmentAndGenotyping.alleles_vcf_index": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/allele_sites/ag.allsites.nonN.vcf.gz.tbi",
   "BatchImportShortReadAlignmentAndGenotyping.runTimeSettings": {
     "lsf_group": "pathdev",
-    "lsf_queue": "normal",
+    "lsf_queue": "normal"
   }
 
 
