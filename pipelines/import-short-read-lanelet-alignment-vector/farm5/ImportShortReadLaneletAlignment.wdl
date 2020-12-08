@@ -22,9 +22,8 @@ import "../../../tasks/farm5/ShortReadAlignmentTasks.wdl" as AlignTasks
 
 workflow ImportShortReadLaneletAlignment {
   String pipeline_version = "1.0.0"
-  Int IDX_LANELET_INFO_SAMPLE_ID = 0
-  Int IDX_LANELET_INFO_IRODS_PATH = 1
-
+  
+  String LANELET_INFO_COLNAME_IRODS_PATH = "irods_path"
 
   input {
     String sample_id
@@ -34,10 +33,10 @@ workflow ImportShortReadLaneletAlignment {
     RunTimeSettings runTimeSettings
   }
 
-  Array[Array[String]] lanelet_infos = read_tsv(per_sample_manifest_file)
-  scatter (lanelet_info in lanelet_infos) {
+  Array[Object] lanelet_infos = read_objects(per_sample_manifest_file)
+  scatter (idx in range(length(lanelet_infos))) {
 
-    String irods_path = lanelet_info[IDX_LANELET_INFO_IRODS_PATH]
+    String irods_path = lanelet_infos[idx][LANELET_INFO_COLNAME_IRODS_PATH]
 
     call ImportTask.ImportIRODS as ImportIRODS {
       input:
