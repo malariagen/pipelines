@@ -4,16 +4,27 @@ version 1.0
 ##
 ## This WDL pipeline implements the Short Read Alignment Pipeline as described in
 ## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## Takes an input bam or cram for a lanelet and aligns it using bwa.
-##
+## Imports multiple lanelet bams/crams for the same sample from IRODS.
+## BWA aligns the lanelet bams/crams.  Processes each lanelet in parallel.
+## Lanelet refers a lane of a sample that has been multiplexed into multiple
+## sequencing lanes.
+## Expects that the per_sample_manifest_file contains only the lanelets for a single sample
+## and each lanelet has its own row.
+## Columns:  sample, run_ena, irods_path
 
 import "../../../structs/farm5/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/farm5/ImportTasks.wdl" as ImportTask
 import "../../../tasks/farm5/Alignment.wdl" as LaneletAlignmentTask
+import "../../../tasks/farm5/ShortReadAlignmentTasks.wdl" as AlignTasks
+
+
 
 workflow ImportShortReadLaneletAlignment {
   String pipeline_version = "1.0.0"
+  Int IDX_LANELET_INFO_SAMPLE_ID = 0
+  Int IDX_LANELET_INFO_IRODS_PATH = 1
+
 
   input {
     String sample_id
@@ -26,8 +37,7 @@ workflow ImportShortReadLaneletAlignment {
   Array[Array[String]] lanelet_infos = read_tsv(per_sample_manifest_file)
   scatter (lanelet_info in lanelet_infos) {
 
-    String run_ena = lanelet_info[1]
-    String irods_path = lanelet_info[2]
+    String irods_path = lanelet_info[IDX_LANELET_INFO_IRODS_PATH]
 
     call ImportTask.ImportIRODS as ImportIRODS {
       input:
@@ -40,15 +50,29 @@ workflow ImportShortReadLaneletAlignment {
     String cram_path = if is_cram then ImportIRODS.output_file else ""
     String bam_path = if is_cram then "" else ImportIRODS.output_file
 
+    String irods_basename = if is_cram then basename(irods_path, ".cram")  else basename(irods_path, ".bam")
+    String read_group_filename = sample_id + "." + irods_basename + ".read_group.txt"
+
+    call AlignTasks.ExtractReadGroup as ExtractReadGroup {
+      input:
+        input_file = ImportIRODS.output_file,
+        sample_id = sample_id,
+        read_group_filename = read_group_filename,
+        runTimeSettings = runTimeSettings
+    }
+
+    String read_group = read_string(ExtractReadGroup.read_group_file)
+    String align_basename = sample_id + "." + irods_basename + ".align"
+
     call LaneletAlignmentTask.Alignment as LaneletAlignment {
       input:
         sample_id = sample_id,
-        read_group_id = run_ena,
+        read_group = read_group,
         input_cram = cram_path,
         input_bam = bam_path,
         input_fastq1 = "",
         input_fastq2 = "",
-        output_file_basename = run_ena,
+        output_file_basename = align_basename,
         reference = reference,
         runTimeSettings = runTimeSettings
     }

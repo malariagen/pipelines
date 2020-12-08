@@ -1,17 +1,17 @@
 {
   "ShortReadAlignmentAndGenotyping.sample_id": "AA0052-C",
-  "ShortReadAlignmentAndGenotyping.input_file": "gs://broad-gotc-dev-storage/malariaGEN/ag1000g-phase3-validation/validation_lanelets_gcp.tsv",
-  "ShortReadAlignmentAndGenotyping.alleles_vcf": "gs://broad-gotc-dev-storage/malariaGEN/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz",
-  "ShortReadAlignmentAndGenotyping.alleles_vcf_index": "gs://broad-gotc-dev-storage/malariaGEN/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz.tbi",
+  "ShortReadAlignmentAndGenotyping.input_file": "gs://malariagen/ShortReadAlignment/inputs/validation_lanelets_gs_paths.tsv",
+  "ShortReadAlignmentAndGenotyping.alleles_vcf": "gs://malariagen/references/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz",
+  "ShortReadAlignmentAndGenotyping.alleles_vcf_index": "gs://malariagen/references/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz.tbi",
   "ShortReadAlignmentAndGenotyping.reference": {
-    "ref_fasta": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
-    "ref_fasta_index": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
-    "ref_dict": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
-    "ref_sa": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.sa",
-    "ref_amb": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
-    "ref_bwt": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
-    "ref_ann": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
-    "ref_pac": "gs://broad-gotc-dev-storage/malariaGEN/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
+    "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
+    "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
+    "ref_dict": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
+    "ref_sa": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.sa",
+    "ref_amb": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
+    "ref_bwt": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
+    "ref_ann": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
+    "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
   },
   "ShortReadAlignmentAndGenotyping.runTimeSettings": {
     "preemptible_tries": 0,
