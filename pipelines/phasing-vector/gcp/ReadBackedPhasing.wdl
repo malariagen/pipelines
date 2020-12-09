@@ -39,7 +39,6 @@ workflow ReadBackedPhasing {
       phased_sites_zarr = phased_sites_zarr,
       output_basename = output_basename,
       contig = contig,
-      reference = reference,
       runTimeSettings = runTimeSettings
   }
   # Step 2: WhatsHap phase

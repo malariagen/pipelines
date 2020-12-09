@@ -11,7 +11,6 @@ task SelectVariants {
     File phased_sites_zarr
     String output_basename
     String contig
-    ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
@@ -42,13 +41,15 @@ task SelectVariants {
 }
 
 
-# TODO:  --max-coverage
+# TODO:  --max-coverage - seek clarification about this parameter:
+# is the spec conflating --internal-downsampling and --mapping-quality???
 task WhatsHapPhase {
   input {
     File input_bam
     File input_bam_index
     File subset_vcf
     String output_basename
+    String? contig
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -59,6 +60,7 @@ task WhatsHapPhase {
     whatshap phase \
       -o ~{output_basename}.phased.vcf \
       --reference ~{reference.ref_fasta} \
+      ~{"--chromosome " + contig} \
       ~{subset_vcf} ~{input_bam}
   }
 
