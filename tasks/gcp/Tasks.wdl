@@ -26,3 +26,28 @@ task BgzipAndTabix {
         File vcf_index = "~{output_basename}.vcf.gz.tbi"
     }
 }
+
+task Tabix {
+    input {
+        File input_file
+        RunTimeSettings runTimeSettings
+    }
+
+    String local_file = basename(input_file)
+
+    command {
+        # Localize the passed input_file to the working directory so when the
+        # newly created index file doesn't get delocalized with the long path.
+        cp ~{input_file} ~{local_file}
+        tabix ~{local_file}
+    }
+    runtime {
+        docker: runTimeSettings.bcftools_docker
+        preemptible: runTimeSettings.preemptible_tries
+        cpu: "1"
+        memory: "3.75 GiB"
+    }
+    output {
+        File index_file = "~{local_file}.tbi"
+    }
+}

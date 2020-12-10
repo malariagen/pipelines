@@ -1,13 +1,12 @@
 {
-  "StatisticalPhasing.project_id": "small",
-
+  "StatisticalPhasing.project_id": "small_3L",
   "StatisticalPhasing.sample_phased_vcfs": [
-    "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz",
-    "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz"
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0079-C/AV0079-C_3L.phased.vcf.gz",
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0148-C/AV0148-C_3L.phased.vcf.gz"
   ],
   "StatisticalPhasing.sample_phased_vcf_indices": [
-    "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ReadBackedPhasingOutput/3L/AV0079-C_3L.phased.vcf.gz.tbi",
-    "gs://malariagen/ag1000g-phase1-minimal/AV0148-C/ReadBackedPhasingOutput/3L/AV0148-C_3L.phased.vcf.gz.tbi"
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0079-C/AV0079-C_3L.phased.vcf.gz.tbi",
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0148-C/AV0148-C_3L.phased.vcf.gz.tbi"
   ],
   "StatisticalPhasing.contig": "3L",
   "StatisticalPhasing.genetic_map": "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3L.gmap",
@@ -28,11 +27,11 @@
     "bwa_docker": "us.gcr.io/broad-gotc-prod/malariagen/bwa:0.7.15",
     "biobambam_docker": "us.gcr.io/broad-gotc-prod/malariagen/biobambam2:2.0.73",
     "samtools_docker": "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1",
-    "bcftools_docker": "us.gcr.io/broad-gotc-prod/malariagen/bcftools/bcftools:1.11",
+    "bcftools_docker": "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11",
     "vcftozarr_docker": "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1",
     "lftp_docker": "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0",
     "select_variants_docker": "us.gcr.io/broad-gotc-prod/malariagen/sampleselectvariants:1.0",
     "whatshap_docker": "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0",
-    "shapeit4_docker": "us.gcr.io/broad-gotc-prod/malariagen/shapeit4/shapeit4:4.1.3"
+    "shapeit4_docker": "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
   }
 }

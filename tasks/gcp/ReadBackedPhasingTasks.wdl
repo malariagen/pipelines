@@ -41,26 +41,28 @@ task SelectVariants {
 }
 
 
-# TODO:  --max-coverage - seek clarification about this parameter:
-# is the spec conflating --internal-downsampling and --mapping-quality???
 task WhatsHapPhase {
   input {
     File input_bam
     File input_bam_index
     File subset_vcf
-    String output_basename
+    File subset_vcf_index
+    String output_filename
     String? contig
+    Int internal_downsampling = 15
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(subset_vcf, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB")+ size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
 
   command {
+    touch ~{subset_vcf_index}
     whatshap phase \
-      -o ~{output_basename}.phased.vcf \
+      -o ~{output_filename} \
       --reference ~{reference.ref_fasta} \
       ~{"--chromosome " + contig} \
+      --internal-downsampling=~{internal_downsampling} \
       ~{subset_vcf} ~{input_bam}
   }
 
@@ -73,22 +75,22 @@ task WhatsHapPhase {
   }
 
   output {
-    File phased_vcf = "~{output_basename}.phased.vcf"
+    File phased_vcf = output_filename
   }
 }
 
-# TODO: chromosome lengths
 task WhatsHapStats {
   input {
-   File phased_vcf
-   String output_basename
-   RunTimeSettings runTimeSettings
+    File phased_vcf
+    String output_basename
+    ReferenceSequence reference
+    RunTimeSettings runTimeSettings
   }
-  # TODO: this...
-      #--chr-lengths=CHR_LENGTHS \
+  # TODO - figure out how to make proper use of OPTIONAL reference.ref_chr_lengths
   command {
     whatshap stats \
       ~{phased_vcf} \
+      --chr-lengths=~{reference.ref_chr_lengths} \
       --tsv=~{output_basename}.stats.tsv \
       --gtf=~{output_basename}.blocks.gtf
   }

@@ -41,36 +41,43 @@ workflow ReadBackedPhasing {
       contig = contig,
       runTimeSettings = runTimeSettings
   }
+  # bgzip and index the phased_vcf (Needed by WhatsHap phase)
+  call Tasks.BgzipAndTabix as BgzipAndTabixSelectVariantsVcf {
+    input:
+      input_vcf = SelectVariants.subset_vcf,
+      output_basename = output_basename + ".subset",
+      runTimeSettings = runTimeSettings
+  }
   # Step 2: WhatsHap phase
   call ReadBackedPhasingTasks.WhatsHapPhase {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
-      subset_vcf = SelectVariants.subset_vcf,
+      subset_vcf = BgzipAndTabixSelectVariantsVcf.vcf,
+      subset_vcf_index = BgzipAndTabixSelectVariantsVcf.vcf_index,
+      output_filename = output_basename + ".phased.vcf.gz",
+      reference = reference,
+      runTimeSettings = runTimeSettings
+  }
+  # index the phased_vcf (needed for bcftools merge in statistical phasing pipeline)
+  call Tasks.Tabix as TabixPhasedVcf {
+    input:
+      input_file = WhatsHapPhase.phased_vcf,
+      runTimeSettings = runTimeSettings
+  }
+  # Step 3: WhatsHap stats
+  call ReadBackedPhasingTasks.WhatsHapStats {
+    input:
+      phased_vcf = WhatsHapPhase.phased_vcf,
       output_basename = output_basename,
       reference = reference,
       runTimeSettings = runTimeSettings
   }
 
-  # Step 3: bgzip the phased_vcf (needed for bcftools merge in statistical phasing pipeline)
-  call Tasks.BgzipAndTabix {
-    input:
-      input_vcf = WhatsHapPhase.phased_vcf,
-      output_basename = output_basename + ".phased",
-      runTimeSettings = runTimeSettings
-  }
-  # Step 4: WhatsHap stats
-  call ReadBackedPhasingTasks.WhatsHapStats {
-    input:
-      phased_vcf = WhatsHapPhase.phased_vcf,
-      output_basename = output_basename,
-      runTimeSettings = runTimeSettings
-  }
-
   output {
-    File sample_subset_vcf = SelectVariants.subset_vcf
-    File sample_phased_vcf = BgzipAndTabix.vcf
-    File sample_phased_vcf_index = BgzipAndTabix.vcf_index
+    File subsetted_sample_vcf = SelectVariants.subset_vcf
+    File phased_sample_vcf = WhatsHapPhase.phased_vcf
+    File phased_sample_vcf_index = TabixPhasedVcf.index_file
     File whats_hap_stats_tsv = WhatsHapStats.whats_hap_stats_tsv
     File whats_hap_blocks_gtf = WhatsHapStats.whats_hap_blocks_gtf
   }

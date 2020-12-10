@@ -38,7 +38,7 @@ workflow StatisticalPhasing {
       runTimeSettings = runTimeSettings
   }
 
-  # Step 2: bgzip the merg (needed for bcftools merge in statistical phasing pipeline)
+  # Step 2: bgzip the merged VCF
   call Tasks.BgzipAndTabix {
     input:
       input_vcf = MergeVcfs.merged_vcf,
