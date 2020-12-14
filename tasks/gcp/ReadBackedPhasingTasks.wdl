@@ -15,7 +15,7 @@ task SelectVariants {
   }
 
   Int mem_size = ceil(size(sample_zarr, "GiB") * 3)
-  Int disk_size = ceil(size(sample_zarr, "GiB") * 2)
+  Int disk_size = ceil(size(sample_zarr, "GiB") + size(called_sites_zarr, "GiB")+ size(phased_sites_zarr, "GiB")) * 2 + 20
 
   command {
     python /tools/sample_select_variants.py \

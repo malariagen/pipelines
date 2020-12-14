@@ -15,7 +15,8 @@
     "ref_amb": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
     "ref_bwt": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
     "ref_ann": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
-    "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
+    "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac",
+    "ref_chr_lengths": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.chr_lengths.txt"
   },
   "ReadBackedPhasing.runTimeSettings": {
     "preemptible_tries": 0,
