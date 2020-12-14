@@ -2,12 +2,8 @@ version 1.0
 
 ## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2020
 ##
-## This WDL pipeline implements the Short Read Alignment Pipeline as described in
-## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## This initial version of the pipeline is designed to ONLY work on one sample
-## It can take a list of input_crams, input_bams or input_fastqs (paired).
-## If more than one of these lists of files are provided, the pipeline will use in order:
-## input_crams first, input_bams second (if input_crams not provided), and input_fastqs lastly.
+## This WDL pipeline implements the Statistical component of the Mospquito Phasing Pipeline as described in
+## https://github.com/malariagen/pipelines/blob/master/docs/specs/phasing-vector.md
 ##
 
 import "../../../structs/gcp/RunTimeSettings.wdl"
@@ -20,10 +16,13 @@ workflow StatisticalPhasing {
 
   input {
     String project_id
-    Array[File] sample_phased_vcfs
-    Array[File] sample_phased_vcf_indices
+    Array[File] phased_sample_vcfs
+    Array[File] phased_sample_vcf_indices
     String contig
     File genetic_map
+
+    #TODO - plug in haplotype_reference_panel
+    File? haplotype_reference_panel
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -32,8 +31,8 @@ workflow StatisticalPhasing {
   # Step 1: Merge VCFs
   call StatisticalPhasingTasks.MergeVcfs as MergeVcfs {
     input:
-      sample_phased_vcfs = sample_phased_vcfs,
-      sample_phased_vcf_indices = sample_phased_vcf_indices,
+      phased_sample_vcfs = phased_sample_vcfs,
+      phased_sample_vcf_indices = phased_sample_vcf_indices,
       project_id = project_id,
       runTimeSettings = runTimeSettings
   }

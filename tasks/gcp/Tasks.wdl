@@ -48,6 +48,8 @@ task Tabix {
         memory: "3.75 GiB"
     }
     output {
-        File index_file = "~{local_file}.tbi"
+        # output the path to the copied local file AND the created index so they are side by side.
+        File output_file = local_file
+        File output_index_file = "~{local_file}.tbi"
     }
 }

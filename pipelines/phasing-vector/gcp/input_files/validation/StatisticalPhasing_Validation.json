@@ -1,12 +1,12 @@
 {
   "StatisticalPhasing.project_id": "validation_3L",
-  "StatisticalPhasing.sample_phased_vcfs": [
+  "StatisticalPhasing.phased_sample_vcfs": [
     "gs://malariagen/ReadBackedPhasing/outputs/AA0052-C/AA0052-C_3L.phased.vcf.gz",
     "gs://malariagen/ReadBackedPhasing/outputs/AB0252-C/AB0252-C_3L.phased.vcf.gz",
     "gs://malariagen/ReadBackedPhasing/outputs/AC0010-C/AC0010-C_3L.phased.vcf.gz",
     "gs://malariagen/ReadBackedPhasing/outputs/BL0358-C/BL0358-C_3L.phased.vcf.gz"
   ],
-  "StatisticalPhasing.sample_phased_vcf_indices": [
+  "StatisticalPhasing.phased_sample_vcf_indices": [
     "gs://malariagen/ReadBackedPhasing/outputs/AA0052-C/AA0052-C_3L.phased.vcf.gz.tbi",
     "gs://malariagen/ReadBackedPhasing/outputs/AB0252-C/AB0252-C_3L.phased.vcf.gz.tbi",
     "gs://malariagen/ReadBackedPhasing/outputs/AC0010-C/AC0010-C_3L.phased.vcf.gz.tbi",

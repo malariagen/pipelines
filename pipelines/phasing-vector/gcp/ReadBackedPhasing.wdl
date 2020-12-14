@@ -2,12 +2,8 @@ version 1.0
 
 ## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2020
 ##
-## This WDL pipeline implements the Short Read Alignment Pipeline as described in
-## https://github.com/malariagen/pipelines/blob/c7210d93628aaa31f26baa88a92e10322368b78e/docs/specs/short-read-alignment-vector.md
-## This initial version of the pipeline is designed to ONLY work on one sample
-## It can take a list of input_crams, input_bams or input_fastqs (paired).
-## If more than one of these lists of files are provided, the pipeline will use in order:
-## input_crams first, input_bams second (if input_crams not provided), and input_fastqs lastly.
+## This WDL pipeline implements the Read-Backed component of the Mospquito Phasing Pipeline as described in
+## https://github.com/malariagen/pipelines/blob/master/docs/specs/phasing-vector.md
 ##
 
 import "../../../structs/gcp/RunTimeSettings.wdl"
@@ -19,7 +15,7 @@ workflow ReadBackedPhasing {
   String pipeline_version = "0.0.0"
 
   input {
-    File sample_id
+    String sample_id
     String output_basename
     File input_bam
     File input_bam_index
@@ -76,8 +72,8 @@ workflow ReadBackedPhasing {
 
   output {
     File subsetted_sample_vcf = SelectVariants.subset_vcf
-    File phased_sample_vcf = WhatsHapPhase.phased_vcf
-    File phased_sample_vcf_index = TabixPhasedVcf.index_file
+    File phased_sample_vcf = TabixPhasedVcf.output_file
+    File phased_sample_vcf_index = TabixPhasedVcf.output_index_file
     File whats_hap_stats_tsv = WhatsHapStats.whats_hap_stats_tsv
     File whats_hap_blocks_gtf = WhatsHapStats.whats_hap_blocks_gtf
   }

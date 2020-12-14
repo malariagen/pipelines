@@ -5,8 +5,8 @@ import "../../structs/ReferenceSequence.wdl"
 
 task MergeVcfs {
   input {
-    Array[File] sample_phased_vcfs
-    Array[File] sample_phased_vcf_indices
+    Array[File] phased_sample_vcfs
+    Array[File] phased_sample_vcf_indices
     String project_id
     RunTimeSettings runTimeSettings
   }
@@ -14,7 +14,7 @@ task MergeVcfs {
   command {
     bcftools merge \
       -o ~{project_id}_merged.vcf \
-      ~{sep=' ' sample_phased_vcfs}
+      ~{sep=' ' phased_sample_vcfs}
   }
   runtime {
     docker: runTimeSettings.bcftools_docker
