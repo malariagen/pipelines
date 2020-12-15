@@ -9,6 +9,7 @@ version 1.0
 import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/gcp/Tasks.wdl" as Tasks
+import "../../../tasks/gcp/SNPGenotypingTasks.wdl" as SNPGenotypingTasks
 import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
 
 workflow ReadBackedPhasing {
@@ -19,7 +20,8 @@ workflow ReadBackedPhasing {
     String output_basename
     File input_bam
     File input_bam_index
-    File sample_zarr
+    File? sample_zarr
+    File? sample_vcf
     File called_sites_zarr
     File phased_sites_zarr
     String contig
@@ -27,10 +29,23 @@ workflow ReadBackedPhasing {
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
+
+  if (!defined(sample_zarr)) {
+    # TODO - some sort of error if VCF not provided!
+    call SNPGenotypingTasks.VcfToZarr {
+      input:
+        input_vcf = select_first([sample_vcf]),
+        sample_id = sample_id,
+        output_zarr_file_name = output_basename + ".zarr",
+        output_log_file_name = output_basename + ".log",
+        runTimeSettings = runTimeSettings
+    }
+  }
+
   # Step 1: Genotype data preparation
   call ReadBackedPhasingTasks.SelectVariants {
     input:
-      sample_zarr = sample_zarr,
+      sample_zarr = select_first([sample_zarr, VcfToZarr.zarr_output]),
       called_sites_zarr = called_sites_zarr,
       phased_sites_zarr = phased_sites_zarr,
       output_basename = output_basename,

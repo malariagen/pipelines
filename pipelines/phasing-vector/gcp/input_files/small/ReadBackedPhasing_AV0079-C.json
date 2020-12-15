@@ -1,9 +1,9 @@
 {
   "ReadBackedPhasing.sample_id": "AV0079-C",
   "ReadBackedPhasing.output_basename": "AV0079-C_3L",
-  "ReadBackedPhasing.input_bam": "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ShortReadAlignmentOutput/AV0079-C.bam",
-  "ReadBackedPhasing.input_bam_index": "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/ShortReadAlignmentOutput/AV0079-C.bam.bai",
-  "ReadBackedPhasing.sample_zarr": "gs://malariagen/ag1000g-phase1-minimal/AV0079-C/SnpGenotypingOutput/AV0079-C.zarr.zip",
+  "ReadBackedPhasing.input_bam": "gs://malariagen/ShortReadAlignmentAndGenotyping/outputs/small/AV0079-C/AV0079-C.bam",
+  "ReadBackedPhasing.input_bam_index": "gs://malariagen/ShortReadAlignmentAndGenotyping/outputs/small/AV0079-C/AV0079-C.bam.bai",
+  "ReadBackedPhasing.sample_zarr": "gs://malariagen/ShortReadAlignmentAndGenotyping/outputs/small/AV0079-C/AV0079-C.zarr.zip",
   "ReadBackedPhasing.called_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/AgamP4.allsites.nonN.zarr.zip",
   "ReadBackedPhasing.phased_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_arab.zarr.zip",
   "ReadBackedPhasing.contig": "3L",
