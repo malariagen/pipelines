@@ -29,7 +29,9 @@
   "Phasing.chromosome_list": [
     "3R"
   ],
-  "Phasing.genetic_map": "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3L.gmap",
+  "Phasing.genetic_maps": [
+    "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3R.gmap"
+  ],
   "Phasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",

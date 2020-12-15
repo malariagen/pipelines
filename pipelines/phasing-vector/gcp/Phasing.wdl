@@ -25,7 +25,7 @@ workflow Phasing {
     File called_sites_zarr
     File phased_sites_zarr
     Array[String] chromosome_list
-    File genetic_map # recombination rates
+    Array[File] genetic_maps
 
     File? haplotype_reference_panel
 
@@ -37,9 +37,10 @@ workflow Phasing {
 
   # Step 1: Read-backed phasing
 
-  # Scatter over chormosomes
-  scatter(chromosome in chromosome_list) {
-    # TODO - Name in a chromosome-specific fashion.
+  # Scatter over chromosomes
+  scatter(chr_idx in range(length(chromosome_list))) {
+    String chromosome = chromosome_list[chr_idx]
+    File genetic_map = genetic_maps[chr_idx]
 
     # Scatter over samples
     scatter(idx in range(length(sample_ids))) {
@@ -67,15 +68,14 @@ workflow Phasing {
     # run statistical phasing for all samples (for each chromosome)
     call StatisticalPhasing.StatisticalPhasing {
       input:
-#      project_id = project_id,
-      project_id = project_id + "_" + chromosome,
-      phased_sample_vcfs = phased_sample_vcfs,
-      phased_sample_vcf_indices = phased_sample_vcf_indices,
-      contig = chromosome,
-      genetic_map = genetic_map,
-      haplotype_reference_panel = haplotype_reference_panel,
-      reference = reference,
-      runTimeSettings = runTimeSettings
+        project_id = project_id + "_" + chromosome,
+        phased_sample_vcfs = phased_sample_vcfs,
+        phased_sample_vcf_indices = phased_sample_vcf_indices,
+        contig = chromosome,
+        genetic_map = genetic_map,
+        haplotype_reference_panel = haplotype_reference_panel,
+        reference = reference,
+        runTimeSettings = runTimeSettings
     }
   }
 
@@ -85,5 +85,10 @@ workflow Phasing {
   # TODO: determine addtional outputs
     Array[File] output_vcf = StatisticalPhasing.output_vcf
 #    File zarr_output = StatisticalPhasing.zarr_output
+
+    Array[Array[File]] read_back_phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf
+    Array[Array[File]] read_back_phased_sample_vcf_indices = ReadBackedPhasing.phased_sample_vcf_index
+    Array[Array[File]] whats_hap_stats_tsvs = ReadBackedPhasing.whats_hap_stats_tsv
+    Array[Array[File]] whats_hap_blocks_gtfs = ReadBackedPhasing.whats_hap_blocks_gtf
   }
 }
