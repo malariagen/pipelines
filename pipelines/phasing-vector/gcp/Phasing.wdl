@@ -17,11 +17,10 @@ workflow Phasing {
 
   input {
     String project_id
-#    File sample_manifest
     Array[String] sample_ids
     Array[File] input_bams
-    Array[File] input_bam_indices
-    Array[File] sample_zarrs
+    Array[File]? input_bam_indices
+    Array[File] sample_vcfs
     File called_sites_zarr
     File phased_sites_zarr
     Array[String] chromosome_list
@@ -50,8 +49,7 @@ workflow Phasing {
           sample_id = sample_ids[idx],
           output_basename = sample_ids[idx] + "_" + chromosome,
           input_bam = input_bams[idx],
-          input_bam_index = input_bam_indices[idx],
-          sample_zarr = sample_zarrs[idx],
+          sample_vcf = sample_vcfs[idx],
           called_sites_zarr = called_sites_zarr,
           phased_sites_zarr = phased_sites_zarr,
           contig = chromosome,

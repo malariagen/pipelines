@@ -9,6 +9,7 @@ version 1.0
 import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/gcp/Tasks.wdl" as Tasks
+import "../../../tasks/gcp/ShortReadAlignmentTasks.wdl" as ShortReadAlignmentTasks
 import "../../../tasks/gcp/SNPGenotypingTasks.wdl" as SNPGenotypingTasks
 import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
 
@@ -19,7 +20,7 @@ workflow ReadBackedPhasing {
     String sample_id
     String output_basename
     File input_bam
-    File input_bam_index
+    File? input_bam_index
     File? sample_zarr
     File? sample_vcf
     File called_sites_zarr
@@ -59,11 +60,21 @@ workflow ReadBackedPhasing {
       output_basename = output_basename + ".subset",
       runTimeSettings = runTimeSettings
   }
+
+  # If the bam index is not provided, generate it.
+  if (!defined(input_bam_index)) {
+    call ShortReadAlignmentTasks.SamtoolsIndex {
+      input:
+        input_file = input_bam,
+        runTimeSettings = runTimeSettings
+    }
+  }
+
   # Step 2: WhatsHap phase
   call ReadBackedPhasingTasks.WhatsHapPhase {
     input:
-      input_bam = input_bam,
-      input_bam_index = input_bam_index,
+      input_bam = select_first([SamtoolsIndex.output_file, input_bam]),
+      input_bam_index = select_first([SamtoolsIndex.output_index_file, input_bam_index]),
       subset_vcf = BgzipAndTabixSelectVariantsVcf.vcf,
       subset_vcf_index = BgzipAndTabixSelectVariantsVcf.vcf_index,
       output_filename = output_basename + ".phased.vcf.gz",
@@ -79,7 +90,8 @@ workflow ReadBackedPhasing {
   # Step 3: WhatsHap stats
   call ReadBackedPhasingTasks.WhatsHapStats {
     input:
-      phased_vcf = WhatsHapPhase.phased_vcf,
+      phased_vcf = TabixPhasedVcf.output_file,
+      phased_vcf_index = TabixPhasedVcf.output_index_file,
       output_basename = output_basename,
       reference = reference,
       runTimeSettings = runTimeSettings

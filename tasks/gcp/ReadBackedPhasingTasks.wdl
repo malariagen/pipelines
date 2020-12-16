@@ -54,9 +54,10 @@ task WhatsHapPhase {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB")+ size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
 
   command {
+    touch ~{input_bam_index}
     touch ~{subset_vcf_index}
     whatshap phase \
       -o ~{output_filename} \
@@ -82,12 +83,14 @@ task WhatsHapPhase {
 task WhatsHapStats {
   input {
     File phased_vcf
+    File phased_vcf_index
     String output_basename
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
   # TODO - figure out how to make proper use of OPTIONAL reference.ref_chr_lengths
   command {
+    touch ~{phased_vcf_index}
     whatshap stats \
       ~{phased_vcf} \
       --chr-lengths=~{reference.ref_chr_lengths} \
@@ -98,8 +101,8 @@ task WhatsHapStats {
   runtime {
     docker: runTimeSettings.whatshap_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
-    memory: "3.75 GiB"
+    cpu: "2"
+    memory: "7.5 GiB"
   }
 
   output {

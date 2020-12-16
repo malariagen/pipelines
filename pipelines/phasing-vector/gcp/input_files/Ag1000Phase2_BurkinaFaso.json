@@ -1,0 +1,56 @@
+{
+  "Phasing.project_id": "Ag1000Phase2_BurkinaFaso",
+  "Phasing.sample_ids": [
+    "AB0085-C",
+    "AB0087-C",
+    "AB0088-C",
+    "AB0089-C"
+  ],
+  "Phasing.input_bams": [
+    "gs://malariagen/Ag1000-Phase2/AB0085-C.bam",
+    "gs://malariagen/Ag1000-Phase2/AB0087-C.bam",
+    "gs://malariagen/Ag1000-Phase2/AB0088-C.bam",
+    "gs://malariagen/Ag1000-Phase2/AB0089-C.bam"
+  ],
+  "Phasing.sample_vcfs": [
+    "gs://malariagen/Ag1000-Phase2/AB0085-C.vcf.gz",
+    "gs://malariagen/Ag1000-Phase2/AB0087-C.vcf.gz",
+    "gs://malariagen/Ag1000-Phase2/AB0088-C.vcf.gz",
+    "gs://malariagen/Ag1000-Phase2/AB0089-C.vcf.gz"
+  ],
+  "Phasing.called_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/AgamP4.allsites.nonN.zarr.zip",
+  "Phasing.phased_sites_zarr": "gs://malariagen-pipelines-dev/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_arab.zarr.zip",
+  "Phasing.chromosome_list": [
+    "2R",
+    "3R"
+  ],
+  "Phasing.genetic_maps": [
+    "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/2R.gmap",
+    "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3R.gmap"
+  ],
+  "Phasing.reference": {
+    "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
+    "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
+    "ref_dict": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
+    "ref_sa": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.sa",
+    "ref_amb": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
+    "ref_bwt": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
+    "ref_ann": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
+    "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac",
+    "ref_chr_lengths": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.chr_lengths.txt"
+  },
+  "Phasing.runTimeSettings": {
+    "preemptible_tries": 0,
+    "gatk_docker": "broadinstitute/gatk3:3.7-0",
+    "picard_docker": "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2",
+    "bwa_docker": "us.gcr.io/broad-gotc-prod/malariagen/bwa:0.7.15",
+    "biobambam_docker": "us.gcr.io/broad-gotc-prod/malariagen/biobambam2:2.0.73",
+    "samtools_docker": "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1",
+    "bcftools_docker": "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11",
+    "vcftozarr_docker": "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1",
+    "lftp_docker": "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0",
+    "select_variants_docker": "us.gcr.io/broad-gotc-prod/malariagen/sampleselectvariants:1.0",
+    "whatshap_docker": "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0",
+    "shapeit4_docker": "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+  }
+}
