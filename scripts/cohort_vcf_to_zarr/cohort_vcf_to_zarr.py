@@ -24,7 +24,8 @@ def main():
                         action='append',
                         dest='fields',
                         help="Field to extract, e.g., 'variants/MQ' or 'calldata/GT'. Multiple "
-                             "values may be provided.")
+                             "values may be provided. Use, e.g., 'variants/REF:S1' to specify a "
+                             "custom dtype for the field.")
     parser.add_argument("--compress-algo",
                         help="Blosc compression algorithm.  Choose from [zstd, blosclz, lz4, "
                              "lz4hc, zlib, snappy].",
@@ -41,10 +42,6 @@ def main():
                              "itemsize 1, and byte-shuffle will be used otherwise.",
                         default=-1,
                         type=int)
-    parser.add_argument("--dtype",
-                        help="TODO",
-                        action="append",
-                        type=str)
     parser.add_argument("--alt-number",
                         help="Expected maximum number of alternate alleles.",
                         default=3,
@@ -75,7 +72,13 @@ def main():
     chunk_length = args.chunk_length
     chunk_width = args.chunk_width
     contigs = args.contigs
-    fields = args.fields
+    fields = []
+    types = {}
+    for f in args.fields:
+        if ':' in f:
+            f, t = f.split(':')
+            types[f] = t
+        fields.append(f)
     log = args.log.strip()
 
     log_file_needs_closing = False
@@ -86,8 +89,6 @@ def main():
     else:
         log_file = open(log, "w")
         log_file_needs_closing = True
-
-    # TODO add dtype handling
 
     try:
 
@@ -103,6 +104,7 @@ def main():
                 overwrite=True,
                 tabix=tabix,
                 fields=fields,
+                types=types,
                 alt_number=alt_number,
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
