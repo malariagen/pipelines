@@ -8,6 +8,9 @@ task BgzipAndTabix {
         String output_basename
         RunTimeSettings runTimeSettings
     }
+
+    Int disk_size = ceil(size(input_vcf, "GiB")) * 3 + 20
+
     command {
         # note that bgzip has an option (-i) to index the bgzipped output, but this file is not a tabix file
         # note also that we use '-c' so that bgzip doesn't create the bgzipped file in place, rather it's in a location
@@ -20,6 +23,7 @@ task BgzipAndTabix {
         preemptible: runTimeSettings.preemptible_tries
         cpu: "1"
         memory: "3.75 GiB"
+        disks: "local-disk " + disk_size + " HDD"
     }
     output {
         File vcf = "~{output_basename}.vcf.gz"
@@ -33,6 +37,7 @@ task Tabix {
         RunTimeSettings runTimeSettings
     }
 
+    Int disk_size = ceil(size(input_file, "GiB")) * 2 + 20
     String local_file = basename(input_file)
 
     command {
@@ -46,6 +51,7 @@ task Tabix {
         preemptible: runTimeSettings.preemptible_tries
         cpu: "1"
         memory: "3.75 GiB"
+        disks: "local-disk " + disk_size + " HDD"
     }
     output {
         # output the path to the copied local file AND the created index so they are side by side.

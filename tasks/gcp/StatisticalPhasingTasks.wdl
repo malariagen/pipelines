@@ -10,6 +10,9 @@ task MergeVcfs {
     String project_id
     RunTimeSettings runTimeSettings
   }
+
+  Int disk_size = ceil(size(phased_sample_vcfs, "GiB") + size(phased_sample_vcf_indices, "GiB")) * 2 + 20
+
   #TODO - touch all the index files to avoid the annoying warning
   command {
     bcftools merge \
@@ -21,6 +24,7 @@ task MergeVcfs {
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
     File merged_vcf = "~{project_id}_merged.vcf"
@@ -44,7 +48,9 @@ task ShapeIt4 {
     RunTimeSettings runTimeSettings
   }
 
-    command {
+  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 2 + 20
+
+  command {
     #TODO - handle reference...
     touch ~{merged_vcf_index}
     shapeit4 \
@@ -64,8 +70,9 @@ task ShapeIt4 {
   runtime {
     docker: runTimeSettings.shapeit4_docker
     preemptible: runTimeSettings.preemptible_tries
-    cpu: "2"
-    memory: "7.5 GiB"
+    cpu: "4"
+    memory: "15 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
 
   output {
