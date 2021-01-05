@@ -83,9 +83,8 @@ workflow Phasing {
   # Combine all chromosomes???
 
   output {
-  # TODO: determine addtional outputs
     Array[File] output_vcf = StatisticalPhasing.output_vcf
-#    File zarr_output = StatisticalPhasing.zarr_output
+    Array[Array[File]] output_zarr_files = StatisticalPhasing.output_zarr_files
 
     Array[Array[File]] read_back_phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf
     Array[Array[File]] read_back_phased_sample_vcf_indices = ReadBackedPhasing.phased_sample_vcf_index

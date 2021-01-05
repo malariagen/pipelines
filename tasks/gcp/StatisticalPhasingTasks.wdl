@@ -81,21 +81,44 @@ task ShapeIt4 {
   }
 }
 
-task LigateRegions {
+task CohortVcfToZarr {
   input {
+    File input_vcf
+    String contig
+    String output_log_file_name
 
+    String docker = runTimeSettings.cohortvcftozarr_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
+    RunTimeSettings runTimeSettings
   }
-  command {
 
+  Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
+
+  command {
+    mkdir output
+    python /tools/cohort_vcf_to_zarr.py \
+    --input ~{input_vcf} \
+    --output output/phased.zarr \
+    --contig ~{contig} \
+    --field variants/POS \
+    --field variants/REF:S1 \
+    --field variants/ALT:S1 \
+    --field variants/AC \
+    --field variants/AF \
+    --field variants/CM \
+    --field calldata/GT \
+    --log ~{output_log_file_name}
   }
   runtime {
-
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "7.5 GiB"
+    disks: "local-disk " + disk_size + " HDD"
   }
   output {
-
+    File output_log_file = output_log_file_name
+    Array[File] zarr_files = glob("output/*")
   }
 }
-
-# task VcfToZarr {
-# TODO: can we reuse the vcf to zarr from the genotyping pipeline?
-# }

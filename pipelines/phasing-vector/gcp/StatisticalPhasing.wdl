@@ -63,24 +63,22 @@ workflow StatisticalPhasing {
 #      runTimeSettings = runTimeSettings
 #  }
 
-  # Step 4: VCF to Zarr
-#  call SNPGenotypingTasks.VcfToZarr {
-#    input:
-#      input_vcf = ShapeIt4.phased_vcf,
-#      sample_id = project_id,
-#      output_zarr_file_name = project_id + ".zarr",
-#      output_log_file_name = project_id + ".log",
-#      zip_outputs = false,
-#      runTimeSettings = runTimeSettings
-#  }
+  # Step 4: Cohort VCF to Zarr
+  # TODO - might want to zip these?
+  call StatisticalPhasingTasks.CohortVcfToZarr {
+    input:
+      input_vcf = ShapeIt4.phased_vcf,
+      contig = contig,
+      output_log_file_name = project_id + ".log",
+      runTimeSettings = runTimeSettings
+  }
 
   meta {
     allowNestedInputs: true
   }
 
   output {
-  # TODO: determine outputs needed (stats etc.)
     File output_vcf = ShapeIt4.phased_vcf
-#    File zarr_output = VcfToZarr.zarr_output
+    Array[File] output_zarr_files = CohortVcfToZarr.zarr_files
   }
 }
