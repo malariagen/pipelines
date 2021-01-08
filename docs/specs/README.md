@@ -14,6 +14,7 @@ for implementation.
 
 ### Mosquito SNP genotyping pipeline
 
+* [Version 1.4.1](https://github.com/malariagen/pipelines/blob/a910bde50e824623a709d86465658d9db44e1ccd/docs/specs/snp-genotyping-vector.md)
 * [Version 1.4.0](https://github.com/malariagen/pipelines/blob/c1531ef6120021106cb0159150a297a5d8473e07/docs/specs/snp-genotyping-vector.md)
 
 ### Mosquito phasing pipeline
