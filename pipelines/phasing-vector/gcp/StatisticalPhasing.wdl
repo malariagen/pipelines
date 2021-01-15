@@ -12,7 +12,7 @@ import "../../../tasks/gcp/Tasks.wdl" as Tasks
 import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as StatisticalPhasingTasks
 
 workflow StatisticalPhasing {
-  String pipeline_version = "0.0.0"
+  String pipeline_version = "1.0.0"
 
   input {
     String project_id

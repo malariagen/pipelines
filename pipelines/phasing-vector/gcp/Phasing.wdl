@@ -13,7 +13,7 @@ import "../../../pipelines/phasing-vector/gcp/ReadBackedPhasing.wdl" as ReadBack
 import "../../../pipelines/phasing-vector/gcp/StatisticalPhasing.wdl" as StatisticalPhasing
 
 workflow Phasing {
-  String pipeline_version = "0.0.0"
+  String pipeline_version = "1.0.0"
 
   input {
     String project_id
@@ -61,17 +61,13 @@ workflow Phasing {
       }
     }
 
-    # combine samples
-    Array[File] phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf
-    Array[File] phased_sample_vcf_indices = ReadBackedPhasing.phased_sample_vcf_index
-
     # Step 2: Statistical phasing
     # run statistical phasing for all samples (for each chromosome)
     call StatisticalPhasing.StatisticalPhasing {
       input:
         project_id = project_id + "_" + chromosome,
-        phased_sample_vcfs = phased_sample_vcfs,
-        phased_sample_vcf_indices = phased_sample_vcf_indices,
+        phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf,
+        phased_sample_vcf_indices = ReadBackedPhasing.phased_sample_vcf_index,
         contig = chromosome,
         genetic_map = genetic_map,
         haplotype_reference_panel = haplotype_reference_panel,

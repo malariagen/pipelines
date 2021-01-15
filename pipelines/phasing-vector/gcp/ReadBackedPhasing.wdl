@@ -14,7 +14,7 @@ import "../../../tasks/gcp/SNPGenotypingTasks.wdl" as SNPGenotypingTasks
 import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
 
 workflow ReadBackedPhasing {
-  String pipeline_version = "0.0.0"
+  String pipeline_version = "1.0.0"
 
   input {
     String sample_id
