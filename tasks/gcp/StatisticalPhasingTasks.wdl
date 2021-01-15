@@ -96,10 +96,10 @@ task CohortVcfToZarr {
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
   command {
-    mkdir output
+    mkdir outputs
     python /tools/cohort_vcf_to_zarr.py \
     --input ~{input_vcf} \
-    --output output/phased.zarr \
+    --output outputs \
     --contig ~{contig} \
     --field variants/POS \
     --field variants/REF:S1 \
@@ -119,6 +119,6 @@ task CohortVcfToZarr {
   }
   output {
     File output_log_file = output_log_file_name
-    Array[File] zarr_files = glob("output/*")
+    Array[File] zarr_files = glob("outputs/*")
   }
 }

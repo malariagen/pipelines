@@ -10,6 +10,9 @@ Environment file copied from [here](https://gitlab.com/malariagen-aspis/aspis-pi
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/lh3/bwa. Default version v0.7.17.
 
+### CohortVcfToZarr
+Contains the cohort_vcf_to_zarr python script
+
 ### Samtools
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/samtools/samtools. Default version 1.9.
@@ -52,6 +55,7 @@ A farm5-specific docker image, providing dependencies for the iRODS import and b
 - biobambam 2.0.73 - `docker build . --tag=biobambam:2.0.73`
 - GATK 3.7-0 - `docker pull broadinstitute/gatk3:3.7-0`
 - lftp - `docker build . --tag=lftp:1.0`
+- cohortvcftozarr - `docker build . --tag=cohortvcftozarr:1.0`
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
 - sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
 - whatshap - `docker build . --tag=whatshap:1.0`
