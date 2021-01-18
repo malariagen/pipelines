@@ -35,6 +35,7 @@ task ImportIRODS {
     cpu: num_cpu
     lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
     lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
+    throttle_irods: true
   }
 
   output {
