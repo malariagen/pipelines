@@ -10,4 +10,6 @@ struct ReferenceSequence {
   File ref_bwt
   File ref_ann
   File ref_pac
+  # A tab delimited file, containing chrom\tlength.  Needed for 'whatshap stats'
+  File? ref_chr_lengths
 }

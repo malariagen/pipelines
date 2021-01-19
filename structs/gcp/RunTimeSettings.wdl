@@ -6,9 +6,12 @@ struct RunTimeSettings {
   String picard_docker
   String bwa_docker
   String biobambam_docker
+  String cohortvcftozarr_docker
   String samtools_docker
+  String bcftools_docker
   String vcftozarr_docker
   String lftp_docker
   String select_variants_docker
   String whatshap_docker
+  String shapeit4_docker
 }

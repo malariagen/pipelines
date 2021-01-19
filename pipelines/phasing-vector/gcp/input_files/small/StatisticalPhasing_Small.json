@@ -1,9 +1,16 @@
 {
-  "ShortReadAlignmentAndGenotyping.sample_id": "BL0358-C",
-  "ShortReadAlignmentAndGenotyping.input_file": "gs://malariagen/ShortReadAlignment/inputs/validation_lanelets_gs_paths.tsv",
-  "ShortReadAlignmentAndGenotyping.alleles_vcf": "gs://malariagen/references/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz",
-  "ShortReadAlignmentAndGenotyping.alleles_vcf_index": "gs://malariagen/references/vo_agam_production/resources/observatory/ag.allsites.nonN.vcf.gz.tbi",
-  "ShortReadAlignmentAndGenotyping.reference": {
+  "StatisticalPhasing.project_id": "small_3L",
+  "StatisticalPhasing.phased_sample_vcfs": [
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0079-C/AV0079-C_3L.phased.vcf.gz",
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0148-C/AV0148-C_3L.phased.vcf.gz"
+  ],
+  "StatisticalPhasing.phased_sample_vcf_indices": [
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0079-C/AV0079-C_3L.phased.vcf.gz.tbi",
+    "gs://malariagen/ReadBackedPhasing/outputs/small/AV0148-C/AV0148-C_3L.phased.vcf.gz.tbi"
+  ],
+  "StatisticalPhasing.contig": "3L",
+  "StatisticalPhasing.genetic_map": "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3L.gmap",
+  "StatisticalPhasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
     "ref_fasta_index": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
     "ref_dict": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
@@ -13,7 +20,7 @@
     "ref_ann": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
     "ref_pac": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac"
   },
-  "ShortReadAlignmentAndGenotyping.runTimeSettings": {
+  "StatisticalPhasing.runTimeSettings": {
     "preemptible_tries": 0,
     "gatk_docker": "broadinstitute/gatk3:3.7-0",
     "picard_docker": "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2",

@@ -118,6 +118,47 @@ task CramToBam {
   }
 }
 
+task SamtoolsIndex {
+  input {
+    File input_file
+
+    String docker = runTimeSettings.samtools_docker
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(3 * size(input_file, "GiB")) + 20
+
+  String local_file = basename(input_file)
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    # Localize the passed input_file to the working directory so when the
+    # newly created index file doesn't get delocalized with the long path.
+    cp ~{input_file} ~{local_file}
+    samtools index -b ~{local_file}
+
+  }
+
+  runtime {
+    docker: docker
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+    # output the path to the copied local file AND the created index so they are side by side.
+    File output_file = local_file
+    File output_index_file = "~{local_file}.bai"
+  }
+}
+
 task RevertSam {
   input {
     File input_file

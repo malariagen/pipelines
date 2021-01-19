@@ -10,6 +10,9 @@ Environment file copied from [here](https://gitlab.com/malariagen-aspis/aspis-pi
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/lh3/bwa. Default version v0.7.17.
 
+### CohortVcfToZarr
+Contains the cohort_vcf_to_zarr python script
+
 ### Samtools
 Supports the `build-arg` `version` that represents the tag name found in the repo
 https://github.com/samtools/samtools. Default version 1.9.
@@ -38,10 +41,17 @@ Contains the sample_select_variants python script
 ### WhatsHap
 Contains the latest version of WhatsHap https://whatshap.readthedocs.io/en/latest/
 
+### Shapeit4
+Contains the latest version of Shapeit4 https://odelaneau.github.io/shapeit4/
+
+### Bcftools
+Supports the `build-arg` `version` that represents the tag name found in the repo
+https://github.com/bcftools/bcftools. Default version 1.11.
+
 ### Import
 A farm5-specific docker image, providing dependencies for the iRODS import and batch processing workflows.
 
-## Mosquito short read alignment pipeline
+## Mosquito short read alignment, SNP Genotyping and Phasing pipelines
 
 - bwa 0.7.15 - `docker build . --tag=bwa:0.7.15 --build-arg version=v0.7.15`
 - samtools 1.4.1 (htslib 1.4.1) - `docker build . --tag=samtools:1.4.1 --build-arg version=1.4.1`
@@ -49,8 +59,11 @@ A farm5-specific docker image, providing dependencies for the iRODS import and b
 - biobambam 2.0.73 - `docker build . --tag=biobambam:2.0.73`
 - GATK 3.7-0 - `docker pull broadinstitute/gatk3:3.7-0`
 - lftp - `docker build . --tag=lftp:1.0`
+- cohortvcftozarr - `docker build . --tag=cohortvcftozarr:1.0`
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
 - sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
 - whatshap - `docker build . --tag=whatshap:1.0`
+- shapeit4 - `docker build . --tag=shapeit4:4.1.3`
+- bcftools - `docker build . --tag=bcftools:1.11`
 - import - `docker build . --tag=sangerpathogens/irods:4.1.12`
 

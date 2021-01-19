@@ -110,13 +110,13 @@ Run WhatsHap ``phase`` on a single sample with the following command:
 whatshap phase \
     -o sample_phased.vcf \
     --reference=reference.fasta \
-    --max-coverage=@@TODO \
+    --internal-downsampling=@@TODO \
     sample_genotypes.vcf sample_alignments.bam
 ```
 
 Notes:
 
-* ``--max-coverage`` default is 15, docs say may be increased up to 20
+* ``--internal-downsampling`` default is 15, docs say may be increased up to 20
   to improve phasing quality, but runtime increases exponentially, so
   some exploration of runtime for values in the range 15-20 might be
   useful to see what we can afford.
