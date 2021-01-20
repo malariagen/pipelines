@@ -11,7 +11,7 @@ task UnifiedGenotyper {
     File alleles_vcf_index
     String output_vcf_filename
 
-    String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
+    String docker_tag = "sangerpathogens/malaria-gatk3@sha256:4761153782cdb5f9dcdd11227fd78f58a9d9af5e6d6096deb6f6a47fa6219346"
     Int num_cpu = 4
     Int memory = 3000
     String? lsf_group
@@ -54,6 +54,9 @@ task UnifiedGenotyper {
           -XA MappingQualityRankSumTest \
           -XA QualByDepth \
           -XA ReadPosRankSumTest
+    rm "~{output_vcf_filename}.idx"
+    bgzip ~{output_vcf_filename}
+    tabix -p vcf "~{output_vcf_filename}.gz"
   }
   runtime {
     docker: docker_tag
@@ -63,8 +66,8 @@ task UnifiedGenotyper {
     lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
   }
   output {
-    File output_vcf = output_vcf_filename
-    File output_vcf_index = "~{output_vcf_filename}.idx"
+    File output_vcf = "~{output_vcf_filename}.gz"
+    File output_vcf_index = "~{output_vcf_filename}.gz.tbi"
   }
 }
 
@@ -75,7 +78,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:1baec1f2b253311bf834f8c5bf8c8169e765f738ac1972100027cbfa28329f2f"
+    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:5cb80965aa670763de228a31f2fd70f0e503de81d02a2d578f5e080a8a73fdc0"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -84,8 +87,10 @@ task VcfToZarr {
   }
 
   command {
+    vcf_file_name="~{sample_id}.vcf"
+    bgzip -d -c ~{input_vcf} > $vcf_file_name
     python /tools/sample_vcf_to_zarr.py \
-        --input ~{input_vcf} \
+        --input $vcf_file_name \
         --output ~{output_zarr_file_name} \
         --sample ~{sample_id} \
         --field variants/MQ \
@@ -101,6 +106,7 @@ task VcfToZarr {
         --contig UNKN \
         --log ~{output_log_file_name} \
         --zip
+    rm $vcf_file_name
   }
   runtime {
     docker: docker_tag
