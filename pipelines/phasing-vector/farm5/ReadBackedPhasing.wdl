@@ -6,12 +6,12 @@ version 1.0
 ## https://github.com/malariagen/pipelines/blob/master/docs/specs/phasing-vector.md
 ##
 
-import "../../../structs/gcp/RunTimeSettings.wdl"
+import "../../../structs/farm5/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
-import "../../../tasks/gcp/Tasks.wdl" as Tasks
-import "../../../tasks/gcp/ShortReadAlignmentTasks.wdl" as ShortReadAlignmentTasks
-import "../../../tasks/gcp/SNPGenotypingTasks.wdl" as SNPGenotypingTasks
-import "../../../tasks/gcp/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
+import "../../../tasks/farm5/Tasks.wdl" as Tasks
+import "../../../tasks/farm5/ShortReadAlignmentTasks.wdl" as ShortReadAlignmentTasks
+import "../../../tasks/farm5/SNPGenotypingTasks.wdl" as SNPGenotypingTasks
+import "../../../tasks/farm5/ReadBackedPhasingTasks.wdl" as ReadBackedPhasingTasks
 
 workflow ReadBackedPhasing {
   String pipeline_version = "1.0.0"

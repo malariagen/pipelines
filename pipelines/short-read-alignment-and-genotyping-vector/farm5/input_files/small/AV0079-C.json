@@ -1,6 +1,6 @@
 {
-  "ShortReadAlignmentAndGenotyping.sample_id": "AV0148-C",
-  "ShortReadAlignmentAndGenotyping.input_file": "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/lanelets.tsv",
+  "ShortReadAlignmentAndGenotyping.sample_id": "AV0079-C",
+  "ShortReadAlignmentAndGenotyping.input_file": "/lustre/scratch118/malaria/team112/personal/gg18/ag1000g-phase1-minimal/lanelets_farm5_local.tsv",
   "ShortReadAlignmentAndGenotyping.alleles_vcf": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/allele_sites/ag.allsites.nonN.vcf.gz",
   "ShortReadAlignmentAndGenotyping.alleles_vcf_index": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/allele_sites/ag.allsites.nonN.vcf.gz.tbi",
   "ShortReadAlignmentAndGenotyping.reference": {

@@ -725,3 +725,44 @@ task GatkCallableLoci {
     File summary_file = summary_filename
   }
 }
+
+task SamtoolsIndex {
+  input {
+    File input_file
+
+    String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
+    Int num_cpu = 2
+    Int memory = 3000
+    String? lsf_group
+    String? lsf_queue
+    RunTimeSettings runTimeSettings
+  }
+
+  String local_file = basename(input_file)
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    # Localize the passed input_file to the working directory so when the
+    # newly created index file doesn't get delocalized with the long path.
+    cp ~{input_file} ~{local_file}
+    samtools index -b ~{local_file}
+
+  }
+
+  runtime {
+    docker: docker_tag
+    cpu: num_cpu
+    memory: memory
+    lsf_group: select_first([runTimeSettings.lsf_group, lsf_group, "pathdev"])
+    lsf_queue: select_first([runTimeSettings.lsf_queue, lsf_queue, "normal"])
+  }
+
+  output {
+    # output the path to the copied local file AND the created index so they are side by side.
+    File output_file = local_file
+    File output_index_file = "~{local_file}.bai"
+  }
+}
