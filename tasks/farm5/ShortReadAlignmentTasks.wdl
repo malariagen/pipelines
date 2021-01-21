@@ -278,7 +278,7 @@ task ReadAlignment {
   # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
   # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
   String full_read_group_id = select_first([read_group_id, output_sam_basename])
-  String autogen_read_group = "@RG\tID:" + full_read_group_id + "\tSM:" + sample_id + "\tCN:SC\tPL:ILLUMINA"
+  String autogen_read_group = "@RG\\tID:" + full_read_group_id + "\\tSM:" + sample_id + "\\tCN:SC\\tPL:ILLUMINA"
   String full_read_group = select_first([read_group, autogen_read_group])
 
   command {
