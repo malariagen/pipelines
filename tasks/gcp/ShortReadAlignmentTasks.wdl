@@ -8,7 +8,7 @@ task SplitUpInputFile {
     File input_file
     String sample_id
 
-    String docker = runTimeSettings.lftp_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -34,7 +34,7 @@ task SplitUpInputFile {
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -50,7 +50,7 @@ task Ftp {
     String input_string
     String output_filename = basename(input_string)
 
-    String docker = runTimeSettings.lftp_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/lftp:1.0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -67,7 +67,7 @@ task Ftp {
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -84,7 +84,7 @@ task CramToBam {
     File input_file
     String output_filename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
     ReferenceSequence reference
@@ -105,7 +105,7 @@ task CramToBam {
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -118,34 +118,44 @@ task CramToBam {
   }
 }
 
-task SamtoolsIndex {
+# Sometimes the existing read group ID doesn't give useful info.
+# Replace the read group ID with the bam/cram basename without the extension.
+# Replaces the tabs with "\t" so that it can be used directly as a string
+# parameter -R in bwa mem.
+# Write out the new read group ID to file.
+# Most useful where bam/cram has run, lane, tag information in its filename.
+task ExtractReadGroup {
   input {
     File input_file
+    String sample_id
+    String read_group_filename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
-    Int num_cpu = 2
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
   Int disk_size = ceil(3 * size(input_file, "GiB")) + 20
 
-  String local_file = basename(input_file)
+  Boolean is_cram = sub(basename(input_file), ".*\\.", "") == "cram"
+  String read_group_id = if is_cram then basename(input_file, ".cram")  else basename(input_file, ".bam")
+
 
   command {
 
     set -e
     set -o pipefail
 
-    # Localize the passed input_file to the working directory so when the
-    # newly created index file doesn't get delocalized with the long path.
-    cp ~{input_file} ~{local_file}
-    samtools index -b ~{local_file}
+    read_group=$( samtools view -H ~{input_file} | grep '^@RG')
+    echo "$read_group" | sed -e "s/ID:\S*\s/ID:~{read_group_id}\t/" | \
+      sed -e "s/SM:\S*\s/SM:~{sample_id}\t/" | \
+      sed -e "s/\t/\\\\t/g" > ~{read_group_filename}
 
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -153,9 +163,7 @@ task SamtoolsIndex {
   }
 
   output {
-    # output the path to the copied local file AND the created index so they are side by side.
-    File output_file = local_file
-    File output_index_file = "~{local_file}.bai"
+    File read_group_file = read_group_filename
   }
 }
 
@@ -164,7 +172,7 @@ task RevertSam {
     File input_file
     String output_filename
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -186,7 +194,7 @@ task RevertSam {
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -204,7 +212,7 @@ task SamToFastq {
     String output_fastq1_filename
     String output_fastq2_filename
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -222,7 +230,7 @@ task SamToFastq {
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -235,17 +243,21 @@ task SamToFastq {
   }
 }
 
+# User must supply either one of read_group_id or read_group
+# If they supply read_group_id, a fake read_group will  be generated as
+# @RG  ID:~{read_group_id} SM:~{sample_id} CN:SC PL:ILLUMINA
 task ReadAlignment {
   input {
-    String read_group_id
+    String? read_group_id
+    String? read_group
     String sample_id
     File fastq1
     File fastq2
     String output_sam_basename
 
-    String docker = runTimeSettings.bwa_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bwa:0.7.15"
     Int preemptible_tries = runTimeSettings.preemptible_tries
-    Int num_cpu = 16
+    Int num_cpu = 4
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
@@ -256,22 +268,26 @@ task ReadAlignment {
   Float disk_multiplier = 2.5
   Int disk_size = ceil(fastq_size + bwa_ref_size + (disk_multiplier * fastq_size) + 20)
 
+  # suggested content for the read group tag: (from Thuy):
+  # Read group identifier [ID]: full platform unit ID as the read group identifier (including the flowcell, run, lane)
+  # library [LB]: obtained from raw sequenced bam, but we can make this up for testing
+  # sample [SM]: obtained from raw sequenced bam, but we can also obtain this from the sample manifest or fastq filename
+  # sequencing centre [CN]: obtained from raw sequenced bam, but we can make this up for testing
+  # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
+  # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
+  # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
+  String full_read_group_id = select_first([read_group_id, output_sam_basename])
+  String autogen_read_group = "@RG\\tID:" + full_read_group_id + "\\tSM:" + sample_id + "\\tCN:SC\\tPL:ILLUMINA"
+  String full_read_group = select_first([read_group, autogen_read_group])
+
   command {
     set -o pipefail
     set -e
 
-    # suggested content for the read group tag: (from Thuy):
-    # Read group identifier [ID]: full platform unit ID as the read group identifier (including the flowcell, run, lane)
-    # library [LB]: obtained from raw sequenced bam, but we can make this up for testing
-    # sample [SM]: obtained from raw sequenced bam, but we can also obtain this from the sample manifest or fastq filename
-    # sequencing centre [CN]: obtained from raw sequenced bam, but we can make this up for testing
-    # platform [PL]: obtained from raw sequenced bam, but we can make this up for testing
-    # study [DS]: obtained from raw sequenced bam, but we can make this up for testing
-    # @rg ID:130508_HS22_09812_A_D1U5TACXX_4#48 LB:7206533 SM:AN0131-C CN:SC PL:ILLUMINA DS:1087-AN-HAPMAP-DONNELLY
-    /bwa/bwa mem -M -t 16 -T 0 -R '@RG\tID:~{read_group_id}\tSM:~{sample_id}\tCN:SC\tPL:ILLUMINA' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
+    bwa mem -M -K 100000000 -t 4 -T 0 -R '~{full_read_group}' ~{reference.ref_fasta} ~{fastq1} ~{fastq2} > ~{output_sam_basename}.sam
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "15 GiB"
@@ -287,7 +303,7 @@ task ReadAlignmentPostProcessing {
     File input_sam
     String output_bam_basename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
     RunTimeSettings runTimeSettings
@@ -300,15 +316,15 @@ task ReadAlignmentPostProcessing {
     set -e
     set -o pipefail
 
-    /bin/samtools view -bu ~{input_sam} |
-    /bin/samtools sort -n - |
-    /bin/samtools fixmate - - |
-    /bin/samtools sort - > ~{output_bam_basename}.bam
+    samtools view -bu ~{input_sam} |
+    samtools sort -n - |
+    samtools fixmate - - |
+    samtools sort - > ~{output_bam_basename}.bam
 
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "14 GiB"
@@ -324,7 +340,7 @@ task SetNmMdAndUqTags {
     File input_bam
     String output_bam_basename
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -342,7 +358,7 @@ task SetNmMdAndUqTags {
       IS_BISULFITE_SEQUENCE=false
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -358,7 +374,7 @@ task MergeSamFiles {
     Array[File] input_files
     String output_filename
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -373,7 +389,7 @@ task MergeSamFiles {
       OUTPUT=~{output_filename}
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -389,7 +405,7 @@ task MarkDuplicates {
     File input_bam
     String output_filename
 
-    String docker = runTimeSettings.biobambam_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/biobambam2:2.0.73"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -401,7 +417,7 @@ task MarkDuplicates {
     /usr/local/bin/bammarkduplicates I=~{input_bam} O=~{output_filename} index=1
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     disks: "local-disk " + disk_size + " HDD"
@@ -420,7 +436,7 @@ task RealignerTargetCreator {
     File? known_indels_vcf
     String output_interval_list_filename
 
-    String docker = runTimeSettings.gatk_docker
+    String docker_tag = "broadinstitute/gatk3:3.7-0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -439,7 +455,7 @@ task RealignerTargetCreator {
           -o ~{output_interval_list_filename}
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -458,7 +474,7 @@ task IndelRealigner {
     File interval_list_file
     String output_bam_filename
 
-    String docker = runTimeSettings.gatk_docker
+    String docker_tag = "broadinstitute/gatk3:3.7-0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -478,7 +494,7 @@ task IndelRealigner {
           -o ~{output_bam_filename}
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"
@@ -494,7 +510,7 @@ task FixMateInformation {
     File input_file
     String output_bam_basename
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -517,7 +533,7 @@ task FixMateInformation {
       mv ~{output_bam_basename}.bai ~{output_bam_basename}.bam.bai
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"
@@ -537,7 +553,7 @@ task ValidateSamFile {
     Int? max_output
     Array[String]? ignore
 
-    String docker = runTimeSettings.picard_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/picard:2.9.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -559,7 +575,7 @@ task ValidateSamFile {
       MODE=VERBOSE
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -575,7 +591,7 @@ task SamtoolsStats {
     File input_file
     String report_filename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -590,12 +606,12 @@ task SamtoolsStats {
     set -e
     set -o pipefail
 
-    /bin/samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
+    samtools stats -r ~{reference.ref_fasta} ~{input_file} > ~{report_filename}
 
   }
 
   runtime {
-    docker: runTimeSettings.samtools_docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"
@@ -612,7 +628,7 @@ task SamtoolsIdxStats {
     File input_bam_index
     String report_filename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -625,12 +641,12 @@ task SamtoolsIdxStats {
     set -e
     set -o pipefail
 
-    /bin/samtools idxstats ~{input_bam} > ~{report_filename}
+    samtools idxstats ~{input_bam} > ~{report_filename}
 
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -646,7 +662,7 @@ task SamtoolsFlagStat {
     File input_bam
     String report_filename
 
-    String docker = runTimeSettings.samtools_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -659,12 +675,12 @@ task SamtoolsFlagStat {
     set -e
     set -o pipefail
 
-    /bin/samtools flagstat ~{input_bam} > ~{report_filename}
+    samtools flagstat ~{input_bam} > ~{report_filename}
 
   }
 
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -681,7 +697,7 @@ task GatkCallableLoci {
     File input_bam_index
     String summary_filename
 
-    String docker = runTimeSettings.gatk_docker
+    String docker_tag = "broadinstitute/gatk3:3.7-0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     ReferenceSequence reference
@@ -700,7 +716,7 @@ task GatkCallableLoci {
           --minDepth 5
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "3.75 GiB"
@@ -708,5 +724,46 @@ task GatkCallableLoci {
   }
   output {
     File summary_file = summary_filename
+  }
+}
+
+task SamtoolsIndex {
+  input {
+    File input_file
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samtools:1.4.1"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(3 * size(input_file, "GiB")) + 20
+
+  String local_file = basename(input_file)
+
+  command {
+
+    set -e
+    set -o pipefail
+
+    # Localize the passed input_file to the working directory so when the
+    # newly created index file doesn't get delocalized with the long path.
+    cp ~{input_file} ~{local_file}
+    samtools index -b ~{local_file}
+
+  }
+
+  runtime {
+    docker: docker_tag
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "3.75 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+    # output the path to the copied local file AND the created index so they are side by side.
+    File output_file = local_file
+    File output_index_file = "~{local_file}.bai"
   }
 }

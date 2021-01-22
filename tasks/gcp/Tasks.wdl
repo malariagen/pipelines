@@ -6,6 +6,8 @@ task BgzipAndTabix {
     input {
         File input_vcf
         String output_basename
+
+        String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
         RunTimeSettings runTimeSettings
     }
 
@@ -19,7 +21,7 @@ task BgzipAndTabix {
         tabix ~{output_basename}.vcf.gz
     }
     runtime {
-        docker: runTimeSettings.bcftools_docker
+        docker: docker_tag
         preemptible: runTimeSettings.preemptible_tries
         cpu: "1"
         memory: "3.75 GiB"
@@ -34,6 +36,8 @@ task BgzipAndTabix {
 task Tabix {
     input {
         File input_file
+
+        String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
         RunTimeSettings runTimeSettings
     }
 
@@ -47,7 +51,7 @@ task Tabix {
         tabix ~{local_file}
     }
     runtime {
-        docker: runTimeSettings.bcftools_docker
+        docker: docker_tag
         preemptible: runTimeSettings.preemptible_tries
         cpu: "1"
         memory: "3.75 GiB"

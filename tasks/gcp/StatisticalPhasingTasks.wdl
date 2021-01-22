@@ -8,6 +8,8 @@ task MergeVcfs {
     Array[File] phased_sample_vcfs
     Array[File] phased_sample_vcf_indices
     String project_id
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
     RunTimeSettings runTimeSettings
   }
 
@@ -20,7 +22,7 @@ task MergeVcfs {
       ~{sep=' ' phased_sample_vcfs}
   }
   runtime {
-    docker: runTimeSettings.bcftools_docker
+    docker: docker_tag
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
@@ -45,6 +47,8 @@ task ShapeIt4 {
     Int pbwt_depth = 4
     # TODO - how to handle refence as an option
     ReferenceSequence? reference
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
     RunTimeSettings runTimeSettings
   }
 
@@ -68,7 +72,7 @@ task ShapeIt4 {
   }
 
   runtime {
-    docker: runTimeSettings.shapeit4_docker
+    docker: docker_tag
     preemptible: runTimeSettings.preemptible_tries
     cpu: "4"
     memory: "15 GiB"
@@ -87,7 +91,7 @@ task CohortVcfToZarr {
     String contig
     String output_log_file_name
 
-    String docker = runTimeSettings.cohortvcftozarr_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/cohortvcftozarr:1.0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -111,7 +115,7 @@ task CohortVcfToZarr {
     --log ~{output_log_file_name}
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"

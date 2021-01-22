@@ -11,7 +11,7 @@ task UnifiedGenotyper {
     File alleles_vcf_index
     String output_vcf_filename
 
-    String docker = runTimeSettings.gatk_docker
+    String docker_tag = "broadinstitute/gatk3:3.7-0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 4
     ReferenceSequence reference
@@ -56,7 +56,7 @@ task UnifiedGenotyper {
           -XA ReadPosRankSumTest
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "15 GiB"
@@ -75,7 +75,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker = runTimeSettings.vcftozarr_docker
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -103,7 +103,7 @@ task VcfToZarr {
         --zip
   }
   runtime {
-    docker: docker
+    docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"

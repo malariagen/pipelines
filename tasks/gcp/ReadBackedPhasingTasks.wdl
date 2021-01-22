@@ -11,6 +11,8 @@ task SelectVariants {
     File phased_sites_zarr
     String output_basename
     String contig
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/sampleselectvariants:1.0"
     RunTimeSettings runTimeSettings
   }
 
@@ -28,7 +30,7 @@ task SelectVariants {
   }
 
   runtime {
-    docker: runTimeSettings.select_variants_docker
+    docker: docker_tag
     preemptible: runTimeSettings.preemptible_tries
     cpu: "1"
     memory: "3.75 GiB"
@@ -51,6 +53,8 @@ task WhatsHapPhase {
     String? contig
     Int internal_downsampling = 15
     ReferenceSequence reference
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
     RunTimeSettings runTimeSettings
   }
 
@@ -68,7 +72,7 @@ task WhatsHapPhase {
   }
 
   runtime {
-    docker: runTimeSettings.whatshap_docker
+    docker: docker_tag
     preemptible: runTimeSettings.preemptible_tries
     cpu: "2"
     memory: "30 GiB"
@@ -86,6 +90,8 @@ task WhatsHapStats {
     File phased_vcf_index
     String output_basename
     ReferenceSequence reference
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
     RunTimeSettings runTimeSettings
   }
   # TODO - figure out how to make proper use of OPTIONAL reference.ref_chr_lengths
@@ -99,7 +105,7 @@ task WhatsHapStats {
   }
 
   runtime {
-    docker: runTimeSettings.whatshap_docker
+    docker: docker_tag
     preemptible: runTimeSettings.preemptible_tries
     cpu: "2"
     memory: "7.5 GiB"
