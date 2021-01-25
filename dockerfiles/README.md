@@ -29,6 +29,8 @@ The Broad Institute provided Dockerfile for GATK can be found on [docker hub](ht
 - For GATK 3.X use https://hub.docker.com/r/broadinstitute/gatk3
 - For GATK 4.X use https://hub.docker.com/r/broadinstitute/gatk
 
+The GATK 3.7-0 image (provided by the Broad Institute) has been been extended with htslib software for use in Sanger pipelines.
+
 ### Lftp
 Contains the lftp too, a simple ftp client, used for downloading files from ena
 
@@ -57,7 +59,7 @@ A farm5-specific docker image, providing dependencies for the iRODS import and b
 - samtools 1.4.1 (htslib 1.4.1) - `docker build . --tag=samtools:1.4.1 --build-arg version=1.4.1`
 - picard 2.9.2 - ` docker build . --tag=picard:2.9.2 --build-arg version=2.9.2`
 - biobambam 2.0.73 - `docker build . --tag=biobambam:2.0.73`
-- GATK 3.7-0 - `docker pull broadinstitute/gatk3:3.7-0`
+- GATK 3.7-0 - `docker build . --tag=sangerpathogens/gatk3:3.7.0`
 - lftp - `docker build . --tag=lftp:1.0`
 - cohortvcftozarr - `docker build . --tag=cohortvcftozarr:1.0`
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
