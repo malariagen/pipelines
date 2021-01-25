@@ -11,7 +11,7 @@ task UnifiedGenotyper {
     File alleles_vcf_index
     String output_vcf_filename
 
-    String docker_tag = "broadinstitute/gatk3:3.7-0"
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/gatk3:3.7-0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 4
     ReferenceSequence reference
@@ -54,6 +54,9 @@ task UnifiedGenotyper {
           -XA MappingQualityRankSumTest \
           -XA QualByDepth \
           -XA ReadPosRankSumTest
+    rm "~{output_vcf_filename}.idx"
+    bgzip ~{output_vcf_filename}
+    tabix -p vcf "~{output_vcf_filename}.gz"
   }
   runtime {
     docker: docker_tag
@@ -63,8 +66,8 @@ task UnifiedGenotyper {
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
-    File output_vcf = output_vcf_filename
-    File output_vcf_index = "~{output_vcf_filename}.idx"
+    File output_vcf = "~{output_vcf_filename}.gz"
+    File output_vcf_index = "~{output_vcf_filename}.gz.tbi"
   }
 }
 
@@ -75,7 +78,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.1"
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -84,8 +87,10 @@ task VcfToZarr {
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
   command {
+    vcf_file_name="~{sample_id}.vcf"
+    bgzip -d -c ~{input_vcf} > $vcf_file_name
     python /tools/sample_vcf_to_zarr.py \
-        --input ~{input_vcf} \
+        --input $vcf_file_name \
         --output ~{output_zarr_file_name} \
         --sample ~{sample_id} \
         --field variants/MQ \
@@ -101,6 +106,7 @@ task VcfToZarr {
         --contig UNKN \
         --log ~{output_log_file_name} \
         --zip
+    rm $vcf_file_name
   }
   runtime {
     docker: docker_tag
