@@ -1,8 +1,7 @@
 # Mosquito phasing pipeline specification
 
-* Version: 0.0.0
+* Version: 1.0.0
 * Authors: Alistair Miles, Jon Brenas
-* Status: DRAFT
 
 This document specifies a pipeline for phasing SNP genotypes for a
 cohort of multiple samples. The pipeline makes use of both read-backed

@@ -1,0 +1,25 @@
+{
+  "ReadBackedPhasing.sample_id": "AV0148-C",
+  "ReadBackedPhasing.output_basename": "AV0148-C_3L",
+  "ReadBackedPhasing.input_bam": "/lustre/scratch118/malaria/team112/personal/gg18/ShortReadAlignmentAndGenotyping/outputs/small/AV0148-C/AV0148-C.bam",
+  "ReadBackedPhasing.input_bam_index": "/lustre/scratch118/malaria/team112/personal/gg18/ShortReadAlignmentAndGenotyping/outputs/small/AV0148-C/AV0148-C.bam.bai",
+  "ReadBackedPhasing.sample_zarr": "/lustre/scratch118/malaria/team112/personal/gg18/ShortReadAlignmentAndGenotyping/outputs/small/AV0148-C/AV0148-C.zarr.zip",
+  "ReadBackedPhasing.called_sites_zarr": "/lustre/scratch118/malaria/team112/personal/gg18/ag3-phasing-20200918/AgamP4.allsites.nonN.zarr.zip",
+  "ReadBackedPhasing.phased_sites_zarr": "/lustre/scratch118/malaria/team112/personal/gg18/ag3-phasing-20200918/ag3_phased_sites_gamb_colu_arab.zarr.zip",
+  "ReadBackedPhasing.contig": "3L",
+  "ReadBackedPhasing.reference": {
+    "ref_fasta": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
+    "ref_fasta_index": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.fai",
+    "ref_dict": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.dict",
+    "ref_sa": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.sa",
+    "ref_amb": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.amb",
+    "ref_bwt": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.bwt",
+    "ref_ann": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.ann",
+    "ref_pac": "/lustre/scratch118/infgen/pathogen/pathpipe/malariaGEN/vectors/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa.pac",
+    "ref_chr_lengths": "/lustre/scratch118/malaria/team112/personal/gg18/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.chr_lengths.txt"
+  },
+  "ReadBackedPhasing.runTimeSettings": {
+    "lsf_group": "pathdev",
+    "lsf_queue": "normal"
+  }
+}
