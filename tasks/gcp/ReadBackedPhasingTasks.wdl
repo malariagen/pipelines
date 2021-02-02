@@ -13,6 +13,8 @@ task SelectVariants {
     String contig
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/sampleselectvariants:1.0"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -31,8 +33,8 @@ task SelectVariants {
 
   runtime {
     docker: docker_tag
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -55,6 +57,8 @@ task WhatsHapPhase {
     ReferenceSequence reference
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
     RunTimeSettings runTimeSettings
   }
 
@@ -73,8 +77,8 @@ task WhatsHapPhase {
 
   runtime {
     docker: docker_tag
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "2"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "30 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -92,6 +96,8 @@ task WhatsHapStats {
     ReferenceSequence reference
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 2
     RunTimeSettings runTimeSettings
   }
   # TODO - figure out how to make proper use of OPTIONAL reference.ref_chr_lengths
@@ -106,8 +112,8 @@ task WhatsHapStats {
 
   runtime {
     docker: docker_tag
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "2"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "7.5 GiB"
   }
 

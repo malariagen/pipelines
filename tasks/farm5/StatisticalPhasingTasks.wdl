@@ -93,9 +93,10 @@ task CohortVcfToZarr {
   input {
     File input_vcf
     String contig
+    String output_zarr_file_name
     String output_log_file_name
 
-    String singularity_image = "cohortvcftozarr.1.0.sif"
+    String singularity_image = "cohortvcftozarr.1.1.sif"
     Int num_cpu = 1
     Int memory = 7500
     String? lsf_group
@@ -107,7 +108,7 @@ task CohortVcfToZarr {
     mkdir outputs
     python /tools/cohort_vcf_to_zarr.py \
     --input ~{input_vcf} \
-    --output outputs \
+    --output ~{output_zarr_file_name} \
     --contig ~{contig} \
     --field variants/POS \
     --field variants/REF:S1 \
@@ -116,7 +117,8 @@ task CohortVcfToZarr {
     --field variants/AF \
     --field variants/CM \
     --field calldata/GT \
-    --log ~{output_log_file_name}
+    --log ~{output_log_file_name} \
+    --zip
   }
   runtime {
     singularity: singularity_image
@@ -127,6 +129,6 @@ task CohortVcfToZarr {
   }
   output {
     File output_log_file = output_log_file_name
-    Array[File] zarr_files = glob("outputs/*")
+    File zarr_output = "~{output_zarr_file_name}.zip"
   }
 }

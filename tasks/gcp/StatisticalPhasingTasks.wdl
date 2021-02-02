@@ -10,6 +10,8 @@ task MergeVcfs {
     String project_id
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
@@ -23,8 +25,8 @@ task MergeVcfs {
   }
   runtime {
     docker: docker_tag
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "1"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -49,6 +51,8 @@ task ShapeIt4 {
     ReferenceSequence? reference
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 4
     RunTimeSettings runTimeSettings
   }
 
@@ -73,8 +77,8 @@ task ShapeIt4 {
 
   runtime {
     docker: docker_tag
-    preemptible: runTimeSettings.preemptible_tries
-    cpu: "4"
+    preemptible: preemptible_tries
+    cpu: num_cpu
     memory: "15 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
@@ -89,9 +93,10 @@ task CohortVcfToZarr {
   input {
     File input_vcf
     String contig
+    String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/cohortvcftozarr:1.0"
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/cohortvcftozarr:1.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -103,7 +108,7 @@ task CohortVcfToZarr {
     mkdir outputs
     python /tools/cohort_vcf_to_zarr.py \
     --input ~{input_vcf} \
-    --output outputs \
+    --output ~{output_zarr_file_name} \
     --contig ~{contig} \
     --field variants/POS \
     --field variants/REF:S1 \
@@ -112,7 +117,8 @@ task CohortVcfToZarr {
     --field variants/AF \
     --field variants/CM \
     --field calldata/GT \
-    --log ~{output_log_file_name}
+    --log ~{output_log_file_name} \
+    --zip
   }
   runtime {
     docker: docker_tag
@@ -123,6 +129,6 @@ task CohortVcfToZarr {
   }
   output {
     File output_log_file = output_log_file_name
-    Array[File] zarr_files = glob("outputs/*")
+    File zarr_output = "~{output_zarr_file_name}.zip"
   }
 }

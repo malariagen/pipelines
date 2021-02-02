@@ -64,11 +64,11 @@ workflow StatisticalPhasing {
 #  }
 
   # Step 4: Cohort VCF to Zarr
-  # TODO - might want to zip these?
   call StatisticalPhasingTasks.CohortVcfToZarr {
     input:
       input_vcf = ShapeIt4.phased_vcf,
       contig = contig,
+      output_zarr_file_name = project_id + ".zarr",
       output_log_file_name = project_id + ".log",
       runTimeSettings = runTimeSettings
   }
@@ -79,6 +79,6 @@ workflow StatisticalPhasing {
 
   output {
     File output_vcf = ShapeIt4.phased_vcf
-    Array[File] output_zarr_files = CohortVcfToZarr.zarr_files
+    File zarr_output = CohortVcfToZarr.zarr_output
   }
 }
