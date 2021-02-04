@@ -1,0 +1,21 @@
+version: 1.2
+workflows:
+  - name: MalariaVector_ShortReadAlignment
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/short-read-alignment-vector/gcp/ShortReadAlignment.wdl
+  - name: MalariaVector_SNPGenotyping
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/SNP-genotyping-vector/gcp/SNPGenotyping.wdl
+  - name: MalariaVector_ShortReadAlignmentAndGenotyping
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/short-read-alignment-and-genotyping-vector/gcp/ShortReadAlignmentAndGenotyping.wdl
+  - name: MalariaVector_Phasing
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/phasing-vector/gcp/Phasing.wdl
+  - name: MalariaVector_ReadBackedPhasing
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/phasing-vector/gcp/ReadBackedPhasing.wdl
+  - name: MalariaVector_StatisticalPhasing
+    subclass: WDL
+    primaryDescriptorPath: /pipelines/phasing-vector/gcp/StatisticalPhasing.wdl
+
