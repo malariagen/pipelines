@@ -18,4 +18,3 @@ workflows:
   - name: MalariaVector_StatisticalPhasing
     subclass: WDL
     primaryDescriptorPath: /pipelines/phasing-vector/gcp/StatisticalPhasing.wdl
-
