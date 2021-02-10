@@ -12,28 +12,7 @@ class TestScript(unittest.TestCase):
         shutil.rmtree("output", ignore_errors=True)
         os.mkdir("output")
 
-    def test_phased(self):
-
-        # run conversion
-        result = subprocess.run(["python", "cohort_vcf_to_zarr.py",
-                                 "--input", "fixture/phased.vcf",
-                                 "--output", "output/phased.zarr",
-                                 "--contig", "2R",
-                                 "--field", "variants/POS",
-                                 "--field", "variants/REF:S1",
-                                 "--field", "variants/ALT:S1",
-                                 "--field", "variants/AC",
-                                 "--field", "variants/AF",
-                                 "--field", "variants/CM",
-                                 "--field", "calldata/GT",
-                                 "--alt-number", "1",
-                                 ],
-                                check=True,
-                                capture_output=True)
-        print(result.stdout.decode())
-
-        # open and check output
-        callset = zarr.open("output/phased.zarr")
+    def check_example_callset(self, callset):
         assert "2R" in callset
         contig_callset = callset["2R"]
         assert "variants" in contig_callset
@@ -63,6 +42,53 @@ class TestScript(unittest.TestCase):
         assert [b'T', b'G', b'T'] == variants['ALT'][:3].tolist()
         assert [0, 0, 0, 0, 1, 0, 0, 0] == gt[10].flatten().tolist()
         assert [0, 0, 0, 0, 0, 1, 0, 0] == gt[12].flatten().tolist()
+
+    def test_phased(self):
+        # run conversion
+        result = subprocess.run(["python", "cohort_vcf_to_zarr.py",
+                                 "--input", "fixture/phased.vcf",
+                                 "--output", "output/phased.zarr",
+                                 "--contig", "2R",
+                                 "--field", "variants/POS",
+                                 "--field", "variants/REF:S1",
+                                 "--field", "variants/ALT:S1",
+                                 "--field", "variants/AC",
+                                 "--field", "variants/AF",
+                                 "--field", "variants/CM",
+                                 "--field", "calldata/GT",
+                                 "--alt-number", "1"
+                                 ],
+                                check=True,
+                                capture_output=True)
+        print(result.stdout.decode())
+
+        # open and check output
+        callset = zarr.open("output/phased.zarr")
+        self.check_example_callset(callset)
+
+    def test_phased_zip(self):
+        # run conversion
+        result = subprocess.run(["python", "cohort_vcf_to_zarr.py",
+                                 "--input", "fixture/phased.vcf",
+                                 "--output", "output/phased.zarr",
+                                 "--contig", "2R",
+                                 "--field", "variants/POS",
+                                 "--field", "variants/REF:S1",
+                                 "--field", "variants/ALT:S1",
+                                 "--field", "variants/AC",
+                                 "--field", "variants/AF",
+                                 "--field", "variants/CM",
+                                 "--field", "calldata/GT",
+                                 "--alt-number", "1",
+                                 "--zip"
+                                 ],
+                                check=True,
+                                capture_output=True)
+        print(result.stdout.decode())
+
+        # open and check output
+        callset = zarr.open("output/phased.zarr.zip")
+        self.check_example_callset(callset)
 
 
 if __name__ == '__main__':

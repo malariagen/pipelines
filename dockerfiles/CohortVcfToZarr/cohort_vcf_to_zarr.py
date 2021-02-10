@@ -1,7 +1,46 @@
 import sys
 import allel
 import zarr
+import zipfile
+import os
+import shutil
 
+
+def zip_zarr(zarr_path, del_orig=False):
+    """
+    Assembles the entire Zarr directory into an uncompressed zip file name {zarr_path}.zip.
+
+    Parameters
+    ----------
+    zarr_path : str
+        Path to zarr folder.
+    del_orig : bool
+        Whether the original zarr directory should be deleted.
+
+    """
+
+    output_zip_path = zarr_path + ".zip"
+
+    with zipfile.ZipFile(file=output_zip_path, mode="w", compression=zipfile.ZIP_STORED,
+                         allowZip64=False) as zh:
+        for curr_dir_path, dir_basenames, file_basenames in os.walk(top=zarr_path, topdown=True):
+            for file_basename in file_basenames:
+                # We need the absolute path to add files into the zipped zarr
+                # but we want the zipped files named using relative paths to the zarr directory.
+                curr_dir_rel_path = os.path.relpath(curr_dir_path, start=zarr_path)
+                file_rel_path = os.path.join(curr_dir_rel_path, file_basename)
+                file_abs_path = os.path.join(curr_dir_path, file_basename)
+                zh.write(filename=file_abs_path, arcname=file_rel_path)
+
+    # reopen and test
+    with zipfile.ZipFile(file=output_zip_path, mode="r") as zh:
+        bad = zh.testzip()
+        if bad:
+            raise RuntimeError(f"zip test failed, first bad file: {bad}")
+
+    # clean up
+    if del_orig:
+        shutil.rmtree(zarr_path)
 
 def main():
 
@@ -60,6 +99,11 @@ def main():
     parser.add_argument("--log",
                         help="Path to logfile, stdout or stderr. Default: stdout.",
                         default="stdout")
+    parser.add_argument("--zip", action="store_true",
+                        help="If flag exists, entire zarr folder is zipped with no "
+                             "compression, and the original zarr folder is deleted. "
+                             "The zip file name is the value given for the --output "
+                             "argument, appended with '.zip'.")
 
     args = parser.parse_args()
     input_vcf_path = args.input
@@ -71,6 +115,7 @@ def main():
     tabix = args.tabix
     chunk_length = args.chunk_length
     chunk_width = args.chunk_width
+    do_zip = args.zip
     contigs = args.contigs
     fields = []
     types = {}
@@ -115,6 +160,8 @@ def main():
         if log_file_needs_closing:
             log_file.close()
 
+    if do_zip:
+        zip_zarr(zarr_path=output_zarr_path, del_orig=True)
 
 if __name__ == "__main__":
     main()

@@ -7,10 +7,10 @@ version 1.0
 ##.
 ##
 
-import "../../../structs/gcp/RunTimeSettings.wdl"
+import "../../../structs/farm5/RunTimeSettings.wdl"
 import "../../../structs/ReferenceSequence.wdl"
-import "../../../pipelines/phasing-vector/gcp/ReadBackedPhasing.wdl" as ReadBackedPhasing
-import "../../../pipelines/phasing-vector/gcp/StatisticalPhasing.wdl" as StatisticalPhasing
+import "../../../pipelines/phasing-vector/farm5/ReadBackedPhasing.wdl" as ReadBackedPhasing
+import "../../../pipelines/phasing-vector/farm5/StatisticalPhasing.wdl" as StatisticalPhasing
 
 workflow Phasing {
   String pipeline_version = "1.0.0"
@@ -33,7 +33,7 @@ workflow Phasing {
     RunTimeSettings runTimeSettings
   }
 
-  # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
+  # TODO: extract sample_id, sample_bam, and sample_vcf information from the manifest file (or inputs)
 
   # Step 1: Read-backed phasing
 
