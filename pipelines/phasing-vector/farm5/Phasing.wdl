@@ -33,7 +33,7 @@ workflow Phasing {
     RunTimeSettings runTimeSettings
   }
 
-  # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
+  # TODO: extract sample_id, sample_bam, and sample_vcf information from the manifest file (or inputs)
 
   # Step 1: Read-backed phasing
 
