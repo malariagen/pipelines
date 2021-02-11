@@ -1,4 +1,4 @@
-# ShortReadAlignment (vector) pipeline
+# Haplotype phasing (vector) pipeline
 
 This folder contains the pipeline wdl and workflow inputs for the Vector phasing pipelines as specified in https://github.com/malariagen/pipelines/blob/797a6b1c152d7e262404575c15a6c36553af5c41/docs/specs/phasing-vector.md
 
