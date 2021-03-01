@@ -698,6 +698,6 @@
     "ref_chr_lengths": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.chr_lengths.txt"
   },
   "Phasing.runTimeSettings": {
-    "preemptible_tries": 0
+    "preemptible_tries": 3
   }
 }
