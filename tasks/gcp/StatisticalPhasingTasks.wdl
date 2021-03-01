@@ -51,6 +51,7 @@ task ShapeIt4 {
     ReferenceSequence? reference
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    # Compute Engine always stops preemptible instances after they run for 24 hours
     Int preemptible_tries = 0
     Int num_cpu = 4
     RunTimeSettings runTimeSettings
