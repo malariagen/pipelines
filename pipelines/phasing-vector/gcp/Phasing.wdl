@@ -63,7 +63,7 @@ workflow Phasing {
 
     # Step 2: Statistical phasing
     # run statistical phasing for all samples (for each chromosome)
-    call StatisticalPhasing.StatisticalPhasing {
+    call StatisticalPhasing.StatisticalPhasing as StatisticalPhasing {
       input:
         project_id = project_id + "_" + chromosome,
         phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf,
@@ -74,6 +74,10 @@ workflow Phasing {
         reference = reference,
         runTimeSettings = runTimeSettings
     }
+  }
+
+  meta {
+    allowNestedInputs: true
   }
 
   output {
