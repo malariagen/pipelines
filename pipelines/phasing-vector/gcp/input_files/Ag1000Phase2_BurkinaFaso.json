@@ -683,8 +683,8 @@
     "3R"
   ],
   "Phasing.genetic_maps": [
-    "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/2R.gmap",
-    "gs://malariagen/genetic_maps/ag1000g/phase2/AR1/3R.gmap"
+    "gs://vo_agam_release/v3/snp_haplotypes/setup/2R.gmap",
+    "gs://vo_agam_release/v3/snp_haplotypes/setup/3R.gmap"
   ],
   "Phasing.reference": {
     "ref_fasta": "gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4.fa",
