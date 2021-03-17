@@ -44,7 +44,7 @@ task ShapeIt4 {
     String contig
     File genetic_map
     Float window = 2.5
-    Int num_threads = 2
+    Int num_threads = num_cpu
     String mcmc_iterations = "5b,1p,1b,1p,1b,1p,5m"
     Int pbwt_depth = 4
     # TODO - how to handle refence as an option
