@@ -141,6 +141,7 @@ task CreateFOFN {
 task LigateRegions {
   input {
     Array[File] region_phased_vcfs
+    Array[File] region_phased_vcfs_indicies
     File region_phased_vcf_file_list
     String project_id
 

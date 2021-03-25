@@ -49,20 +49,25 @@ workflow StatisticalPhasing {
   # Step 3: ShapeIt4
   scatter(region in read_lines(interval_list)) {
     call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
-    input:
-      merged_vcf = BgzipAndTabix.vcf,
-      merged_vcf_index = BgzipAndTabix.vcf_index,
-      project_id = project_id,
-      region = region,
-      genetic_map = genetic_map,
-      reference = reference,
-      runTimeSettings = runTimeSettings
+      input:
+        merged_vcf = BgzipAndTabix.vcf,
+        merged_vcf_index = BgzipAndTabix.vcf_index,
+        project_id = project_id,
+        region = region,
+        genetic_map = genetic_map,
+        reference = reference,
+        runTimeSettings = runTimeSettings
+    }
+    call Tasks.Tabix as Tabix {
+      input:
+        input_file = ShapeIt4.region_phased_vcf,
+        runTimeSettings = runTimeSettings
     }
   }
   # Step 4a: Create a file of file names for the region phased vcfs
   call StatisticalPhasingTasks.CreateFOFN as CreateFOFN {
     input:
-      region_phased_vcfs = ShapeIt4.region_phased_vcf,
+      region_phased_vcfs = Tabix.output_file,
       interval_list = interval_list,
       project_id = project_id,
       runTimeSettings = runTimeSettings
@@ -71,7 +76,8 @@ workflow StatisticalPhasing {
   # Step 4: Ligate regions
   call StatisticalPhasingTasks.LigateRegions as LigateRegions {
     input:
-      region_phased_vcfs = ShapeIt4.region_phased_vcf,
+      region_phased_vcfs = Tabix.output_file,
+      region_phased_vcfs_indicies = Tabix.output_file,
       region_phased_vcf_file_list = CreateFOFN.fofn,
       project_id = project_id,
       runTimeSettings = runTimeSettings
