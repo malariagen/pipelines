@@ -152,9 +152,6 @@ task LigateRegions {
 
   Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
 
-
-
-
   command {
     bcftools concat \
         --file-list ~{region_phased_vcf_file_list} \
