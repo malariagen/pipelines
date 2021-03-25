@@ -59,12 +59,20 @@ workflow StatisticalPhasing {
       runTimeSettings = runTimeSettings
     }
   }
+  # Step 4a: Create a file of file names for the region phased vcfs
+  call StatisticalPhasingTasks.CreateFOFN as CreateFOFN {
+    input:
+      region_phased_vcfs = ShapeIt4.region_phased_vcf,
+      interval_list = interval_list,
+      project_id = project_id,
+      runTimeSettings = runTimeSettings
+  }
 
   # Step 4: Ligate regions
   call StatisticalPhasingTasks.LigateRegions as LigateRegions {
     input:
       region_phased_vcfs = ShapeIt4.region_phased_vcf,
-      interval_list = interval_list,
+      region_phased_vcf_file_list = CreateFOFN.fofn,
       project_id = project_id,
       runTimeSettings = runTimeSettings
   }

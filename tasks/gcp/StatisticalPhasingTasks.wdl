@@ -93,22 +93,19 @@ task ShapeIt4 {
 }
 
 
-task LigateRegions {
+task CreateFOFN {
   input {
     Array[File] region_phased_vcfs
     File interval_list
     String project_id
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    String docker_tag = "python:3.7.2"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
   }
 
   Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
-
-
-
   command {
     set -e pipefail
 
@@ -123,12 +120,44 @@ task LigateRegions {
             if i in f:
                 ordered_files.append(f)
 
-    with open("ordered_files.txt", "w") as f:
+    with open("~{project_id}_phased_vcf_list.txt.txt", "w") as f:
         f.write("\n".join(ordered_files))
     CODE
+ }
 
+  runtime {
+    docker: docker_tag
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "15 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+      File fofn =  "~{project_id}_phased_vcf_list.txt"
+  }
+}
+
+task LigateRegions {
+  input {
+    Array[File] region_phased_vcfs
+    File region_phased_vcf_file_list
+    String project_id
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
+
+
+
+
+  command {
     bcftools concat \
-        --file-list "ordered_files.txt" \
+        --file-list ~{region_phased_vcf_file_list} \
         --ligate
         --output ~{project_id}_phased.vcf.gz
   }
