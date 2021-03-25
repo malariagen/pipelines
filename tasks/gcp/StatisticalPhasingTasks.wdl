@@ -41,7 +41,7 @@ task ShapeIt4 {
     File merged_vcf
     File merged_vcf_index
     String project_id
-    String contig
+    String region
     File genetic_map
     Float window = 2.5
     Int num_threads = num_cpu
@@ -58,6 +58,8 @@ task ShapeIt4 {
   }
 
   Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 2 + 20
+  String output_prefix = sub(region, ":", "_")
+  String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
   command {
     #TODO - handle reference...
@@ -65,7 +67,7 @@ task ShapeIt4 {
     shapeit4 \
         --input ~{merged_vcf} \
         ~{"--map " + genetic_map} \
-        --region ~{contig} \
+        --region ~{region} \
         ~{"--window " + window} \
         ~{"--thread " + num_threads} \
         ~{"--mcmc-iterations " + mcmc_iterations} \
@@ -73,6 +75,61 @@ task ShapeIt4 {
         --sequencing \
         --use-PS 0.0001 \
         --log phased.log \
+        --output ~{output_filename}
+  }
+
+  runtime {
+    docker: docker_tag
+    preemptible: preemptible_tries
+    cpu: num_cpu
+    memory: "15 GiB"
+    disks: "local-disk " + disk_size + " HDD"
+  }
+
+  output {
+      File region_phased_vcf =  "~{output_filename}"
+      File log_file =  "phased.log"
+  }
+}
+
+
+task LigateRegions {
+  input {
+    Array[File] region_phased_vcfs
+    File interval_list
+    String project_id
+
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int num_cpu = 1
+    RunTimeSettings runTimeSettings
+  }
+
+  Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
+
+
+
+  command {
+    set -e pipefail
+
+    python3 <<CODE
+    input_files = [ "~{sep='", "' region_phased_vcfs}" ]
+    with open("~{interval_list}") as f:
+        intervals = [i.replace(":", "_").strip("\n") for i in f]
+    ordered_files = []
+
+    for i in intervals:
+        for f in input_files:
+            if i in f:
+                ordered_files.append(f)
+
+    with open("ordered_files.txt", "w") as f:
+        f.write("\n".join(ordered_files))
+    CODE
+
+    bcftools concat \
+        --file-list "ordered_files.txt" \
+        --ligate
         --output ~{project_id}_phased.vcf.gz
   }
 
@@ -86,9 +143,9 @@ task ShapeIt4 {
 
   output {
       File phased_vcf =  "~{project_id}_phased.vcf.gz"
-      File log_file =  "phased.log"
   }
 }
+
 
 task CohortVcfToZarr {
   input {

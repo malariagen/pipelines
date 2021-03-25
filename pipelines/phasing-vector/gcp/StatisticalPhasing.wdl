@@ -20,6 +20,7 @@ workflow StatisticalPhasing {
     Array[File] phased_sample_vcf_indices
     String contig
     File genetic_map
+    File interval_list
 
     #TODO - plug in haplotype_reference_panel
     File? haplotype_reference_panel
@@ -46,27 +47,32 @@ workflow StatisticalPhasing {
   }
 
   # Step 3: ShapeIt4
-  call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
+  scatter(region in read_lines(interval_list)) {
+    call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
     input:
       merged_vcf = BgzipAndTabix.vcf,
       merged_vcf_index = BgzipAndTabix.vcf_index,
       project_id = project_id,
-      contig = contig,
+      region = region,
       genetic_map = genetic_map,
       reference = reference,
       runTimeSettings = runTimeSettings
+    }
   }
-  # Possible Step: Ligate regions (?)
-#  call StatisticalPhasingTasks.LigateRegions {
-#    input:
-#      reference = reference,
-#      runTimeSettings = runTimeSettings
-#  }
 
-  # Step 4: Cohort VCF to Zarr
+  # Step 4: Ligate regions
+  call StatisticalPhasingTasks.LigateRegions as LigateRegions {
+    input:
+      region_phased_vcfs = ShapeIt4.region_phased_vcf,
+      interval_list = interval_list,
+      project_id = project_id,
+      runTimeSettings = runTimeSettings
+  }
+
+  # Step 5: Cohort VCF to Zarr
   call StatisticalPhasingTasks.CohortVcfToZarr {
     input:
-      input_vcf = ShapeIt4.phased_vcf,
+      input_vcf = LigateRegions.phased_vcf,
       contig = contig,
       output_zarr_file_name = project_id + ".zarr",
       output_log_file_name = project_id + ".log",
@@ -78,7 +84,7 @@ workflow StatisticalPhasing {
   }
 
   output {
-    File output_vcf = ShapeIt4.phased_vcf
+    File output_vcf = LigateRegions.phased_vcf
     File zarr_output = CohortVcfToZarr.zarr_output
   }
 }
