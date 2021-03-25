@@ -120,7 +120,7 @@ task CreateFOFN {
             if i in f:
                 ordered_files.append(f)
 
-    with open("~{project_id}_phased_vcf_list.txt.txt", "w") as f:
+    with open("~{project_id}_phased_vcf_list.txt", "w") as f:
         f.write("\n".join(ordered_files))
     CODE
  }
