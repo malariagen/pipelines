@@ -171,6 +171,7 @@ task LigateRegions {
         f.write("\n".join(ordered_files))
     CODE
 
+    for f in (~{sep=" " region_phased_vcfs_indicies}); do touch $f; done
 
     bcftools concat \
         --file-list "phased_vcf_list.txt" \
