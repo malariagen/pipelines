@@ -93,50 +93,6 @@ task ShapeIt4 {
 }
 
 
-#task CreateFOFN {
-#  input {
-#    Array[File] region_phased_vcfs
-#    File interval_list
-#    String project_id
-#
-#    String docker_tag = "python:3.7.2"
-#    Int preemptible_tries = runTimeSettings.preemptible_tries
-#    Int num_cpu = 1
-#    RunTimeSettings runTimeSettings
-#  }
-#
-#  Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
-#  command {
-#    set -e pipefail
-#
-#    python3 <<CODE
-#    input_files = [ "~{sep='", "' region_phased_vcfs}" ]
-#    with open("~{interval_list}") as f:
-#        intervals = [i.replace(":", "_").strip("\n") for i in f]
-#    ordered_files = []
-#
-#    for i in intervals:
-#        for f in input_files:
-#            if i in f:
-#                ordered_files.append(f)
-#
-#    with open("~{project_id}_phased_vcf_list.txt", "w") as f:
-#        f.write("\n".join(ordered_files))
-#    CODE
-# }
-#
-#  runtime {
-#    docker: docker_tag
-#    preemptible: preemptible_tries
-#    cpu: num_cpu
-#    memory: "15 GiB"
-#    disks: "local-disk " + disk_size + " HDD"
-#  }
-#
-#  output {
-#      File fofn =  "~{project_id}_phased_vcf_list.txt"
-#  }
-#}
 
 task LigateRegions {
   input {
@@ -157,6 +113,12 @@ task LigateRegions {
     set -e pipefail
 
     python3 <<CODE
+    from pathlib import Path
+
+    index_files = [ "~{sep='", "' region_phased_vcfs_indicies}" ]
+    for f in index_files:
+        Path(f).touch()
+
     input_files = [ "~{sep='", "' region_phased_vcfs}" ]
     with open("~{interval_list}") as f:
         intervals = [i.replace(":", "_").strip("\n") for i in f]
@@ -170,8 +132,6 @@ task LigateRegions {
     with open("phased_vcf_list.txt", "w") as f:
         f.write("\n".join(ordered_files))
     CODE
-
-    for f in (~{sep=" " region_phased_vcfs_indicies}); do touch $f; done
 
     bcftools concat \
         --file-list "phased_vcf_list.txt" \

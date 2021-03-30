@@ -64,14 +64,6 @@ workflow StatisticalPhasing {
         runTimeSettings = runTimeSettings
     }
   }
-  # Step 4a: Create a file of file names for the region phased vcfs
-  #call StatisticalPhasingTasks.CreateFOFN as CreateFOFN {
-  #  input:
-  #    region_phased_vcfs = Tabix.output_file,
-  #    interval_list = interval_list,
-  #    project_id = project_id,
-  #    runTimeSettings = runTimeSettings
-  #}
 
   # Step 4: Ligate regions
   call StatisticalPhasingTasks.LigateRegions as LigateRegions {
