@@ -135,7 +135,7 @@ task LigateRegions {
 
     bcftools concat \
         --file-list "phased_vcf_list.txt" \
-        --ligate
+        --ligate \
         --output ~{project_id}_phased.vcf.gz
   }
 
