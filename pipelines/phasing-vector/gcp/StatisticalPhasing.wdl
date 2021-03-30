@@ -69,7 +69,7 @@ workflow StatisticalPhasing {
   call StatisticalPhasingTasks.LigateRegions as LigateRegions {
     input:
       region_phased_vcfs = Tabix.output_file,
-      region_phased_vcfs_indicies = Tabix.output_file,
+      region_phased_vcfs_indicies = Tabix.output_index_file,
       interval_list = interval_list,
       project_id = project_id,
       runTimeSettings = runTimeSettings
