@@ -97,7 +97,7 @@ task ShapeIt4 {
 task LigateRegions {
   input {
     Array[File] region_phased_vcfs
-    Array[File] region_phased_vcfs_indicies
+    Array[File] region_phased_vcfs_indices
     File interval_list
     String project_id
 
@@ -115,7 +115,7 @@ task LigateRegions {
     python3 <<CODE
     from pathlib import Path
 
-    index_files = [ "~{sep='", "' region_phased_vcfs_indicies}" ]
+    index_files = [ "~{sep='", "' region_phased_vcfs_indices}" ]
     for f in index_files:
         Path(f).touch()
 
