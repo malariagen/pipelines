@@ -107,7 +107,7 @@ task LigateRegions {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(region_phased_vcfs, "GiB")) * 2 + 20
+  Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 50) + 20
 
   command {
     set -e pipefail
