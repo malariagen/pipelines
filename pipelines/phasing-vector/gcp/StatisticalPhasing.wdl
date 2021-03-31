@@ -91,6 +91,7 @@ workflow StatisticalPhasing {
 
   output {
     File output_vcf = LigateRegions.phased_vcf
+    File output_vcf_index = LigateRegions.phased_vcf_index
     File zarr_output = CohortVcfToZarr.zarr_output
   }
 }

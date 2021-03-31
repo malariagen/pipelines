@@ -139,6 +139,7 @@ task LigateRegions {
         --output ~{project_id}_phased.vcf
 
     bgzip -c ~{project_id}_phased.vcf > ~{project_id}_phased.vcf.gz
+    tabix ~{project_id}_phased.vcf.gz
   }
 
   runtime {
@@ -151,6 +152,7 @@ task LigateRegions {
 
   output {
       File phased_vcf =  "~{project_id}_phased.vcf.gz"
+      File phased_vcf_index = "~{project_id}_phased.vcf.gz.tbi"
   }
 }
 
