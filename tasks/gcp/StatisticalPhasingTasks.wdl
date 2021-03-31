@@ -138,7 +138,7 @@ task LigateRegions {
         --ligate \
         --output ~{project_id}_phased.vcf
 
-    bgzip -c ~{project_id}_phased.vcf > ~{project_id}_phased.vcf.gz
+    bgzip ~{project_id}_phased.vcf
     tabix ~{project_id}_phased.vcf.gz
   }
 
