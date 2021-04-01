@@ -107,7 +107,7 @@ task LigateRegions {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 50) + 20
+  Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 10) + 20
 
   command {
     set -e pipefail
@@ -136,9 +136,9 @@ task LigateRegions {
     bcftools concat \
         --file-list "phased_vcf_list.txt" \
         --ligate \
-        --output ~{project_id}_phased.vcf
+        --output ~{project_id}_phased.vcf.gz \
+        --output-type z
 
-    bgzip ~{project_id}_phased.vcf
     tabix ~{project_id}_phased.vcf.gz
   }
 
