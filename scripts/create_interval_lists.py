@@ -48,7 +48,7 @@ gs://malariagen/references/Anopheles-gambiae-PEST_CHROMOSOMES_AgamP4/Anopheles-g
 Default interval size is 2Mb and default overlap size is 400Kb (note that arguments to the script are in bp).
 """
 def main():
-    parser = argparse.ArgumentParser(description="Creat an interval list for each chromosome")
+    parser = argparse.ArgumentParser(description="Create an interval list for each chromosome")
     parser.add_argument('--chromosome-lengths-file',
                         dest='chromosome_lengths_file',
                         required=True,
@@ -90,4 +90,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
