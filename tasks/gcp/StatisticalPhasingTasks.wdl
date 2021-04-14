@@ -12,6 +12,7 @@ task MergeVcfs {
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
+    Float mem_gb = 3.75
     RunTimeSettings runTimeSettings
   }
 
@@ -27,7 +28,7 @@ task MergeVcfs {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "3.75 GiB"
+    memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -54,6 +55,7 @@ task ShapeIt4 {
     # Compute Engine always stops preemptible instances after they run for 24 hours
     Int preemptible_tries = 0
     Int num_cpu = 4
+    Float mem_gb = 15
     RunTimeSettings runTimeSettings
   }
 
@@ -82,7 +84,7 @@ task ShapeIt4 {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "15 GiB"
+    memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
 
@@ -104,6 +106,7 @@ task LigateRegions {
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftoolspython:1.11"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
+    Float mem_gb = 15
     RunTimeSettings runTimeSettings
   }
 
@@ -146,7 +149,7 @@ task LigateRegions {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "15 GiB"
+    memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
 
@@ -167,6 +170,7 @@ task CohortVcfToZarr {
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/cohortvcftozarr:1.1"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
+    Float mem_gb = 7.5
     RunTimeSettings runTimeSettings
   }
 
@@ -192,7 +196,7 @@ task CohortVcfToZarr {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "7.5 GiB"
+    memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
