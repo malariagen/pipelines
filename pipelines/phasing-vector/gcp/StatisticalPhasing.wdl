@@ -20,6 +20,7 @@ workflow StatisticalPhasing {
     Array[File] phased_sample_vcf_indices
     String contig
     File genetic_map
+    File interval_list
 
     #TODO - plug in haplotype_reference_panel
     File? haplotype_reference_panel
@@ -46,27 +47,38 @@ workflow StatisticalPhasing {
   }
 
   # Step 3: ShapeIt4
-  call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
+  scatter(region in read_lines(interval_list)) {
+    call StatisticalPhasingTasks.ShapeIt4 as ShapeIt4 {
+      input:
+        merged_vcf = BgzipAndTabix.vcf,
+        merged_vcf_index = BgzipAndTabix.vcf_index,
+        project_id = project_id,
+        region = region,
+        genetic_map = genetic_map,
+        reference = reference,
+        runTimeSettings = runTimeSettings
+    }
+    call Tasks.Tabix as Tabix {
+      input:
+        input_file = ShapeIt4.region_phased_vcf,
+        runTimeSettings = runTimeSettings
+    }
+  }
+
+  # Step 4: Ligate regions
+  call StatisticalPhasingTasks.LigateRegions as LigateRegions {
     input:
-      merged_vcf = BgzipAndTabix.vcf,
-      merged_vcf_index = BgzipAndTabix.vcf_index,
+      region_phased_vcfs = Tabix.output_file,
+      region_phased_vcfs_indices = Tabix.output_index_file,
+      interval_list = interval_list,
       project_id = project_id,
-      contig = contig,
-      genetic_map = genetic_map,
-      reference = reference,
       runTimeSettings = runTimeSettings
   }
-  # Possible Step: Ligate regions (?)
-#  call StatisticalPhasingTasks.LigateRegions {
-#    input:
-#      reference = reference,
-#      runTimeSettings = runTimeSettings
-#  }
 
-  # Step 4: Cohort VCF to Zarr
+  # Step 5: Cohort VCF to Zarr
   call StatisticalPhasingTasks.CohortVcfToZarr {
     input:
-      input_vcf = ShapeIt4.phased_vcf,
+      input_vcf = LigateRegions.phased_vcf,
       contig = contig,
       output_zarr_file_name = project_id + ".zarr",
       output_log_file_name = project_id + ".log",
@@ -78,7 +90,8 @@ workflow StatisticalPhasing {
   }
 
   output {
-    File output_vcf = ShapeIt4.phased_vcf
+    File output_vcf = LigateRegions.phased_vcf
+    File output_vcf_index = LigateRegions.phased_vcf_index
     File zarr_output = CohortVcfToZarr.zarr_output
   }
 }

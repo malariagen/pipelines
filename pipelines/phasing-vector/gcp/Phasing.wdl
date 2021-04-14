@@ -26,6 +26,7 @@ workflow Phasing {
     File phased_sites_zarr
     Array[String] chromosome_list
     Array[File] genetic_maps
+    Array[File] interval_lists
 
     File? haplotype_reference_panel
 
@@ -41,6 +42,7 @@ workflow Phasing {
   scatter(chr_idx in range(length(chromosome_list))) {
     String chromosome = chromosome_list[chr_idx]
     File genetic_map = genetic_maps[chr_idx]
+    File interval_list = interval_lists[chr_idx]
 
     # Scatter over samples
     scatter(idx in range(length(sample_ids))) {
@@ -71,6 +73,7 @@ workflow Phasing {
         contig = chromosome,
         genetic_map = genetic_map,
         haplotype_reference_panel = haplotype_reference_panel,
+        interval_list = interval_list,
         reference = reference,
         runTimeSettings = runTimeSettings
     }
@@ -82,6 +85,7 @@ workflow Phasing {
 
   output {
     Array[File] output_vcf = StatisticalPhasing.output_vcf
+    Array[File] output_vcf_index = StatisticalPhasing.output_vcf_index
     Array[File] output_zarrs = StatisticalPhasing.zarr_output
 
     Array[Array[File]] read_back_phased_sample_vcfs = ReadBackedPhasing.phased_sample_vcf
