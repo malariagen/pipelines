@@ -62,7 +62,7 @@ task WhatsHapPhase {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 5 + 20
 
   command {
     touch ~{input_bam_index}
