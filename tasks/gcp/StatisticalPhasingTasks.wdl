@@ -10,7 +10,7 @@ task MergeVcfs {
     String project_id
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/bcftools:1.11"
-    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int preemptible_tries = 1
     Int num_cpu = 1
     Float mem_gb = 3.75
     RunTimeSettings runTimeSettings
@@ -59,7 +59,7 @@ task ShapeIt4 {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5 + 20
   String output_prefix = sub(region, ":", "_")
   String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
