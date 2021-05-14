@@ -59,10 +59,11 @@ task WhatsHapPhase {
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
+    Int mem_gb = 30
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 5 + 20
 
   command {
     touch ~{input_bam_index}
@@ -79,7 +80,7 @@ task WhatsHapPhase {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "30 GiB"
+    memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
 

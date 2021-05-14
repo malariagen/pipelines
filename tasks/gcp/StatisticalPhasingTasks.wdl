@@ -16,7 +16,7 @@ task MergeVcfs {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(phased_sample_vcfs, "GiB") + size(phased_sample_vcf_indices, "GiB")) * 2 + 20
+  Int disk_size = ceil(size(phased_sample_vcfs, "GiB") + size(phased_sample_vcf_indices, "GiB")) * 10 + 20
 
   #TODO - touch all the index files to avoid the annoying warning
   command {
