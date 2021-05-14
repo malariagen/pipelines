@@ -59,7 +59,6 @@ task WhatsHapPhase {
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/whatshap:1.0"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
-    Int mem_gb = 30
     RunTimeSettings runTimeSettings
   }
 
@@ -80,7 +79,7 @@ task WhatsHapPhase {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: mem_gb + " GiB"
+    memory: "30 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
 
