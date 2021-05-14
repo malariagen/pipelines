@@ -79,7 +79,7 @@ task WhatsHapPhase {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "30 GiB"
+    memory: "50 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
 
