@@ -59,7 +59,7 @@ task ShapeIt4 {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5 + 20
+  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 20 + 20
   String output_prefix = sub(region, ":", "_")
   String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
@@ -110,7 +110,7 @@ task LigateRegions {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 10) + 20
+  Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 20) + 20
 
   command {
     set -e pipefail
