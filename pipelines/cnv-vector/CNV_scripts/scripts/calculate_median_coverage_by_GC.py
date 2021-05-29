@@ -123,7 +123,7 @@ output_variance = pd.DataFrame(0, columns=chroms + ['autosomes'], index=sample_n
 for this_sample in sample_names:
 	print('\nAnalysing sample ' + this_sample + '.')
 	stdout.flush()
-	# create the filenames for each autosome
+	# Load and mask the data for each chromosome
 	autosomal_masked_raw_counts = pd.concat(map(lambda c: load_and_mask(working_folder,
 	                                                                    c,
 	                                                                    this_sample,
@@ -147,7 +147,8 @@ for this_sample in sample_names:
 	sexchrom_masked_counts = normalise_coverage_by_GC(sexchrom_masked_raw_counts, median_counts_by_GC)
 	
 	# Now we want to calculate the variance in coverage for this sample, both for each chromosome
-	# and overall
+	# and overall. We filter out the 1% of windows with the highest coverage before calculating
+	# the variance. 
 	print('\tCalculating normalised coverage and variance.')
 	stdout.flush()
 	masked_counts_by_autosome = autosomal_masked_counts.groupby('Chrom')
