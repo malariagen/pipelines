@@ -19,11 +19,11 @@ RUN apt-get update && \
       automake \
       bzip2 \
       gcc \
-          g++ \
+      g++ \
       make \
       wget \
       zlib1g-dev \
-          libboost-all-dev
+      libboost-all-dev
 
 WORKDIR /tmp
 # Install htslib to get bgzip and tabix
