@@ -51,7 +51,7 @@ task ShapeIt4 {
     # TODO - how to handle refence as an option
     ReferenceSequence? reference
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.2.1"
     # Compute Engine always stops preemptible instances after they run for 24 hours
     Int preemptible_tries = 0
     Int num_cpu = 4
