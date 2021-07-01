@@ -65,7 +65,7 @@ A farm5-specific docker image, providing dependencies for the iRODS import and b
 - samplevcftozarr - `docker build . --tag=samplevcftozarr:1.0`
 - sampleselectvariants - `docker build . --tag=sampleselectvarians:1.0`
 - whatshap - `docker build . --tag=whatshap:1.0`
-- shapeit4 - `docker build . --tag=shapeit4:4.1.3`
+- shapeit4 - `docker build . --tag=shapeit4:4.2.1`
 - bcftools - `docker build . --tag=bcftools:1.11`
 - import - `docker build . --tag=sangerpathogens/irods:4.1.12`
 

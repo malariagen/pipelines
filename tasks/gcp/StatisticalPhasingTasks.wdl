@@ -51,15 +51,15 @@ task ShapeIt4 {
     # TODO - how to handle refence as an option
     ReferenceSequence? reference
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.1.3"
+    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.2.1"
     # Compute Engine always stops preemptible instances after they run for 24 hours
-    Int preemptible_tries = 0
+    Int preemptible_tries = 2
     Int num_cpu = 4
     Float mem_gb = 15
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 20 + 20
+  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5 + 20
   String output_prefix = sub(region, ":", "_")
   String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
