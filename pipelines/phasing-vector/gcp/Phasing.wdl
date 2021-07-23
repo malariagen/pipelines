@@ -29,6 +29,7 @@ workflow Phasing {
     Array[File] interval_lists
 
     File? haplotype_reference_panel
+    File? haplotype_reference_panel_index
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
@@ -73,8 +74,8 @@ workflow Phasing {
         contig = chromosome,
         genetic_map = genetic_map,
         haplotype_reference_panel = haplotype_reference_panel,
+        haplotype_reference_panel_index = haplotype_reference_panel_index,
         interval_list = interval_list,
-        reference = reference,
         runTimeSettings = runTimeSettings
     }
   }

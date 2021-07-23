@@ -48,8 +48,8 @@ task ShapeIt4 {
     Int num_threads = num_cpu
     String mcmc_iterations = "5b,1p,1b,1p,1b,1p,5m"
     Int pbwt_depth = 4
-    # TODO - how to handle refence as an option
-    ReferenceSequence? reference
+    File? haplotype_reference_panel
+    File? haplotype_reference_panel_index
 
     String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/shapeit4:4.2.1"
     # Compute Engine always stops preemptible instances after they run for 24 hours
@@ -77,7 +77,8 @@ task ShapeIt4 {
         --sequencing \
         --use-PS 0.0001 \
         --log phased.log \
-        --output ~{output_filename}
+        --output ~{output_filename} \
+        ~{"--reference " +  haplotype_reference_panel}
   }
 
   runtime {
