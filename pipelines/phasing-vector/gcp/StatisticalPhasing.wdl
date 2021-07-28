@@ -7,7 +7,6 @@ version 1.0
 ##
 
 import "../../../structs/gcp/RunTimeSettings.wdl"
-import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/gcp/Tasks.wdl" as Tasks
 import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as StatisticalPhasingTasks
 
@@ -22,10 +21,9 @@ workflow StatisticalPhasing {
     File genetic_map
     File interval_list
 
-    #TODO - plug in haplotype_reference_panel
     File? haplotype_reference_panel
+    File? haplotype_reference_panel_index
 
-    ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
@@ -55,7 +53,8 @@ workflow StatisticalPhasing {
         project_id = project_id,
         region = region,
         genetic_map = genetic_map,
-        reference = reference,
+        haplotype_reference_panel = haplotype_reference_panel,
+        haplotype_reference_panel_index = haplotype_reference_panel_index,
         runTimeSettings = runTimeSettings
     }
     call Tasks.Tabix as Tabix {

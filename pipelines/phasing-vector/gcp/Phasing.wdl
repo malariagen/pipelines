@@ -28,13 +28,19 @@ workflow Phasing {
     Array[File] genetic_maps
     Array[File] interval_lists
 
-    File? haplotype_reference_panel
+    Array[File]? haplotype_reference_panels
+    Array[File]? haplotype_reference_panel_indices
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
   # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
+
+  # This is a wdl hack to create a pseudo None
+  if (false) {
+    File? none = "None"
+  }
 
   # Step 1: Read-backed phasing
 
@@ -54,7 +60,7 @@ workflow Phasing {
           input_bam = input_bams[idx],
           input_bam_index = input_bam_indices[idx],
           sample_zarr = sample_zarrs[idx],
-#          sample_vcf = sample_vcfs[idx],
+#         sample_vcf = sample_vcfs[idx],
           called_sites_zarr = called_sites_zarr,
           phased_sites_zarr = phased_sites_zarr,
           contig = chromosome,
@@ -72,9 +78,9 @@ workflow Phasing {
         phased_sample_vcf_indices = ReadBackedPhasing.phased_sample_vcf_index,
         contig = chromosome,
         genetic_map = genetic_map,
-        haplotype_reference_panel = haplotype_reference_panel,
+        haplotype_reference_panel = if defined(haplotype_reference_panels) then select_first([haplotype_reference_panels])[chr_idx] else none,
+        haplotype_reference_panel_index = if defined(haplotype_reference_panel_indices) then select_first([haplotype_reference_panel_indices])[chr_idx] else none,
         interval_list = interval_list,
-        reference = reference,
         runTimeSettings = runTimeSettings
     }
   }
