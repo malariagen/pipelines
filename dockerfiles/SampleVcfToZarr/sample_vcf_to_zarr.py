@@ -165,7 +165,7 @@ def main():
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
                 log=log_file,
-            )fdf
+            )
 
     finally:
         if log_file_needs_closing:
