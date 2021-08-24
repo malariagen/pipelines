@@ -58,10 +58,10 @@ def main():
                         required=True,
                         help="Sample identifier.")
     parser.add_argument("--contig",
-                        required=True,
+                        required=False,
                         action='append',
                         dest='contigs',
-                        help="Contig to extract. Multiple values may be provided.")
+                        help="Contig to extract. Multiple values may be provided. Reads VCF contigs by default.")
     parser.add_argument("--field",
                         required=True,
                         action='append',
@@ -120,7 +120,7 @@ def main():
     chunk_length = args.chunk_length
     chunk_width = args.chunk_width
     do_zip = args.zip
-    contigs = args.contigs
+    contigs = args.contigs or [] # If no contigs provided, read from vcf file
     fields = args.fields
     log = args.log.strip()
 
@@ -132,9 +132,22 @@ def main():
     else:
         log_file = open(log, "w")
         log_file_needs_closing = True
+    
+    if not contigs:
+        with open(input_vcf_path) as vcf_open:
+            for line in vcf_open:
+                chrom = line.split("\t")[0].strip()
+
+                # Doing a double IF to limit the amount of checks to be made
+                if not (chrom.startswith("#") or chrom in contigs):
+                
+                    # A set would be better here, but I want to preserve the original order
+                    contigs.append(chrom)
+            
+            # Reset file read - I don't think this matters, but best to not take risks
+            vcf_open.seek(0)        
 
     try:
-
         for contig in contigs:
 
             allel.vcf_to_zarr(
@@ -152,7 +165,7 @@ def main():
                 chunk_length=chunk_length,
                 chunk_width=chunk_width,
                 log=log_file,
-            )
+            )fdf
 
     finally:
         if log_file_needs_closing:
