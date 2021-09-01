@@ -136,13 +136,14 @@ def main():
     if not contigs:
         with open(input_vcf_path) as vcf_open:
             for line in vcf_open:
-                chrom = line.split("\t")[0].strip()
-
-                # Doing a double IF to limit the amount of checks to be made
-                if not (chrom.startswith("#") or chrom in contigs):
-                
-                    # A set would be better here, but I want to preserve the original order
-                    contigs.append(chrom)
+                # Assuming vcf header follows standard vcf convention
+                if line.startswith("#"):
+                    if "contig=<ID=" in line:
+                        chrom = line.split("<ID=")[1].split(",")[0]
+                        contigs.append(chrom)
+                else:
+                    # Header is finished, no need to read the rest
+                    break
             
             # Reset file read - I don't think this matters, but best to not take risks
             vcf_open.seek(0)        
