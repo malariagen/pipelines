@@ -147,8 +147,13 @@ def main():
             
             # Reset file read - I don't think this matters, but best to not take risks
             vcf_open.seek(0)        
-
+    
     try:
+        if not contigs:
+            # If there still aren't any contigs present, the vcf was faulty
+            log.write(f"contigs argument is empty and provided VCF does not have a valid contig header line")
+            sys.exit(1)
+            
         for contig in contigs:
 
             allel.vcf_to_zarr(
