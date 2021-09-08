@@ -134,7 +134,12 @@ def main():
         log_file_needs_closing = True
     
     if not contigs:
-        with open(input_vcf_path) as vcf_open:
+        if input_vcf_path.endswith((".gz", ".bgz")):
+            vcf_opener = gzip.open
+        else:
+            vcf_opener = open
+
+        with vcf_opener(input_vcf_path, mode="rt") as vcf_open:
             for line in vcf_open:
                 # Assuming vcf header follows standard vcf convention
                 if line.startswith("#"):
@@ -144,10 +149,7 @@ def main():
                 else:
                     # Header is finished, no need to read the rest
                     break
-            
-            # Reset file read - I don't think this matters, but best to not take risks
-            vcf_open.seek(0)        
-    
+               
     try:
         if not contigs:
             # If there still aren't any contigs present, the vcf was faulty
