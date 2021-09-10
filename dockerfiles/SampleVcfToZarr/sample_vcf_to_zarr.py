@@ -153,7 +153,11 @@ def main():
     try:
         if not contigs:
             # If there still aren't any contigs present, the vcf was faulty
-            log.write(f"contigs argument is empty and provided VCF does not have a valid contig header line")
+            log_file.write(f"contigs argument is empty and provided VCF does not have a valid contig header line\n\n"
+                           f"either supply contigs with the '--contig' option, "
+                           f"or ensure the VCF header contains a contig header as specified in the VCF specification: "
+                           f"https://samtools.github.io/hts-specs/VCFv4.2.pdf\n"
+                           f"example: '##contig=<ID=20,length=62435964>'\n")
             sys.exit(1)
             
         for contig in contigs:
