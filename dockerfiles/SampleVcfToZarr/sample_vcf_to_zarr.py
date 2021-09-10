@@ -1,3 +1,4 @@
+import gzip
 import sys
 import allel
 import zarr
@@ -58,10 +59,10 @@ def main():
                         required=True,
                         help="Sample identifier.")
     parser.add_argument("--contig",
-                        required=True,
+                        required=False,
                         action='append',
                         dest='contigs',
-                        help="Contig to extract. Multiple values may be provided.")
+                        help="Contig to extract. Multiple values may be provided. Reads VCF contigs by default.")
     parser.add_argument("--field",
                         required=True,
                         action='append',
@@ -120,7 +121,7 @@ def main():
     chunk_length = args.chunk_length
     chunk_width = args.chunk_width
     do_zip = args.zip
-    contigs = args.contigs
+    contigs = args.contigs or [] # If no contigs provided, read from vcf file
     fields = args.fields
     log = args.log.strip()
 
@@ -132,9 +133,34 @@ def main():
     else:
         log_file = open(log, "w")
         log_file_needs_closing = True
+    
+    if not contigs:
+        if input_vcf_path.endswith((".gz", ".bgz")):
+            vcf_opener = gzip.open
+        else:
+            vcf_opener = open
 
+        with vcf_opener(input_vcf_path, mode="rt") as vcf_open:
+            for line in vcf_open:
+                # Assuming vcf header follows standard vcf convention
+                if line.startswith("#"):
+                    if "contig=<ID=" in line:
+                        chrom = line.split("<ID=")[1].split(",")[0]
+                        contigs.append(chrom)
+                else:
+                    # Header is finished, no need to read the rest
+                    break
+               
     try:
-
+        if not contigs:
+            # If there still aren't any contigs present, the vcf was faulty
+            log_file.write(f"contigs argument is empty and provided VCF does not have a valid contig header line\n\n"
+                           f"either supply contigs with the '--contig' option, "
+                           f"or ensure the VCF header contains a contig header as specified in the VCF specification: "
+                           f"https://samtools.github.io/hts-specs/VCFv4.2.pdf\n"
+                           f"example: '##contig=<ID=20,length=62435964>'\n")
+            sys.exit(1)
+            
         for contig in contigs:
 
             allel.vcf_to_zarr(
