@@ -62,6 +62,21 @@ class TestScript(unittest.TestCase):
         callset = zarr.open("output/example.zarr.zip")
         self.check_example_callset(callset)
 
+    def test_conversion_without_contigs_argument(self):
+        cmd = ["python", "sample_vcf_to_zarr.py",
+               "--input", "fixture/example.vcf.gz",
+               "--output", "output/example.zarr",
+               "--sample", "NA00001",
+               "--field", "variants/DP",
+               "--field", "calldata/GT",
+               "--field", "calldata/GQ",
+               ]
+        result = subprocess.run(cmd,
+                                check=True,
+                                capture_output=True)
+        print(result.stdout.decode())
+        callset = zarr.open("output/example.zarr")
+        self.check_example_callset(callset)
 
 if __name__ == '__main__':
     unittest.main()
