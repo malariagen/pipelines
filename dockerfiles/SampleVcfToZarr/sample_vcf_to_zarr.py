@@ -1,3 +1,4 @@
+import gzip
 import sys
 import allel
 import zarr
