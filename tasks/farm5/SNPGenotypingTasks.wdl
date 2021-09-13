@@ -78,7 +78,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:5cb80965aa670763de228a31f2fd70f0e503de81d02a2d578f5e080a8a73fdc0"
+    String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:1241e33a6ee7f14d86c4e8cf17834cdf4999b92a592477e14d6b14229a81921d"
     Int num_cpu = 2
     Int memory = 3000
     String? lsf_group
@@ -97,13 +97,6 @@ task VcfToZarr {
         --field calldata/GT \
         --field calldata/GQ \
         --field calldata/AD \
-        --contig 2R \
-        --contig 2L \
-        --contig 3R \
-        --contig 3L \
-        --contig X \
-        --contig Y_unplaced \
-        --contig UNKN \
         --log ~{output_log_file_name} \
         --zip
     rm $vcf_file_name
