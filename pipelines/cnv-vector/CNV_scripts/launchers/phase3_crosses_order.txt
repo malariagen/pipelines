@@ -1,0 +1,26 @@
+# Order of launchers that were run to call CNVs in the crosses
+
+bamfolder=/lustre/scratch118/malaria/team112/pipelines/setups/vo_agam/symlink/vo_agam_indelrealign/bam_fix_mates_v2 
+indexfolder=/lustre/scratch118/malaria/team112/pipelines/setups/vo_agam/symlink/vo_agam_indelrealign/bam_index_v2
+~/scripts/CNV_scripts/launchers/setup_folder.sh ~/personal/phase3_crosses_cnv ~/personal/vo_agam_release/v3/metadata/general/AG1000G-X/samples.meta.csv ~/personal/vo_agam_release/v3/metadata/species_calls_20200422/AG1000G-X/samples.species_aim.csv $bamfolder $indexfolder
+
+~/scripts/CNV_scripts/launchers/run_coverage_vobs.sh ~/personal/phase3_crosses_cnv/data/sample_manifest.txt phase3_crosses_cnv 
+
+~/scripts/CNV_scripts/launchers/run_diagnostic_reads_vobs.sh ~/personal/phase3_crosses_cnv/data/sample_manifest.txt phase3_crosses_cnv 
+
+~/scripts/CNV_scripts/launchers/run_coverage_stats_by_species_vobs.sh phase3_crosses_cnv 
+
+~/scripts/CNV_scripts/launchers/run_HMM_vobs.sh phase3_crosses_cnv
+
+bsub -o temp.log -e temp.error ~/scripts/CNV_scripts/scripts/join_species_coverage_variance_files_vobs.sh phase3_crosses_cnv
+
+~/scripts/CNV_scripts/launchers/run_coverage_CNVs_vobs.sh ~/personal/phase3_crosses_cnv/data/sample_metadata_tabs.tsv phase3_crosses_cnv 
+
+~/scripts/CNV_scripts/launchers/run_target_regions_analysis_vobs.sh ~/personal/phase3_crosses_cnv/data/sample_manifest_known_species.txt ~/personal/phase3_crosses_cnv/data/sample_speciescalls_tabs.tsv ~/personal/phase3_crosses_cnv/data/sample_metadata_tabs.tsv phase3_crosses_cnv 
+
+bsub -o temp.log -e temp.error -R"select[mem>1000] rusage[mem=1000]" -M1000 ~/scripts/CNV_scripts/scripts/join_CNV_output_files_vobs.sh phase3_crosses_cnv 
+
+~/scripts/CNV_scripts/launchers/run_modal_CNVs_vobs.sh ~/personal/phase3_crosses_cnv/data/sample_metadata_tabs.tsv phase3_crosses_cnv 
+
+# Note. Later, the run_target_regions_analysis script was rerun in order to fix the Cyp6mz_Dupz labelling issue. Another small change was also made to the target_regions_analysis.r script (changing one the 5 nucleotide sequence used to detect Dup10). This doesn't make any difference to any of the results in the .csv files (just in the number of supporting reads, which is recorded in the Rdata file, but not in any of the presence / absence results which are in the csv). The old scripts were moved to target_regions_anlaysis_old.*. The old results were moved into the folder target_regions_analysis_old.
+
