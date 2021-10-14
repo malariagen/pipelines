@@ -387,7 +387,7 @@ known.cnvs <- list(ace1   = list(Dup1  = list(FA = matrix(c(3436850,3639550,3437
                                                               seq = c('GCACA', 'AGTAC'))),
                                  Dup10 = list(FA = matrix(c(15234900, 15244750, 15235200, 15245050), 2, 2),
                                               BP = data.frame(pos = c(15234989, 15245128),
-                                                              seq = c('GCACC', 'ATTCT'))),
+                                                              seq = c('GCACC', 'CTGAA'))),
                                  Dup11 = list(FA = matrix(c(15236900, 15246800, 15237200, 15247100), 2, 2),
                                               BP = data.frame(pos = c(15236922, 15247159),
                                                               seq = c('CATTA', 'TATCT'))),
@@ -613,13 +613,8 @@ full.cnv.table <- do.call(cbind, read.based.cnvs)
 full.cnv.table <- cbind(rownames(full.cnv.table) %in% high.var.samples, full.cnv.table)
 gene.cluster.names <- setNames(c('Ace1', 'Cyp6aap', 'Cyp6mz', 'Gstue', 'Cyp9k1'), 
                                names(diagnostic.read.counts))
-# The column names for the full table will be with the gene cluster codes that we used in the phase 2 analysis,
-# and will split the Cyp6mz cnvs into their constituent clusters
-colnames(full.cnv.table) <- c('High.var.sample', stri_replace_all_fixed(unlist(sapply(names(gene.cluster.names), function(x) paste(gene.cluster.names[x], colnames(read.based.cnvs[[x]]), sep = '_'))),
-                                                                        c('Cyp6mz_Dupm[^z]', 'Cyp6mz_Dupz'),
-                                                                        c('Cyp6m_Dup', 'Cyp6z_Dup'),
-                                                                        vectorize_all = F)
-                             )
+# The column names for the full table will be with the gene cluster codes that we used in the phase 2 analysis.
+colnames(full.cnv.table) <- c('High.var.sample', unlist(sapply(names(gene.cluster.names), function(x) paste(gene.cluster.names[x], colnames(read.based.cnvs[[x]]), sep = '_'))))
 # Get the results in a different format. Here as a list where, for each CNV, we have a vector of samples that 
 # carry it. 
 cnv.sample.lists <- lapply(read.based.cnvs, function(m) apply(m, 2, function(x) rownames(m)[x]))

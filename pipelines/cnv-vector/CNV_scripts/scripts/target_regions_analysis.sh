@@ -17,17 +17,17 @@ mkdir -p target_regions_analysis
 
 export R_LIBS_USER="~/R-modules:$R_LIBS_USER"
 
-R --version
+R-3.6.1 --version
 
-R --slave -f $scriptsfolder/target_regions_analysis.r --args $manifest \
-                                                             $gene_coordinates_file \
-                                                             $metadata \
-                                                             $species_id_file \
-                                                             $coverage_variance_file \
-                                                             $coveragefolder \
-                                                             $diagnostic_reads_folder \
-                                                             $plotting_functions_file \
-                                                             $ncores \
-                                                             > target_regions_analysis/target_regions_analysis.log 2>&1
+R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args $manifest \
+                                                                   $gene_coordinates_file \
+                                                                   $metadata \
+                                                                   $species_id_file \
+                                                                   $coverage_variance_file \
+                                                                   $coveragefolder \
+                                                                   $diagnostic_reads_folder \
+                                                                   $plotting_functions_file \
+                                                                   $ncores \
+                                                                   > target_regions_analysis/target_regions_analysis.log 2>&1
 
 

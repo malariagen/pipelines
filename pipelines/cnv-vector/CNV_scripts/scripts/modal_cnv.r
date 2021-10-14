@@ -17,7 +17,7 @@ gene.coordinates.list <- lapply(split(all.gene.coordinates, all.gene.coordinates
 
 # Get the metadata
 meta.file <- arg.values[3]
-meta <- read.table(meta.file, sep = '\t', header = T, row.names = 1, quote = '', comment.char = '')[sample.names, ]
+meta <- read.table(meta.file, sep = '\t', header = T, row.names = 1, quote = '', comment.char = '', colClasses = c(sex_call = 'factor'))[sample.names, ]
 expected.copy.number.on.X <- c(2, 1)[(meta$sex_call == 'M') + 1]
 
 # Get the species name (only used to name the output file)
