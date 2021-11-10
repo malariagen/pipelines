@@ -94,7 +94,6 @@ task CramToBam {
     Int memory = 3000
     String? lsf_group
     String? lsf_queue
-    ReferenceSequence reference
     RunTimeSettings runTimeSettings
   }
 
@@ -103,7 +102,7 @@ task CramToBam {
     set -e
     set -o pipefail
 
-    samtools view -h -T ~{reference.ref_fasta} ~{input_file} |
+    samtools view -h ~{input_file} |
     samtools view -b -o ~{output_filename} -
     samtools index -b ~{output_filename}
 
