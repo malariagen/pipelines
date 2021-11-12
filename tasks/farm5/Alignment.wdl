@@ -37,7 +37,6 @@ workflow Alignment {
       input:
         input_file = input_cram,
         output_filename = output_file_basename + ".bam",
-        reference = reference,
         runTimeSettings = runTimeSettings
     }
   }
