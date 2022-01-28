@@ -14,6 +14,7 @@ task MergeVcfs {
     Int num_cpu = 1
     Float mem_gb = 3.75
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int disk_size = ceil(size(phased_sample_vcfs, "GiB") + size(phased_sample_vcf_indices, "GiB")) * 10 + 20
@@ -30,6 +31,7 @@ task MergeVcfs {
     cpu: num_cpu
     memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
   output {
     File merged_vcf = "~{project_id}_merged.vcf"
@@ -57,6 +59,7 @@ task ShapeIt4 {
     Int num_cpu = 4
     Float mem_gb = 15
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5 + 20
@@ -87,6 +90,7 @@ task ShapeIt4 {
     cpu: num_cpu
     memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
 
   output {
@@ -109,6 +113,7 @@ task LigateRegions {
     Int num_cpu = 1
     Float mem_gb = 15
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int disk_size = ceil((size(region_phased_vcfs, "GiB") + size(region_phased_vcfs, "GiB")) * 20) + 20
@@ -152,6 +157,7 @@ task LigateRegions {
     cpu: num_cpu
     memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
 
   output {
@@ -173,6 +179,7 @@ task CohortVcfToZarr {
     Int num_cpu = 1
     Float mem_gb = 7.5
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
@@ -199,6 +206,7 @@ task CohortVcfToZarr {
     cpu: num_cpu
     memory: mem_gb + " GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
   output {
     File output_log_file = output_log_file_name

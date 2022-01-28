@@ -82,6 +82,7 @@ task VcfToZarr {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
+    String runtime_zones = "us-central1-b"
   }
 
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
@@ -114,6 +115,7 @@ task VcfToZarr {
     cpu: num_cpu
     memory: "7.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
   output {
     File output_log_file = output_log_file_name

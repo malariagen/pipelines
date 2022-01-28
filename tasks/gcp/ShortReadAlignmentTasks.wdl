@@ -735,6 +735,7 @@ task SamtoolsIndex {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
     RunTimeSettings runTimeSettings
+    String runtime_zones = "us-central1-b"
   }
 
   Int disk_size = ceil(3 * size(input_file, "GiB")) + 20
@@ -759,6 +760,7 @@ task SamtoolsIndex {
     cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
 
   output {

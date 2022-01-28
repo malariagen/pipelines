@@ -33,6 +33,7 @@ workflow Phasing {
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
@@ -65,7 +66,8 @@ workflow Phasing {
           phased_sites_zarr = phased_sites_zarr,
           contig = chromosome,
           reference = reference,
-          runTimeSettings = runTimeSettings
+          runTimeSettings = runTimeSettings,
+          runtime_zones = runtime_zones
       }
     }
 
@@ -81,7 +83,8 @@ workflow Phasing {
         haplotype_reference_panel = if defined(haplotype_reference_panels) then select_first([haplotype_reference_panels])[chr_idx] else none,
         haplotype_reference_panel_index = if defined(haplotype_reference_panel_indices) then select_first([haplotype_reference_panel_indices])[chr_idx] else none,
         interval_list = interval_list,
-        runTimeSettings = runTimeSettings
+        runTimeSettings = runTimeSettings,
+        runtime_zones = runtime_zones
     }
   }
 
