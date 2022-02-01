@@ -25,6 +25,7 @@ workflow StatisticalPhasing {
     File? haplotype_reference_panel_index
 
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   # Step 1: Merge VCFs
@@ -33,7 +34,8 @@ workflow StatisticalPhasing {
       phased_sample_vcfs = phased_sample_vcfs,
       phased_sample_vcf_indices = phased_sample_vcf_indices,
       project_id = project_id,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   # Step 2: bgzip the merged VCF
@@ -41,7 +43,8 @@ workflow StatisticalPhasing {
     input:
       input_vcf = MergeVcfs.merged_vcf,
       output_basename = project_id + "_merged",
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   # Step 3: ShapeIt4
@@ -55,12 +58,14 @@ workflow StatisticalPhasing {
         genetic_map = genetic_map,
         haplotype_reference_panel = haplotype_reference_panel,
         haplotype_reference_panel_index = haplotype_reference_panel_index,
-        runTimeSettings = runTimeSettings
+        runTimeSettings = runTimeSettings,
+        runtime_zones = runtime_zones
     }
     call Tasks.Tabix as Tabix {
       input:
         input_file = ShapeIt4.region_phased_vcf,
-        runTimeSettings = runTimeSettings
+        runTimeSettings = runTimeSettings,
+        runtime_zones = runtime_zones
     }
   }
 
@@ -71,7 +76,8 @@ workflow StatisticalPhasing {
       region_phased_vcfs_indices = Tabix.output_index_file,
       interval_list = interval_list,
       project_id = project_id,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   # Step 5: Cohort VCF to Zarr
@@ -81,7 +87,8 @@ workflow StatisticalPhasing {
       contig = contig,
       output_zarr_file_name = project_id + ".zarr",
       output_log_file_name = project_id + ".log",
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   meta {

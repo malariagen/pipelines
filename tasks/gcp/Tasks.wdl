@@ -11,6 +11,7 @@ task BgzipAndTabix {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
+    String runtime_zones = "us-central1-b"
   }
 
   Int disk_size = ceil(size(input_vcf, "GiB")) * 3 + 20
@@ -28,6 +29,7 @@ task BgzipAndTabix {
     cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
   output {
     File vcf = "~{output_basename}.vcf.gz"
@@ -43,6 +45,7 @@ task Tabix {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
+    String runtime_zones = "us-central1-b"
   }
 
   Int disk_size = ceil(size(input_file, "GiB")) * 2 + 20
@@ -60,6 +63,7 @@ task Tabix {
     cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
   output {
     # output the path to the copied local file AND the created index so they are side by side.

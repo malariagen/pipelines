@@ -29,6 +29,7 @@ workflow ReadBackedPhasing {
 
     ReferenceSequence reference
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   if (!defined(sample_zarr)) {
@@ -39,7 +40,8 @@ workflow ReadBackedPhasing {
         sample_id = sample_id,
         output_zarr_file_name = output_basename + ".zarr",
         output_log_file_name = output_basename + ".log",
-        runTimeSettings = runTimeSettings
+        runTimeSettings = runTimeSettings,
+        runtime_zones = runtime_zones
     }
   }
 
@@ -51,14 +53,16 @@ workflow ReadBackedPhasing {
       phased_sites_zarr = phased_sites_zarr,
       output_basename = output_basename,
       contig = contig,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
   # bgzip and index the phased_vcf (Needed by WhatsHap phase)
   call Tasks.BgzipAndTabix as BgzipAndTabixSelectVariantsVcf {
     input:
       input_vcf = SelectVariants.subset_vcf,
       output_basename = output_basename + ".subset",
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   # If the bam index is not provided, generate it.
@@ -66,7 +70,8 @@ workflow ReadBackedPhasing {
     call ShortReadAlignmentTasks.SamtoolsIndex {
       input:
         input_file = input_bam,
-        runTimeSettings = runTimeSettings
+        runTimeSettings = runTimeSettings,
+        runtime_zones = runtime_zones
     }
   }
 
@@ -79,13 +84,15 @@ workflow ReadBackedPhasing {
       subset_vcf_index = BgzipAndTabixSelectVariantsVcf.vcf_index,
       output_filename = output_basename + ".phased.vcf.gz",
       reference = reference,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
   # index the phased_vcf (needed for bcftools merge in statistical phasing pipeline)
   call Tasks.Tabix as TabixPhasedVcf {
     input:
       input_file = WhatsHapPhase.phased_vcf,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
   # Step 3: WhatsHap stats
   call ReadBackedPhasingTasks.WhatsHapStats {
@@ -94,7 +101,8 @@ workflow ReadBackedPhasing {
       phased_vcf_index = TabixPhasedVcf.output_index_file,
       output_basename = output_basename,
       reference = reference,
-      runTimeSettings = runTimeSettings
+      runTimeSettings = runTimeSettings,
+      runtime_zones = runtime_zones
   }
 
   output {

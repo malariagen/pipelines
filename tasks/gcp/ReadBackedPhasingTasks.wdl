@@ -16,6 +16,7 @@ task SelectVariants {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int mem_size = ceil(size(sample_zarr, "GiB") * 3)
@@ -37,6 +38,7 @@ task SelectVariants {
     cpu: num_cpu
     memory: "3.75 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
 
   output {
@@ -60,6 +62,7 @@ task WhatsHapPhase {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
 
   Int disk_size = ceil(size(subset_vcf, "GiB") + size(subset_vcf_index, "GiB") + size(input_bam, "GiB") + size(input_bam_index, "GiB")) * 5 + 20
@@ -81,6 +84,7 @@ task WhatsHapPhase {
     cpu: num_cpu
     memory: "50 GiB"
     disks: "local-disk " + disk_size + " HDD"
+    zones: runtime_zones
   }
 
   output {
@@ -99,6 +103,7 @@ task WhatsHapStats {
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 2
     RunTimeSettings runTimeSettings
+    String runtime_zones
   }
   # TODO - figure out how to make proper use of OPTIONAL reference.ref_chr_lengths
   command {
@@ -115,6 +120,7 @@ task WhatsHapStats {
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"
+    zones: runtime_zones
   }
 
   output {
