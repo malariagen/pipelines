@@ -14,7 +14,7 @@ task SelectVariants {
 
     String singularity_image = "sampleselectvariants.1.0.sif"
     Int num_cpu = 1
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -57,7 +57,7 @@ task WhatsHapPhase {
 
     String singularity_image = "whatshap.1.0.sif"
     Int num_cpu = 2
-    Int memory = 30000
+    Int memory = 32000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -96,7 +96,7 @@ task WhatsHapStats {
 
     String singularity_image = "whatshap.1.0.sif"
     Int num_cpu = 2
-    Int memory = 7000
+    Int memory = 9000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings

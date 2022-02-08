@@ -10,7 +10,7 @@ task SplitUpInputFile {
 
     String docker_tag = "sangerpathogens/malaria-lftp@sha256:08f6ecb84d21a09f248749e65d5c90686030a99423c8e31101e9c98fe4992745"
     Int num_cpu = 1
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -55,7 +55,7 @@ task Ftp {
 
     String docker_tag = "sangerpathogens/malaria-lftp@sha256:08f6ecb84d21a09f248749e65d5c90686030a99423c8e31101e9c98fe4992745"
     Int num_cpu = 1
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -91,7 +91,7 @@ task CramToBam {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 2
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -136,7 +136,7 @@ task ExtractReadGroup {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
-    Int memory = 100
+    Int memory = 2100
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -178,7 +178,7 @@ task RevertSam {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -218,7 +218,7 @@ task SamToFastq {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -261,7 +261,7 @@ task ReadAlignment {
 
     String docker_tag = "sangerpathogens/malaria-bwa@sha256:1504f6bacc2a2b8b5583f0782c9cd89c1a9c7db8d31bd5bbcfccc8470f24f5e0"
     Int num_cpu = 4
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -305,7 +305,7 @@ task ReadAlignmentPostProcessing {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 2
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -342,7 +342,7 @@ task SetNmMdAndUqTags {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -376,7 +376,7 @@ task MergeSamFiles {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -407,7 +407,7 @@ task MarkDuplicates {
 
     String docker_tag = "sangerpathogens/malaria-biobambam@sha256:b185800c292be69ad5928489b530b9a46b2057dea2380f845ba6925591fe62fc"
     Int num_cpu = 1
-    Int memory = 2000
+    Int memory = 4000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -438,7 +438,7 @@ task RealignerTargetCreator {
 
     String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -476,7 +476,7 @@ task IndelRealigner {
 
     String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
-    Int memory = 8000
+    Int memory = 10000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -512,7 +512,7 @@ task FixMateInformation {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 8000
+    Int memory = 10000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -555,7 +555,7 @@ task ValidateSamFile {
 
     String docker_tag = "sangerpathogens/malaria-picard@sha256:918e067454d1b6635c3f617eacfeb3c3984f771fe0b1aefd11a8878db661f9e8"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -592,7 +592,7 @@ task SamtoolsStats {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
-    Int memory = 2000
+    Int memory = 4000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -628,7 +628,7 @@ task SamtoolsIdxStats {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
-    Int memory = 2000
+    Int memory = 4000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -662,7 +662,7 @@ task SamtoolsFlagStat {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 1
-    Int memory = 2000
+    Int memory = 4000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -697,7 +697,7 @@ task GatkCallableLoci {
 
     String docker_tag = "sangerpathogens/malaria-gatk3@sha256:11dcafb2c5b574c8313942874ec8449b536adcc37c00bad149f1ef1a45012a28"
     Int num_cpu = 1
-    Int memory = 4000
+    Int memory = 6000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -731,7 +731,7 @@ task SamtoolsIndex {
 
     String docker_tag = "sangerpathogens/malaria-samtools@sha256:e6f69efb1481e737cea07ae9e365457761e52720e559b28432b8495cec800c63"
     Int num_cpu = 2
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings

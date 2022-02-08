@@ -13,7 +13,7 @@ task UnifiedGenotyper {
 
     String docker_tag = "sangerpathogens/malaria-gatk3@sha256:4761153782cdb5f9dcdd11227fd78f58a9d9af5e6d6096deb6f6a47fa6219346"
     Int num_cpu = 4
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     ReferenceSequence reference
@@ -80,7 +80,7 @@ task VcfToZarr {
 
     String docker_tag = "sangerpathogens/malaria-samplevcftozarr@sha256:1241e33a6ee7f14d86c4e8cf17834cdf4999b92a592477e14d6b14229a81921d"
     Int num_cpu = 2
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings

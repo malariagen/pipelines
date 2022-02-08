@@ -9,7 +9,7 @@ task BgzipAndTabix {
 
     String singularity_image = "bcftools.1.11.sif"
     Int num_cpu = 1
-    Int memory = 30000
+    Int memory = 32000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -41,7 +41,7 @@ task Tabix {
 
     String singularity_image = "bcftools.1.11.sif"
     Int num_cpu = 1
-    Int memory = 30000
+    Int memory = 32000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings

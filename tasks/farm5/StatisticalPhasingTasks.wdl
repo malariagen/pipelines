@@ -11,7 +11,7 @@ task MergeVcfs {
 
     String singularity_image = "bcftools.1.11.sif"
     Int num_cpu = 1
-    Int memory = 3000
+    Int memory = 5000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -52,7 +52,7 @@ task ShapeIt4 {
 
     String singularity_image = "shapeit4_4.1.3.sif"
     Int num_cpu = 4
-    Int memory = 15000
+    Int memory = 17000
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
@@ -98,7 +98,7 @@ task CohortVcfToZarr {
 
     String singularity_image = "cohortvcftozarr.1.1.sif"
     Int num_cpu = 1
-    Int memory = 7500
+    Int memory = 9500
     String? lsf_group
     String? lsf_queue
     RunTimeSettings runTimeSettings
