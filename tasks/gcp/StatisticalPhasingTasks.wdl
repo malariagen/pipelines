@@ -63,7 +63,7 @@ task ShapeIt4 {
   }
 
   Int disk_size = (ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5) + 20
-  Int total_disk_size = if defined(haplotype_reference_panel) then (ceil(size(merged_vcf, "GiB")) * 5) + disk_size else disk_size
+  Int total_disk_size = if defined(haplotype_reference_panel) then (ceil(size(haplotype_reference_panel, "GiB")) * 5) + disk_size else disk_size
   String output_prefix = sub(region, ":", "_")
   String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
