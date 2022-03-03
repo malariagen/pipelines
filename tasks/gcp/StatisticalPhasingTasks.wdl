@@ -62,12 +62,12 @@ task ShapeIt4 {
     String runtime_zones
   }
 
-  Int disk_size = ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5 + 20
+  Int disk_size = (ceil(size(merged_vcf, "GiB") + size(merged_vcf_index, "GiB") + size(genetic_map, "GiB")) * 5) + 20
+  Int total_disk_size = if defined(haplotype_reference_panel) then (ceil(size(haplotype_reference_panel, "GiB")) * 5) + disk_size else disk_size
   String output_prefix = sub(region, ":", "_")
   String output_filename = output_prefix + "_" +  project_id + "_phased.vcf.gz"
 
   command {
-    #TODO - handle reference...
     touch ~{merged_vcf_index}
     shapeit4 \
         --input ~{merged_vcf} \
@@ -89,7 +89,7 @@ task ShapeIt4 {
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: mem_gb + " GiB"
-    disks: "local-disk " + disk_size + " HDD"
+    disks: "local-disk " + total_disk_size + " HDD"
     zones: runtime_zones
   }
 
