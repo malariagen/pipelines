@@ -97,13 +97,6 @@ task VcfToZarr {
         --field calldata/GT \
         --field calldata/GQ \
         --field calldata/AD \
-        --contig 2R \
-        --contig 2L \
-        --contig 3R \
-        --contig 3L \
-        --contig X \
-        --contig Y_unplaced \
-        --contig UNKN \
         --log ~{output_log_file_name} \
         --zip
     rm $vcf_file_name
