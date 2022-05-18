@@ -13,7 +13,7 @@ import "../../../structs/ReferenceSequence.wdl"
 import "../../../tasks/gcp/SNPGenotypingTasks.wdl" as Tasks
 
 workflow SNPGenotyping {
-  String pipeline_version = "1.0.0"
+  String pipeline_version = "1.0.1"
 
   input {
     String sample_id
@@ -41,6 +41,7 @@ workflow SNPGenotyping {
   call Tasks.VcfToZarr {
     input:
       input_vcf = UnifiedGenotyper.output_vcf,
+      input_vcf_index = UnifiedGenotyper.output_vcf_index,
       sample_id = sample_id,
       output_zarr_file_name = output_basename + ".zarr",
       output_log_file_name = output_basename + ".log",

@@ -74,6 +74,7 @@ task UnifiedGenotyper {
 task VcfToZarr {
   input {
     File input_vcf
+    File input_vcf_index
     String sample_id
     String output_zarr_file_name
     String output_log_file_name
@@ -88,10 +89,8 @@ task VcfToZarr {
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
   command {
-    vcf_file_name="~{sample_id}.vcf"
-    bgzip -d -c ~{input_vcf} > $vcf_file_name
     python /tools/sample_vcf_to_zarr.py \
-        --input $vcf_file_name \
+        --input ~{input_vcf} \
         --output ~{output_zarr_file_name} \
         --sample ~{sample_id} \
         --field variants/MQ \
@@ -122,4 +121,3 @@ task VcfToZarr {
     File zarr_output = "~{output_zarr_file_name}.zip"
   }
 }
-
