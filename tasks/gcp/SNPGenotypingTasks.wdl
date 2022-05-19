@@ -88,10 +88,11 @@ task VcfToZarr {
 
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
-  # The --tabix "tabix -h" parameter shouldn't be needed, as scikit-allel
-  # should internally be adding that parameter to ensure the header rows
-  # are included, but for some reason it's not working.
+  # Currently scikit-allel has a bug where parsing breaks if the index file is
+  # older than the VCF file. We work around that here by touching the index file.
+
   command {
+    touch ~{input_vcf_index}
     python /tools/sample_vcf_to_zarr.py \
         --input ~{input_vcf} \
         --output ~{output_zarr_file_name} \
@@ -100,10 +101,8 @@ task VcfToZarr {
         --field calldata/GT \
         --field calldata/GQ \
         --field calldata/AD \
-        --tabix "tabix -h" \
         --log ~{output_log_file_name} \
         --zip
-    rm $vcf_file_name
   }
   runtime {
     docker: docker_tag
