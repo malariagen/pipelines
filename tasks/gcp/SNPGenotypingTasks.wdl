@@ -83,9 +83,10 @@ task VcfToZarr {
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
     String runtime_zones = "us-central1-b"
+    Int disk_size_gb = 60
   }
 
-  Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
+  #Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
   command {
     vcf_file_name="~{sample_id}.vcf"
@@ -114,7 +115,7 @@ task VcfToZarr {
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: "7.5 GiB"
-    disks: "local-disk " + disk_size + " HDD"
+    disks: "local-disk ${disk_size_gb} HDD"
     zones: runtime_zones
   }
   output {
