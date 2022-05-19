@@ -79,7 +79,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.2"
+    String docker_tag = "gcr.io/malariagen-jupyterhub/malariagen-pipelines/samplevcftozarr:1.3"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
