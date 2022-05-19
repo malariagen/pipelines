@@ -79,7 +79,7 @@ task VcfToZarr {
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "gcr.io/malariagen-jupyterhub/malariagen-pipelines/samplevcftozarr:1.3"
+    String docker_tag = "gcr.io/malariagen-jupyterhub/malariagen-pipelines/samplevcftozarr:1.4"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -88,6 +88,9 @@ task VcfToZarr {
 
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
+  # The --tabix "tabix -h" parameter shouldn't be needed, as scikit-allel
+  # should internally be adding that parameter to ensure the header rows
+  # are included, but for some reason it's not working.
   command {
     python /tools/sample_vcf_to_zarr.py \
         --input ~{input_vcf} \
@@ -97,6 +100,7 @@ task VcfToZarr {
         --field calldata/GT \
         --field calldata/GQ \
         --field calldata/AD \
+        --tabix "tabix -h" \
         --log ~{output_log_file_name} \
         --zip
     rm $vcf_file_name
