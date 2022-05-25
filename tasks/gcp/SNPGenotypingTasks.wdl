@@ -74,11 +74,12 @@ task UnifiedGenotyper {
 task VcfToZarr {
   input {
     File input_vcf
+    File input_vcf_index
     String sample_id
     String output_zarr_file_name
     String output_log_file_name
 
-    String docker_tag = "us.gcr.io/broad-gotc-prod/malariagen/samplevcftozarr:1.2"
+    String docker_tag = "gcr.io/malariagen-jupyterhub/malariagen-pipelines/samplevcftozarr:1.4"
     Int preemptible_tries = runTimeSettings.preemptible_tries
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
@@ -87,27 +88,21 @@ task VcfToZarr {
 
   Int disk_size = (ceil(size(input_vcf, "GiB")) * 4) + 20
 
+  # Currently scikit-allel has a bug where parsing breaks if the index file is
+  # older than the VCF file. We work around that here by touching the index file.
+
   command {
-    vcf_file_name="~{sample_id}.vcf"
-    bgzip -d -c ~{input_vcf} > $vcf_file_name
+    touch ~{input_vcf_index}
     python /tools/sample_vcf_to_zarr.py \
-        --input $vcf_file_name \
+        --input ~{input_vcf} \
         --output ~{output_zarr_file_name} \
         --sample ~{sample_id} \
         --field variants/MQ \
         --field calldata/GT \
         --field calldata/GQ \
         --field calldata/AD \
-        --contig 2R \
-        --contig 2L \
-        --contig 3R \
-        --contig 3L \
-        --contig X \
-        --contig Y_unplaced \
-        --contig UNKN \
         --log ~{output_log_file_name} \
         --zip
-    rm $vcf_file_name
   }
   runtime {
     docker: docker_tag
@@ -122,4 +117,3 @@ task VcfToZarr {
     File zarr_output = "~{output_zarr_file_name}.zip"
   }
 }
-

@@ -22,6 +22,7 @@ workflow Phasing {
     Array[File] input_bam_indices
     Array[File] sample_zarrs
     Array[File] sample_vcfs = []
+    Array[File] sample_vcf_indices = []
     File called_sites_zarr
     File phased_sites_zarr
     Array[String] chromosome_list
@@ -62,6 +63,7 @@ workflow Phasing {
           input_bam_index = input_bam_indices[idx],
           sample_zarr = sample_zarrs[idx],
 #         sample_vcf = sample_vcfs[idx],
+#         sample_vcf_index = sample_vcf_indices[idx],
           called_sites_zarr = called_sites_zarr,
           phased_sites_zarr = phased_sites_zarr,
           contig = chromosome,

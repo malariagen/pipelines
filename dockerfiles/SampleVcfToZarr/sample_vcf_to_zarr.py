@@ -135,6 +135,8 @@ def main():
         log_file_needs_closing = True
     
     if not contigs:
+        print("No contig parameters, discovering from VCF headers", file=log_file)
+
         if input_vcf_path.endswith((".gz", ".bgz")):
             vcf_opener = gzip.open
         else:
@@ -150,6 +152,8 @@ def main():
                 else:
                     # Header is finished, no need to read the rest
                     break
+
+        print(f"Discovered contigs: {contigs}", file=log_file)
                
     try:
         if not contigs:
@@ -162,6 +166,7 @@ def main():
             sys.exit(1)
             
         for contig in contigs:
+            print(f"Processing contig {contig}...", file=log_file)
 
             allel.vcf_to_zarr(
                 input=input_vcf_path,

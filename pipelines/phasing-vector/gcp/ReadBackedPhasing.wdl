@@ -23,6 +23,7 @@ workflow ReadBackedPhasing {
     File? input_bam_index
     File? sample_zarr
     File? sample_vcf
+    File? sample_vcf_index
     File called_sites_zarr
     File phased_sites_zarr
     String contig
@@ -37,6 +38,7 @@ workflow ReadBackedPhasing {
     call SNPGenotypingTasks.VcfToZarr {
       input:
         input_vcf = select_first([sample_vcf]),
+        input_vcf_index = select_first([sample_vcf_index]),
         sample_id = sample_id,
         output_zarr_file_name = output_basename + ".zarr",
         output_log_file_name = output_basename + ".log",
