@@ -564,7 +564,7 @@ task ValidateSamFile {
   Int disk_size = ceil(size(input_file, "GiB") + ref_size) + 20
 
   command {
-    java -Xmx3500m -jar /bin/picard.jar \
+    java -Xmx4500m -jar /bin/picard.jar \
       ValidateSamFile \
       INPUT=~{input_file} \
       OUTPUT=~{report_filename} \
@@ -578,7 +578,7 @@ task ValidateSamFile {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "3.75 GiB"
+    memory: "5.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
