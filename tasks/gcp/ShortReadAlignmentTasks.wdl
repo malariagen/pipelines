@@ -265,7 +265,7 @@ task ReadAlignment {
   Float fastq_size = size(fastq1, "GiB") + size(fastq2, "GiB")
   Float ref_size = size(reference.ref_fasta, "GiB") + size(reference.ref_fasta_index, "GiB") + size(reference.ref_dict, "GiB")
   Float bwa_ref_size = ref_size + size(reference.ref_amb, "GiB") + size(reference.ref_ann, "GiB") + size(reference.ref_bwt, "GiB") + size(reference.ref_pac, "GiB") + size(reference.ref_sa, "GiB")
-  Float disk_multiplier = 2.5
+  Float disk_multiplier = 4
   Int disk_size = ceil(fastq_size + bwa_ref_size + (disk_multiplier * fastq_size) + 20)
 
   # suggested content for the read group tag: (from Thuy):
