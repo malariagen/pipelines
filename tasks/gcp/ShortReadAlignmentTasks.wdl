@@ -484,7 +484,7 @@ task IndelRealigner {
   Int disk_size = (ceil(size(input_bam, "GiB")) * 2) + 20
 
   command {
-    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx7500m \
+    java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx9500m \
           -jar /usr/GenomeAnalysisTK.jar \
           -T IndelRealigner \
           -I ~{input_bam} \
@@ -497,7 +497,7 @@ task IndelRealigner {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "7.5 GiB"
+    memory: "10.5 GiB"
     disks: "local-disk " + disk_size + " HDD"
   }
   output {
@@ -516,7 +516,7 @@ task FixMateInformation {
     RunTimeSettings runTimeSettings
   }
 
-  Int disk_size = (ceil(size(input_file, "GiB")) * 8) + 20
+  Int disk_size = (ceil(size(input_file, "GiB")) * 10) + 20
 
   command {
    set -e
