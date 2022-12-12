@@ -36,7 +36,7 @@ task SelectVariants {
     docker: docker_tag
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: "3.75 GiB"
+    memory: "7.00 GiB"
     disks: "local-disk " + disk_size + " HDD"
     zones: runtime_zones
   }
