@@ -76,13 +76,22 @@ Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 ```
 
 #### Step: Calculate Coverage Summary Stats
-**Description:** Analyzes the read count for each sample. Computes a GC normalization table that describes the mean read count for each percentile of GC. Computs overall coverage variace \
+**Description:** Analyzes the read count for each sample. Computes a GC normalization table that describes the mean read count for each percentile of GC. Computes overall coverage variance \
 **Inputs:** Windowed count reads file, 1 per sample\
 **Outputs:** Summary statistics file, 1 per sample\
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/get_coverage_stats_by_sample_set_vobs.sh\
 ```bash
-
+  #Runs calculate_median_coverage_by_GC.py which is a script that calculates the median coverage by GC window for a list of samples from Ag1000G
+  python $scriptsfolder/calculate_median_coverage_by_GC.py 0.9 \
+                                                          $accessibility_file \
+                                                          0.5 \
+                                                          $mapqprop_file \
+                                                          $manifest \
+                                                          $GC_content_file \
+                                                          $workingfolder \
+                                                          $sample_group_id \
+                                                          > $workingfolder/calculate_mean_coverage_by_GC_09_05_${sample_group_id}.log 2>&1
 ```
 
 #### Step: CNV HMM
@@ -92,7 +101,17 @@ Steps in CNV_pipeline/scripts/get_coverage_stats_by_sample_set_vobs.sh\
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/coverage_HMM_vobs.sh\
 ```bash
-
+  #Runs HMM_process.py which is a script that runs an mHMM on coverage counts obtained from a bamfile, using normalisation based on the mean coverage per GC bin over the whole genome of the individual.
+  python ${scriptsfolder}/HMM_process.py \
+       $manifest \
+       $chrom \
+       $coveragefolder \
+       $GC_content_file \
+       $coverage_by_GC_file \
+       $coverage_variance_file \
+       $mapq_prop_file \
+       0.5 \
+       > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
 ```
 
 
@@ -105,7 +124,16 @@ Steps in CNV_pipeline/scripts/coverage_HMM_vobs.sh\
 **Software:** R version 3.6.1\
 Steps in CNV_pipeline/scripts/coverage_CNVs_vobs.sh\
 ```bash
-
+R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
+                                                        $manifest \
+                                                        $coverage_variance_file \
+                                                        $gene_coordinates_file \
+                                                        $detox_genes_file \
+                                                        $workingfolder \
+                                                        $ncores \
+                                                        $outputfolder \
+                                                        $metadata \
+                                                        > $coveragefolder/$chrom/CNV_analysis_logs/CNV_analysis_${output_name}.log 2>&1
 ```
 
 
@@ -129,6 +157,17 @@ Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 **Software:** R version 3.6.1\
 Steps in CNV_pipeline/scripts/target_regions_analysis_vobs.sh\
 ```bash
+  R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args $manifest \
+                                                                   $gene_coordinates_file \
+                                                                   $metadata \
+                                                                   $species_id_file \
+                                                                   $coverage_variance_file \
+                                                                   $coveragefolder \
+                                                                   $diagnostic_reads_folder \
+                                                                   $plotting_functions_file \
+                                                                   $ncores \
+                                                                   > target_regions_analysis/target_regions_analysis.log 2>&1
+
 
 ```
 
