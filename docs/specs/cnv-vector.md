@@ -147,7 +147,7 @@ Note: this is currently combined with the windowed coverage step at the beginnin
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 ```bash
-
+  # See steps in "Windowed Coverage" for sub-pipeline CNV HMM.
 ```
 
 #### Step: Target Regions CNV Calls
