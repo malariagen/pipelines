@@ -6,6 +6,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+#TODO: Determine if R is really required here
 # # Add the R repository and install the latest R
 # RUN echo "deb https://cloud.r-project.org/bin/linux/ubuntu hirsute-cran40/" >> /etc/apt/sources.list && \
 #     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
@@ -28,4 +29,4 @@ WORKDIR /cnv
 COPY . .
 
 # Set the default command to run when the container starts
-CMD ["python", "app.py"]
+# CMD ["python", ""]
