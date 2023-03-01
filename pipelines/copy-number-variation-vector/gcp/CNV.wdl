@@ -5,7 +5,7 @@ version 1.0
 ## This WDL pipeline implements Copy Number Variation Pipeline as described in:
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
 ##.
-##
+
 
  import "../../../structs/gcp/RunTimeSettings.wdl"
  import "../../../structs/ReferenceSequence.wdl"
