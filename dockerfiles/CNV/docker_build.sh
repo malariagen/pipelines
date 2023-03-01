@@ -1,6 +1,6 @@
 #!/bin/bash
 #fail-fast
-set -e
+set -e -x
 
 # Update version when changes to Dockerfile are made
 DOCKER_IMAGE_VERSION=1.0.0
@@ -48,7 +48,7 @@ function main(){
         ;;
     esac
     done
-    if [ -z $tag ]; 
+    if [ -v TAG ]; 
     then
         IMAGE_TAG="$TAG"
     else
@@ -57,7 +57,7 @@ function main(){
 
     echo "building and pushing GCR Image - $GCR_URL:$IMAGE_TAG"
 
-    if [ $CACHING == "ON" ]; then
+    if [[ "$CACHING" == "ON" ]]; then
         docker build -t "$GCR_URL:$IMAGE_TAG" "$DIR"
     else
         docker build -t "$GCR_URL:$IMAGE_TAG" --no-cache "$DIR"
