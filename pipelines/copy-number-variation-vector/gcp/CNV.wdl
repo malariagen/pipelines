@@ -7,8 +7,8 @@ version 1.0
 ##.
 
 
- import "../../../structs/gcp/RunTimeSettings.wdl"
- import "../../../structs/ReferenceSequence.wdl"
+ import "../../structs/gcp/RunTimeSettings.wdl"
+ import "../../structs/ReferenceSequence.wdl"
 # import "../../../pipelines/phasing-vector/gcp/ReadBackedPhasing.wdl" as ReadBackedPhasing
 # import "../../../pipelines/phasing-vector/gcp/StatisticalPhasing.wdl" as StatisticalPhasing
 
@@ -49,7 +49,7 @@ workflow CNV {
   }
  
   call hello
-  
+
   output {
     String test = hello.message
 
