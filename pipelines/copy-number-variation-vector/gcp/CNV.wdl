@@ -7,8 +7,8 @@ version 1.0
 ##.
 
 
- import "../../structs/gcp/RunTimeSettings.wdl"
- import "../../structs/ReferenceSequence.wdl"
+#  import "../../structs/gcp/RunTimeSettings.wdl"
+#  import "../../structs/ReferenceSequence.wdl"
 # import "../../../pipelines/phasing-vector/gcp/ReadBackedPhasing.wdl" as ReadBackedPhasing
 # import "../../../pipelines/phasing-vector/gcp/StatisticalPhasing.wdl" as StatisticalPhasing
 
@@ -17,24 +17,24 @@ workflow CNV {
 
   input {
     String project_id
-    Array[String] sample_ids
-    Array[File] input_bams
-    Array[File] input_bam_indices
-    Array[File] sample_zarrs
-    Array[File] sample_vcfs = []
-    Array[File] sample_vcf_indices = []
-    File called_sites_zarr
-    File phased_sites_zarr
-    Array[String] chromosome_list
-    Array[File] genetic_maps
-    Array[File] interval_lists
+    # Array[String] sample_ids
+    # Array[File] input_bams
+    # Array[File] input_bam_indices
+    # Array[File] sample_zarrs
+    # Array[File] sample_vcfs = []
+    # Array[File] sample_vcf_indices = []
+    # File called_sites_zarr
+    # File phased_sites_zarr
+    # Array[String] chromosome_list
+    # Array[File] genetic_maps
+    # Array[File] interval_lists
 
-    Array[File]? haplotype_reference_panels
-    Array[File]? haplotype_reference_panel_indices
+    # Array[File]? haplotype_reference_panels
+    # Array[File]? haplotype_reference_panel_indices
 
-    ReferenceSequence reference
-    RunTimeSettings runTimeSettings
-    String runtime_zones
+    # ReferenceSequence reference
+    # RunTimeSettings runTimeSettings
+    # String runtime_zones
   }
 
   # TODO: extract sample_id, sample_bam, and sample_vcf information from the maifest file (or inputs)
