@@ -17,6 +17,7 @@ workflow CNV {
 
   input {
     String project_id
+    File sample_bam
     # Array[String] sample_ids
     # Array[File] input_bams
     # Array[File] input_bam_indices
