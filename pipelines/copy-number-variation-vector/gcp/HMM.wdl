@@ -28,13 +28,15 @@ task WindowedCoverage {
   input {
     File input_bam
   }
-  command {
-    echo "Hello, World!"
+  command <<<
+    echo "Processing file: " 
     basename ~{input_bam}
+    echo "Current directory: " 
     pwd
-    cd scripts/
+    cd /cnv/scripts/
+    ls -lht
     bash get_windowed_coverage_and_diagnostic_reads.sh
-  }
+  >>>
   runtime {
     docker: "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1677557222"
     memory: "4 GiB"
