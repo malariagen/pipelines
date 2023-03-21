@@ -22,8 +22,6 @@ workflow CNV {
     String scripts_folder="/cnv/scripts"
   }
 
-  
-
   # This is a wdl hack to create a pseudo None
   if (false) {
     File? none = "None"
@@ -45,17 +43,4 @@ workflow CNV {
   }
 }
 
-# task hello {
-#   command {
-#     echo "Hello, World!"
-#   }
-#   runtime {
-#     docker: "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1677557222"
-#     memory: "4 GiB"
-#     preemptible: 3
-#   }
-#   output {
-#     String message = read_string(stdout())
-#   }
-# }
 
