@@ -19,7 +19,9 @@ workflow CNV {
   input {
     String project_id
     Array[File] input_bams
+    Array[String] sample_names
     String scripts_folder="/cnv/scripts"
+    String output_dir="/cnv/output"
   }
 
   # This is a wdl hack to create a pseudo None
@@ -32,7 +34,9 @@ workflow CNV {
     # Run windowed coverage on each sample (for each chromosome)
     call HMM.HMM as HMM {
       input:
-        input_bam = input_bams[idx]
+        input_bam = input_bams[idx],
+        sample_name = sample_names[idx],
+        output_dir = output_dir
     }
   }
 

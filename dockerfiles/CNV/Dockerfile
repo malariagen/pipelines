@@ -19,7 +19,9 @@ RUN apt-get update && \
 COPY requirements_conda.yml requirements_conda.yml
 
 # Create a conda environment and activate it
-RUN conda env create -f requirements_conda.yml && \
+RUN mkdir -p /cnv/output && \
+    mkdir -p /cnv/input && \
+    conda env create -f requirements_conda.yml && \
     echo "conda activate $(head -1 /opt/conda/envs/*/etc/environment.yml | cut -d'/' -f6)" >> ~/.bashrc
 
 # Set the working directory
