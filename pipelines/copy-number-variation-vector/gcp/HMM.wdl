@@ -35,7 +35,7 @@ task WindowedCoverage {
     String output_dir
 
     # runtime values
-    String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1677557222"
+    String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     Int ram = "8 GiB"
     Int cpu = 16
     # TODO: Make disk space dynamic based on input size
