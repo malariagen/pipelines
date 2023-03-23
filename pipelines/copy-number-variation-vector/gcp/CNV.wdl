@@ -21,7 +21,7 @@ workflow CNV {
     Array[File] input_bams
     Array[String] sample_names
     String scripts_folder="/cnv/scripts"
-    String output_dir="/cnv/output"
+    String output_dir="coverage"
   }
 
   # This is a wdl hack to create a pseudo None
