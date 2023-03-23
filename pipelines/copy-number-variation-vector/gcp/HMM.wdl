@@ -43,13 +43,31 @@ task WindowedCoverage {
     Int preemptible = 3
   }
   command <<<
-    echo "Processing file: " 
+    echo "Calculating coverage for: " 
     basename ~{input_bam}
     echo "Current directory: " 
     pwd
     cd /cnv/scripts/
-    ls -lht
-    bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
+    #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
+
+    # Start the conda env
+    source activate cnv37 
+
+    # Get the coverage data
+    echo 
+    allchrom=(2L 2R 3L 3R X)
+    #coveragefolder=~{output_dir}/coverage
+    for chrom in ${allchrom[@]}
+    do
+      #create the directory structure needed (this was likely pre-provisioned in the baremetal version of this pipeline)
+      #mkdir -p ${coveragefolder}/${chrom}/coveragelogs/
+      python /cnv/scripts/counts_for_HMM.py \
+            ~{input_bam} \
+            $chrom \
+            300 300 10 \
+            ~{output_dir}/counts_for_HMM_~{sample_name}_${chrom}_output.csv \
+            > ~{output_dir}/counts_for_HMM_~{sample_name}_${chrom}.log 2>&1
+    done
   >>>
   runtime {
     docker: docker
@@ -61,6 +79,10 @@ task WindowedCoverage {
   }
   output {
     String message = read_string(stdout())
+    #Return an array of Files representing the contents of the output directory
+    Array[File] coverage_files = glob("~{output_dir}/*.csv")
+    #Return an array of Files representing the logs of the coverage calculations
+    Array[File] coverage_logs = glob("~{output_dir}/*.log")
   }
 }
 
