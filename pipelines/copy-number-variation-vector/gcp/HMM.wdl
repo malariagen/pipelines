@@ -73,7 +73,6 @@ task WindowedCoverage {
     docker: docker
     memory: "${ram} GiB"
     disks: "local-disk ${disk} HDD"
-    disk: disk + " GB" # TES
     cpu: cpu
     preemptible: preemptible
   }
