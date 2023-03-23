@@ -36,7 +36,7 @@ task WindowedCoverage {
 
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
-    Int ram = "8 GiB"
+    Int ram = "8000 MiB"
     Int cpu = 16
     # TODO: Make disk space dynamic based on input size
     Int disk = 70
@@ -71,7 +71,7 @@ task WindowedCoverage {
   >>>
   runtime {
     docker: docker
-    memory: "${ram} GiB"
+    memory: ram
     disks: "local-disk ${disk} HDD"
     cpu: cpu
     preemptible: preemptible
