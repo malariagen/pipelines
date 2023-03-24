@@ -49,12 +49,12 @@ task WindowedCoverage {
     pwd
     cd /cnv/scripts/
     #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
-
+    mkdir -p ~{output_dir}
     # Start the conda env
     source activate cnv37 
 
     # Get the coverage data
-    echo 
+    
     allchrom=(2L 2R 3L 3R X)
     #coveragefolder=~{output_dir}/coverage
     for chrom in ${allchrom[@]}
