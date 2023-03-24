@@ -43,7 +43,7 @@ workflow CNV {
   
 
   output {
-    String test = ""
+    Array[File] hmm_outputs = HMM.output_gz
   }
 }
 

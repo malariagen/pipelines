@@ -24,7 +24,7 @@ workflow HMM {
   }
 
   output {
-    String out = ""
+    File output_gz = WindowedCoverage.output_gz
   }
 }
 
@@ -49,7 +49,7 @@ task WindowedCoverage {
     pwd
     ls -lht
     cd /cnv/scripts/
-    ls /cnv
+    ls -lht /cnv
     #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
     mkdir -p ~{output_dir}
     # Start the conda env
@@ -67,9 +67,11 @@ task WindowedCoverage {
             ~{input_bam} \
             $chrom \
             300 300 10 \
-            ~{output_dir}/counts_for_HMM_~{sample_name}_${chrom}_output.csv \
-            > ~{output_dir}/counts_for_HMM_~{sample_name}_${chrom}.log 2>&1
+            ~{output_dir}/${chrom}/counts_for_HMM_${samplename}_${chrom}_output.csv \
+	          > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_${samplename}_${chrom}.log 2>&1
     done
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
+    ls -lht
   >>>
   runtime {
     docker: docker
@@ -79,11 +81,13 @@ task WindowedCoverage {
     preemptible: preemptible
   }
   output {
-    String message = read_string(stdout())
+    #Compressed output directory
+    File output_gz = "~{output_dir}.tar.gz"
+    #String message = read_string(stdout())
     #Return an array of Files representing the contents of the output directory
-    Array[File] coverage_files = glob("~{output_dir}/*.csv")
+    # Array[File] coverage_files = glob("~{output_dir}/*.csv")
     #Return an array of Files representing the logs of the coverage calculations
-    Array[File] coverage_logs = glob("~{output_dir}/*.log")
+    # Array[File] coverage_logs = glob("~{output_dir}/*.log")
   }
 }
 
