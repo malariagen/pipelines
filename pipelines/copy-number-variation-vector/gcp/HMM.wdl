@@ -47,7 +47,9 @@ task WindowedCoverage {
     basename ~{input_bam}
     echo "Current directory: " 
     pwd
+    ls -lht
     cd /cnv/scripts/
+    ls /cnv
     #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
     mkdir -p ~{output_dir}
     # Start the conda env
