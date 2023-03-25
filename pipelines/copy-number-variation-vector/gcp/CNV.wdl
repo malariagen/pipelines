@@ -6,7 +6,6 @@ version 1.0
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
 ##.
 
-
 import "HMM.wdl" as HMM
 workflow CNV {
   meta {
@@ -39,10 +38,7 @@ workflow CNV {
         output_dir = output_dir
     }
   }
-
   output {
     Array[File] hmm_outputs = HMM.output_gz
   }
 }
-
-
