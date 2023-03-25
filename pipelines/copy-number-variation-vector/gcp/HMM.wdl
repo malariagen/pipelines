@@ -9,20 +9,18 @@ version 1.0
 
 workflow HMM {
   String pipeline_version = "1.0.0"
-
+  
   input {
     File input_bam
     String sample_name
     String output_dir
   }
-
   call WindowedCoverage {
     input:
       input_bam = input_bam,
       sample_name = sample_name,
       output_dir = output_dir
   }
-
   output {
     File output_gz = WindowedCoverage.output_gz
   }
@@ -54,9 +52,7 @@ task WindowedCoverage {
     mkdir -p ~{output_dir}
     # Start the conda env
     source activate cnv37 
-
     # Get the coverage data
-    
     allchrom=(2L 2R 3L 3R X)
     #coveragefolder=~{output_dir}/coverage
     for chrom in ${allchrom[@]}
@@ -68,7 +64,7 @@ task WindowedCoverage {
             $chrom \
             300 300 10 \
             ~{output_dir}/${chrom}/counts_for_HMM_${samplename}_${chrom}_output.csv \
-	          > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_${samplename}_${chrom}.log 2>&1
+            > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_${samplename}_${chrom}.log 2>&1
     done
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
     ls -lht

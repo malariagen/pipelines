@@ -40,8 +40,6 @@ workflow CNV {
     }
   }
 
-  
-
   output {
     Array[File] hmm_outputs = HMM.output_gz
   }
