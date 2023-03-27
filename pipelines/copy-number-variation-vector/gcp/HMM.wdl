@@ -9,7 +9,7 @@ version 1.0
 
 workflow HMM {
   String pipeline_version = "1.0.0"
-  
+
   input {
     File input_bam
     String sample_name
@@ -41,12 +41,13 @@ task WindowedCoverage {
     Int preemptible = 3
   }
   command <<<
+    set -x
     echo "Calculating coverage for: " 
     basename ~{input_bam}
     echo "Current directory: " 
     pwd
     ls -lht
-    cd /cnv/scripts/
+    #cd /cnv/scripts/
     ls -lht /cnv
     #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
     mkdir -p ~{output_dir}
@@ -58,7 +59,7 @@ task WindowedCoverage {
     for chrom in ${allchrom[@]}
     do
       #create the directory structure needed (this was likely pre-provisioned in the baremetal version of this pipeline)
-      #mkdir -p ${coveragefolder}/${chrom}/coveragelogs/
+      mkdir -p ~{output_dir}/${chrom}/coveragelogs/
       python /cnv/scripts/counts_for_HMM.py \
             ~{input_bam} \
             $chrom \
