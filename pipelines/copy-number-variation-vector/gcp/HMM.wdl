@@ -14,12 +14,18 @@ workflow HMM {
     File input_bam
     String sample_name
     String output_dir
+    Int interval
+    Int window_size
+    Int min_qual
   }
   call WindowedCoverage {
     input:
       input_bam = input_bam,
       sample_name = sample_name,
-      output_dir = output_dir
+      output_dir = output_dir,
+      interval = interval,
+      window_size = window_size,
+      min_qual = min_qual
   }
   output {
     File output_gz = WindowedCoverage.output_gz
@@ -31,6 +37,9 @@ task WindowedCoverage {
     File input_bam
     String sample_name
     String output_dir
+    Int interval = 300
+    Int window_size = 300
+    Int min_qual = 10
 
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
@@ -63,7 +72,7 @@ task WindowedCoverage {
       python /cnv/scripts/counts_for_HMM.py \
             ~{input_bam} \
             $chrom \
-            300 300 10 \
+            ~{interval} ~{window_size} ~{min_qual} \
             ~{output_dir}/${chrom}/counts_for_HMM_${samplename}_${chrom}_output.csv \
             > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_${samplename}_${chrom}.log 2>&1
     done
