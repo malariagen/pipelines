@@ -37,9 +37,9 @@ task WindowedCoverage {
     File input_bam
     String sample_name
     String output_dir
-    Int interval = 300
-    Int window_size = 300
-    Int min_qual = 10
+    Int interval
+    Int window_size
+    Int min_qual
 
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"

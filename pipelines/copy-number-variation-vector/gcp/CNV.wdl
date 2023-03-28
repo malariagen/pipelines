@@ -21,9 +21,9 @@ workflow CNV {
     Array[String] sample_names
     String scripts_folder="/cnv/scripts"
     String output_dir="coverage"
-    Int interval
-    Int window_size
-    Int min_qual
+    Int interval = 300
+    Int window_size = 300
+    Int min_qual = 10
   }
 
   # This is a wdl hack to create a pseudo None
