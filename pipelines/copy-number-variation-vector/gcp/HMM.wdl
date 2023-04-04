@@ -11,13 +11,23 @@ workflow HMM {
   String pipeline_version = "1.0.0"
 
   input {
+    #windowed coverage parameters
     File input_bam
     String sample_name
     String output_dir
     Int interval
     Int window_size
     Int min_qual
+    #coverage summary parameters
+    Float accessibility_threshold
+    Float mapq_threshold
+    File accessibility_mask_file
+    File mapq_file
+    File sample_manifest
+    File gc_content_file
+    String sample_group_id
   }
+
   call WindowedCoverage {
     input:
       input_bam = input_bam,
@@ -31,7 +41,13 @@ workflow HMM {
   call CoverageSummary {
     input:
       coverage_tarball = WindowedCoverage.output_gz,
-      accessibility_threshold = 0.9
+      accessibility_threshold = accessibility_threshold,
+      mapq_threshold = mapq_threshold,
+      accessibility_mask_file = accessibility_mask_file,
+      mapq_file = mapq_file,
+      sample_manifest = sample_manifest,
+      gc_content_file = gc_content_file,
+      sample_group_id = sample_group_id
   }
   
   output {
@@ -124,17 +140,30 @@ task CoverageSummary {
   meta {
     description: "Analyzes the read count for each sample. Computes a GC normalization table that describes the mean read count for each percentile of GC. Computes overall coverage variance. The output is a summary statistics file, 1 per sample"
   }
+  parameter_meta {
+    coverage_tarball: "The input tarball containing the coverage files"
+    accessibility_threshold: "The accessibility threshold to use for the coverage summary calculations. Default is 0.9."
+    mapq_threshold: "The mapq threshold to use for the coverage summary calculations. Default is 0.5."
+    accessibility_mask_file: "The accessibility mask file to use for the coverage summary calculations"
+    mapq_file: "The mapq file to use for the coverage summary calculations"
+    sample_manifest: "The sample manifest file to use for the coverage summary calculations. This is simply a list of all the sample names."
+    gc_content_file: "The gc content file to use for the coverage summary calculations"
+    sample_group_id: "The sample group id to use for the coverage summary calculations"
+    docker: "(optional) the docker image containing the runtime environment for this task"
+    machine_mem_mb: "(optional) the amount of memory (MiB) to provision for this task"
+    cpu: "(optional) the number of cpus to provision for this task"
+    disk: "(optional) the amount of disk space (GiB) to provision for this task"
+    preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+  }
   input {
     File coverage_tarball
-    Int accessibility_threshold
-
-    # Accessibility Threshold = 0.9 (default, hard-coded in the call to calculate_median_coverage_by_GC)
-    # Mapq Threshold = 0.5 (default, hard-coded in the call to calculate_median_coverage_by_GC)
-    # Accessibility Mask File
-    # Mapq File
-    # Sample Manifest
-    # GC Content File (GC composition for the Agam genom)
-    # Sample Group ID (Appears to be a string only used to append to the output filename)
+    Float accessibility_threshold
+    Float mapq_threshold
+    File accessibility_mask_file
+    File mapq_file
+    File sample_manifest
+    File gc_content_file
+    String sample_group_id
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
