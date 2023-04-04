@@ -27,6 +27,13 @@ workflow HMM {
       window_size = window_size,
       min_qual = min_qual
   }
+
+  call CoverageSummary {
+    input:
+      coverage_tarball = WindowedCoverage.output_gz,
+      accessibility_threshold = 0.9
+  }
+  
   output {
     File output_gz = WindowedCoverage.output_gz
   }
@@ -52,14 +59,19 @@ task WindowedCoverage {
   meta {
     description: "Compute aligned read counts across the genome in 300 bp windows. The output is a set of Windowed count reads file, 1 row per window, 1 file per sample - compressed in a tar.gz file to keep the directory structure."
   }
-  # parameter_meta {
-  #   bam_input: "Input bam file containing reads marked with tags for cell barcodes (CB), molecule barcodes (UB) and gene ids (GX)"
-  #   docker: "(optional) the docker image containing the runtime environment for this task"
-  #   machine_mem_mb: "(optional) the amount of memory (MiB) to provision for this task"
-  #   cpu: "(optional) the number of cpus to provision for this task"
-  #   disk: "(optional) the amount of disk space (GiB) to provision for this task"
-  #   preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
-  # }
+  parameter_meta {
+    input_bam: "The input bam file"
+    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
+    output_dir: "The output directory name. This is set to `coverage` by default."
+    interval: "The interval size (bp) to use for the coverage calculations. Default is 300."
+    window_size: "The window size (bp) to use for the coverage calculations. Default is 300."
+    min_qual: "The minimum quality to use for the coverage calculations. Default is 20."
+    docker: "(optional) the docker image containing the runtime environment for this task"
+    machine_mem_mb: "(optional) the amount of memory (MiB) to provision for this task"
+    cpu: "(optional) the number of cpus to provision for this task"
+    disk: "(optional) the amount of disk space (GiB) to provision for this task"
+    preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+  }
   command <<<
     set -x
     echo "Calculating coverage for: " 
