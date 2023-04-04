@@ -49,6 +49,17 @@ task WindowedCoverage {
     Int disk = 70
     Int preemptible = 3
   }
+  meta {
+    description: "Compute aligned read counts across the genome in 300 bp windows. The output is a set of Windowed count reads file, 1 row per window, 1 file per sample - compressed in a tar.gz file to keep the directory structure."
+  }
+  # parameter_meta {
+  #   bam_input: "Input bam file containing reads marked with tags for cell barcodes (CB), molecule barcodes (UB) and gene ids (GX)"
+  #   docker: "(optional) the docker image containing the runtime environment for this task"
+  #   machine_mem_mb: "(optional) the amount of memory (MiB) to provision for this task"
+  #   cpu: "(optional) the number of cpus to provision for this task"
+  #   disk: "(optional) the amount of disk space (GiB) to provision for this task"
+  #   preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+  # }
   command <<<
     set -x
     echo "Calculating coverage for: " 
@@ -97,4 +108,39 @@ task WindowedCoverage {
   }
 }
 
+task CoverageSummary {
+  meta {
+    description: "Analyzes the read count for each sample. Computes a GC normalization table that describes the mean read count for each percentile of GC. Computes overall coverage variance. The output is a summary statistics file, 1 per sample"
+  }
+  input {
+    File coverage_tarball
+    Int accessibility_threshold
 
+    # Accessibility Threshold = 0.9 (default, hard-coded in the call to calculate_median_coverage_by_GC)
+    # Mapq Threshold = 0.5 (default, hard-coded in the call to calculate_median_coverage_by_GC)
+    # Accessibility Mask File
+    # Mapq File
+    # Sample Manifest
+    # GC Content File (GC composition for the Agam genom)
+    # Sample Group ID (Appears to be a string only used to append to the output filename)
+    # runtime values
+    String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
+    String ram = "8000 MiB"
+    Int cpu = 16
+    # TODO: Make disk space dynamic based on input size
+    Int disk = 70
+    Int preemptible = 3
+  }
+  command <<<
+    set -x
+    echo "Calculating stats for: " 
+    #basename ~{input_bam}
+    echo "Current directory: " 
+    pwd
+    #unzip the tarball
+    tar -zxvf ~{coverage_tarball}
+    #cd /cnv/scripts/
+    ls -lht
+    
+  >>>
+}
