@@ -175,7 +175,6 @@ task CoverageSummary {
   command <<<
     set -x
     echo "Calculating stats for: " 
-    #basename ~{input_bam}
     echo "Current directory: " 
     pwd
     #unzip the tarball
