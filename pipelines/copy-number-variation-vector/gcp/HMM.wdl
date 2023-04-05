@@ -174,13 +174,23 @@ task CoverageSummary {
   }
   command <<<
     set -x
-    echo "Calculating stats for: " 
     echo "Current directory: " 
     pwd
     #unzip the tarball
     tar -zxvf ~{coverage_tarball}
     #cd /cnv/scripts/
     ls -lht
-    
+    allchrom=(2L 2R 3L 3R X)
+    source activate cnv37 
+    # Calculate median coverage by GC 
+    echo "Calculating median and variance of coverage by GC bin for sample group ~{sample_group_id}"
+    python /cnv/scripts/calculate_median_coverage_by_GC.py ~{accessibility_threshold} ~{accessibility_mask_file} \
+                                                         ~{mapq_threshold} \
+                                                         ~{mapq_file} \
+                                                         ~{sample_manifest} \
+                                                         ~{gc_content_file} \
+                                                         coverage \
+                                                         ~{sample_group_id} \
+                                                         > coverage/calculate_mean_coverage_by_GC_09_05_~{sample_group_id}.log 2>&1
   >>>
 }
