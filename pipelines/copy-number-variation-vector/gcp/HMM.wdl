@@ -193,6 +193,17 @@ task CoverageSummary {
                                                          ~{sample_group_id} \
                                                          > coverage/calculate_mean_coverage_by_GC_09_05_~{sample_group_id}.log 2>&1
   >>>
+  runtime {
+    docker: docker
+    memory: ram
+    disks: "local-disk ${disk} HDD"
+    cpu: cpu
+    preemptible: preemptible
+  }
+  output {
+    #dummy output
+    String message = read_string(stdout())
+  }
 }
 
 # task CoverageHMM {
