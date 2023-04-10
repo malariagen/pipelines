@@ -194,3 +194,76 @@ task CoverageSummary {
                                                          > coverage/calculate_mean_coverage_by_GC_09_05_~{sample_group_id}.log 2>&1
   >>>
 }
+
+# task CoverageHMM {
+#   meta {
+#     description: "Runs an mHMM on coverage counts obtained from a bamfile, using normalisation based on the mean coverage per GC bin over the whole genome of the individual. The outputs are normalized coverage values, 1 per window, per sample. Copy number state, 1 per window, per sample."
+#   }
+#   parameter_meta {
+#     coverage_tarball: "The input tarball containing the coverage files"
+#     accessibility_threshold: "The accessibility threshold to use for the coverage summary calculations. Default is 0.9."
+#     mapq_threshold: "The mapq threshold to use for the coverage summary calculations. Default is 0.5."
+#     accessibility_mask_file: "The accessibility mask file to use for the coverage summary calculations"
+#     mapq_file: "The mapq file to use for the coverage summary calculations"
+#     sample_manifest: "The sample manifest file to use for the coverage summary calculations. This is simply a list of all the sample names."
+#     gc_content_file: "The gc content file to use for the coverage summary calculations"
+#     sample_group_id: "The sample group id to use for the coverage summary calculations"
+#     docker: "(optional) the docker image containing the runtime environment for this task"
+#     ram: "(optional) the amount of memory (MiB) to provision for this task"
+#     cpu: "(optional) the number of cpus to provision for this task"
+#     disk: "(optional) the amount of disk space (GiB) to provision for this task"
+#     preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+#   }
+#   input {
+#     File sample_manifest
+#     String chrom
+#     File coverage_tarball
+#     File gc_content_file
+#     File coverage_gc
+#     File coverage_variance
+#     File mapq_file
+#     Float mapq_threshold
+#     String species
+
+#     # runtime values
+#     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
+#     String ram = "8000 MiB"
+#     Int cpu = 16
+#     # TODO: Make disk space dynamic based on input size
+#     Int disk = 70
+#     Int preemptible = 3
+#   }
+#   command <<<
+#     set -x
+#     echo "Current directory: " 
+#     pwd
+#     #unzip the tarball
+#     tar -zxvf ~{coverage_tarball}
+#     #cd /cnv/scripts/
+#     ls -lht
+#     allchrom=(2L 2R 3L 3R X)
+#     # Activate the conda environment
+#     source activate cnv37 
+#     # Calculate median coverage by GC 
+#     python /cnv/scripts/HMM_process.py \
+#       ~{sample_manifest} \
+#       ~{chrom} \
+#       coverage \
+#       ~{gc_content_file} \
+#       ~{coverage_gc} \
+#       ~{coverage_variance} \
+#       ~{mapq_file} \
+#       ~{mapq_threshold} \
+#       > coverage/~{chrom}/HMM_logs_~{species}/HMM_~{chrom}.log 2>&1
+
+#       #  $manifest \
+#       #  $chrom \
+#       #  $coveragefolder \
+#       #  $GC_content_file \
+#       #  $coverage_by_GC_file \
+#       #  $coverage_variance_file \
+#       #  $mapq_prop_file \
+#       #  0.5 \
+#       #  > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
+#   >>>
+# }
