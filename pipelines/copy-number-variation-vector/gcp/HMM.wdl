@@ -13,6 +13,7 @@ workflow HMM {
   input {
     #windowed coverage parameters
     File input_bam
+    File input_bai
     String sample_name
     String output_dir
     Int interval
@@ -31,6 +32,7 @@ workflow HMM {
   call WindowedCoverage {
     input:
       input_bam = input_bam,
+      input_bai = input_bai,
       sample_name = sample_name,
       output_dir = output_dir,
       interval = interval,
@@ -58,6 +60,7 @@ workflow HMM {
 task WindowedCoverage {
   input {
     File input_bam
+    File input_bai
     String sample_name
     String output_dir
     Int interval
@@ -76,7 +79,8 @@ task WindowedCoverage {
     description: "Compute aligned read counts across the genome in 300 bp windows. The output is a set of Windowed count reads file, 1 row per window, 1 file per sample - compressed in a tar.gz file to keep the directory structure."
   }
   parameter_meta {
-    input_bam: "The input bam file"
+    input_bam: "The input BAM file"
+    input_bai: "The BAM file's corresponding index file"
     sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
     output_dir: "The output directory name. This is set to `coverage` by default."
     interval: "The interval size (bp) to use for the coverage calculations. Default is 300."

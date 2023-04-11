@@ -19,6 +19,7 @@ workflow CNV {
     String project_id
     # windowed coverage inputs
     Array[File] input_bams
+    Array[File] input_bais
     Array[String] sample_names
     #String scripts_folder="/cnv/scripts"
     String output_dir="coverage"
@@ -46,6 +47,7 @@ workflow CNV {
     call HMM.HMM as HMM {
       input:
         input_bam = input_bams[idx],
+        input_bai = input_bais[idx],
         sample_name = sample_names[idx],
         output_dir = output_dir,
         interval = interval,
