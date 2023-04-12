@@ -96,6 +96,7 @@ task WindowedCoverage {
     set -x
     echo "Calculating coverage for: " 
     basename ~{input_bam}
+    echo "Sample Name: ~{sample_name}"
     echo "Current directory: " 
     pwd
     ls -lht
