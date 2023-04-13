@@ -117,8 +117,8 @@ task WindowedCoverage {
             ~{input_bam} \
             $chrom \
             ~{interval} ~{window_size} ~{min_qual} \
-            ~{output_dir}/${chrom}/counts_for_HMM_${sample_name}_${chrom}_output.csv \
-            > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_${sample_name}_${chrom}.log 2>&1
+            ~{output_dir}/${chrom}/counts_for_HMM_~{sample_name}_${chrom}_output.csv \
+            > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_~{sample_name}_${chrom}.log 2>&1
     done
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
     ls -lht
