@@ -17,13 +17,23 @@ workflow CNV {
 
   input {
     String project_id
+    # windowed coverage inputs
     Array[File] input_bams
+    Array[File] input_bais
     Array[String] sample_names
-    String scripts_folder="/cnv/scripts"
+    #String scripts_folder="/cnv/scripts"
     String output_dir="coverage"
     Int interval = 300
     Int window_size = 300
     Int min_qual = 10
+    # coverage summary stats inputs
+    Float accessibility_threshold = 0.9
+    Float mapq_threshold = 0.5
+    File accessibility_mask_file
+    File mapq_file
+    File sample_manifest
+    File gc_content_file
+    String sample_group_id
   }
 
   # This is a wdl hack to create a pseudo None
@@ -37,11 +47,19 @@ workflow CNV {
     call HMM.HMM as HMM {
       input:
         input_bam = input_bams[idx],
+        input_bai = input_bais[idx],
         sample_name = sample_names[idx],
         output_dir = output_dir,
         interval = interval,
         window_size = window_size,
-        min_qual = min_qual
+        min_qual = min_qual,
+        accessibility_threshold = accessibility_threshold,
+        mapq_threshold = mapq_threshold,
+        accessibility_mask_file = accessibility_mask_file,
+        mapq_file = mapq_file,
+        sample_manifest = sample_manifest,
+        gc_content_file = gc_content_file,
+        sample_group_id = sample_group_id
     }
   }
   output {
