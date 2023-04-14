@@ -152,7 +152,7 @@ Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 #### Step: Target Regions CNV Calls
 **Description:** \
 **Inputs:** \
-**Outputs:** \
+**Outputs:** text file with genotypes \
 **Software:** R version 3.6.1\
 Steps in CNV_pipeline/scripts/target_regions_analysis_vobs.sh\
 ```bash
@@ -169,6 +169,8 @@ Steps in CNV_pipeline/scripts/target_regions_analysis_vobs.sh\
 
 
 ```
+
+## Convert outputs to zarr and vcf 
 
 ## Implementation notes
 
