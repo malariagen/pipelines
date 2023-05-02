@@ -1,6 +1,6 @@
 version 1.0
 
-## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2020
+## Copyright Wellcome Sanger Institute, Oxford University, and the Broad Institute 2023
 ##
 ## This WDL pipeline implements CNV Coverage Calls portion of the vector Copy Number Variation Pipeline as described in:
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
@@ -21,18 +21,7 @@ workflow CNVCoverageCalls {
 **Outputs:** File similar to VCF. Lists variants with genotypes for each sample. 1 per sample set.\
 **Software:** R version 3.6.1\
 Steps in CNV_pipeline/scripts/coverage_CNVs_vobs.sh\
-```bash
-R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
-                                                        $manifest \
-                                                        $coverage_variance_file \
-                                                        $gene_coordinates_file \
-                                                        $detox_genes_file \
-                                                        $workingfolder \
-                                                        $ncores \
-                                                        $outputfolder \
-                                                        $metadata \
-                                                        > $coveragefolder/$chrom/CNV_analysis_logs/CNV_analysis_${output_name}.log 2>&1
-```
+
 
   input {
     String project_id
@@ -48,23 +37,12 @@ R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
 
   String output_basename = project_id + "_" + sample_name
 
-  # Step 1: Extract Diagnostic Reads
-  call TargetRegionsTasks.ExtractDiagnosticReads as ExtractDiagnosticReads {
+  # Step 1: CNV Coverage Calls
+  call CNVCoverageTasks.CNVCoverageCalls as CoverageCalls {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
       project_id = project_id,
-      output_basename = output_basename,
-      runTimeSettings = runTimeSettings,
-      runtime_zones = runtime_zones
-  }
-
-  # Step 2: Target Regions CNV calling
-  call TargetRegionsTasks.TargetRegionsCNVCalling as CNVCalling {
-    input:
-      HMM = CNV_HMM_output,
-      discordant_reads = ExtractDiagnosticReads.discordant_reads_output,
-      breakpoint_reads = ExtractDiagnosticReads.breakpoint_reads_output,
       output_basename = output_basename,
       runTimeSettings = runTimeSettings,
       runtime_zones = runtime_zones
@@ -79,14 +57,19 @@ R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
   }
 }
 
-task ExtractDiagnosticReads {
+task CNVCoverageCalls {
   input {
-    File input_bam
-    File input_bam_index
-    String project_id
-    String output_basename
+    # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
+    # manifest: species specific manifest file - NOTE different from other manifests
+    # coverage_variance_file: output from CoverageSummary step in HMM pipeline
+    # gene_coordinates_file: pipeline input
+    # detox_genes_file: pipeline input
+    # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    # ncores: ??
+    # outputfolder: Make sure that the output name contains the name of the species (since this will be run once per species)
+    # metadata: pipeline input
 
-    String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
+    String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
     Int num_cpu = 1
     RunTimeSettings runTimeSettings
     Int preemptible_tries = runTimeSettings.preemptible_tries
@@ -96,26 +79,16 @@ task ExtractDiagnosticReads {
   }
 
   command <<<
-    # Get the discordant reads
-    # Runs SSFA.py for every chromosome: This script goes through an alignment file and records the positions of reads within a specified region whose mates map to a different chromosome or discordantly on the same chromosome
-    SSFA_script=$scriptsfolder/SSFA.py
-    SSFAfolder=$outputfolder/diagnostic_reads/SSFA
-    python $SSFA_script $bamfile 2R 3425000:3650000 ${SSFAfolder}/2R/Ace1_region/${samplename}_Ace1_SSFA_output.csv 10 > ${SSFAfolder}/2R/Ace1_region/SSFAlogs/${samplename}_Ace1_SSFA_output.log 2>&1
-    python $SSFA_script $bamfile 2R 28460000:28570000 ${SSFAfolder}/2R/Cyp6_region/${samplename}_CYP6_SSFA_output.csv 10 > ${SSFAfolder}/2R/Cyp6_region/SSFAlogs/${samplename}_CYP6_SSFA_output.log 2>&1
-    python $SSFA_script $bamfile 3R 6900000:7000000 ${SSFAfolder}/3R/Cyp6zm_region/${samplename}_CYP6ZM_SSFA_output.csv 10 > ${SSFAfolder}/3R/Cyp6zm_region/SSFAlogs/${samplename}_CYP6ZM_SSFA_output.log 2>&1
-    python $SSFA_script $bamfile 3R 28570000:28620000 ${SSFAfolder}/3R/Gste_region/${samplename}_GST_SSFA_output.csv 10 > ${SSFAfolder}/3R/Gste_region/SSFAlogs/${samplename}_GST_SSFA_output.log 2>&1
-    python $SSFA_script $bamfile X 15220000:15255000 ${SSFAfolder}/X/Cyp9k1_region/${samplename}_CYP9K1_SSFA_output.csv 10 > ${SSFAfolder}/X/Cyp9k1_region/SSFAlogs/${samplename}_CYP9K1_SSFA_output.log 2>&1
-
-    # Get the soft clipped reads
-    # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
-    breakpoints_script=$scriptsfolder/breakpoint_detector.py
-    breakpointsfolder=$outputfolder/diagnostic_reads/breakpoints
-    python $breakpoints_script $bamfile 2R 3425000:3650000 ${breakpointsfolder}/2R/Ace1_region/${samplename}_Ace1_breakpoints_output 10 > ${breakpointsfolder}/2R/Ace1_region/breakpointlogs/${samplename}_Ace1_breakpoints_output.log 2>&1
-    python $breakpoints_script $bamfile 2R 28460000:28570000 ${breakpointsfolder}/2R/Cyp6_region/${samplename}_CYP6_breakpoints_output 10 > ${breakpointsfolder}/2R/Cyp6_region/breakpointlogs/${samplename}_CYP6_breakpoints_output.log 2>&1
-    python $breakpoints_script $bamfile 3R 6900000:7000000 ${breakpointsfolder}/3R/Cyp6zm_region/${samplename}_CYP6ZM_breakpoints_output 10 > ${breakpointsfolder}/3R/Cyp6zm_region/breakpointlogs/${samplename}_CYP6ZM_breakpoints_output.log 2>&1
-    python $breakpoints_script $bamfile 3R 28570000:28620000 ${breakpointsfolder}/3R/Gste_region/${samplename}_GST_breakpoints_output 10 > ${breakpointsfolder}/3R/Gste_region/breakpointlogs/${samplename}_GST_breakpoints_output.log 2>&1
-    python $breakpoints_script $bamfile X 15220000:15255000 ${breakpointsfolder}/X/Cyp9k1_region/${samplename}_CYP9K1_breakpoints_output 10 > ${breakpointsfolder}/X/Cyp9k1_region/breakpointlogs/${samplename}_CYP9K1_breakpoints_output.log 2>&1
-
+    R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
+      $manifest \
+      $coverage_variance_file \
+      $gene_coordinates_file \
+      $detox_genes_file \
+      $workingfolder \
+      $ncores \
+      $outputfolder \
+      $metadata \
+      > $coveragefolder/$chrom/CNV_analysis_logs/CNV_analysis_${output_name}.log 2>&1
   >>>
   runtime {
     docker: docker
@@ -127,56 +100,5 @@ task ExtractDiagnosticReads {
   }
   output {
     File diagnostic_reads_tar = # zip of the directory structure for the extract diagnostic reads step
-  }
-}
-
-task TargetRegionsCNVCalling {
-  input {
-    File sample_manifest        # manifest: pipeline input
-    # gene_coordinates_file
-    # metadata
-    # species_id_file
-    # coverage_variance_file
-    # coveragefolder
-    File diagnostic_reads_tar   # diagnostic_reads_folder: output of ExtractDiagnosticReads
-    # plotting_functions_file
-    # ncores
-
-    String project_id
-    String output_basename
-
-    String docker # add R docker
-    Int num_cpu = 1
-    RunTimeSettings runTimeSettings
-    Int preemptible_tries = runTimeSettings.preemptible_tries
-    String runtime_zones = "us-central1-b"
-    Float mem_gb = 3.75
-    Int disk_gb = 50
-  }
-
-
-  command <<<
-    R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args $manifest \
-      $gene_coordinates_file \
-      $metadata \
-      $species_id_file \
-      $coverage_variance_file \
-      $coveragefolder \
-      $diagnostic_reads_folder \
-      $plotting_functions_file \
-      $ncores \
-      > target_regions_analysis/target_regions_analysis.log 2>&1
-  >>>
-  runtime {
-    docker: docker
-    preemptible: preemptible_tries
-    cpu: num_cpu
-    memory: mem_gb + " GiB"
-    disks: "local-disk " + disk_gb + " HDD"
-    zones: runtime_zones
-  }
-  output {
-    File output_file = local_file
-    File output_index_file = "~{local_file}.tbi"
   }
 }

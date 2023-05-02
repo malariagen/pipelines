@@ -46,6 +46,15 @@ workflow TargetRegions {
   # Step 2: Target Regions CNV calling
   call TargetRegionsTasks.TargetRegionsCNVCalling as CNVCalling {
     input:
+      sample_manifest = sample_manifest
+      gene_coordinates_file
+      sample_metadata
+      species_id_file
+      coverage_variance_file
+      coverage_tar
+      diagnostic_reads_tar
+      plotting_functions_file
+
       HMM = CNV_HMM_output,
       discordant_reads = ExtractDiagnosticReads.discordant_reads_output,
       breakpoint_reads = ExtractDiagnosticReads.breakpoint_reads_output,
@@ -116,21 +125,20 @@ task ExtractDiagnosticReads {
 
 task TargetRegionsCNVCalling {
   input {
-    File sample_manifest        # manifest: pipeline input
-    # gene_coordinates_file
-    # metadata
-    # species_id_file
-    # coverage_variance_file
-    # coveragefolder
-    File diagnostic_reads_tar   # diagnostic_reads_folder: output of ExtractDiagnosticReads
-    # plotting_functions_file
-    # ncores
+    File sample_manifest              # manifest: pipeline input
+    File gene_coordinates_file        # gene_coordinates_file: pipeline input
+    File sample_metadata              # metadata: pipeline input
+    File species_id_file              # species_id_file: pipeine input
+    File coverage_variance_file       # coverage_variance_file: output from CoverageSummary step in HMM pipeline
+    File coverage_tar                 # coveragefolder: output from CoverageSummary step in HMM pipeline
+    File diagnostic_reads_tar         # diagnostic_reads_folder: output of ExtractDiagnosticReads
+    File plotting_functions_file      # plotting_functions_file
 
     String project_id
     String output_basename
 
-    String docker # add R docker
-    Int num_cpu = 1
+    String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
+    Int num_cpu = 8
     RunTimeSettings runTimeSettings
     Int preemptible_tries = runTimeSettings.preemptible_tries
     String runtime_zones = "us-central1-b"
@@ -140,15 +148,16 @@ task TargetRegionsCNVCalling {
 
 
   command <<<
-    R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args $manifest \
-      $gene_coordinates_file \
-      $metadata \
-      $species_id_file \
-      $coverage_variance_file \
-      $coveragefolder \
-      $diagnostic_reads_folder \
-      $plotting_functions_file \
-      $ncores \
+    # need to unzip the tarred folders before passing them here
+    R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args ~{sample_manifest}# $manifest \
+      ~{gene_coordinates_file} \      # $gene_coordinates_file
+      ~{sample_metadata} \            # $metadata
+      ~{species_id_file} \            # $species_id_file
+      ~{coverage_variance_file} \     # $coverage_variance_file
+      ~{coverage_tar} \               # $coveragefolder
+      ~{diagnostic_reads_tar} \       # $diagnostic_reads_folder
+      ~{plotting_functions_file} \    # $plotting_functions_file
+      ~{num_cpu} \                    # $ncores
       > target_regions_analysis/target_regions_analysis.log 2>&1
   >>>
   runtime {
