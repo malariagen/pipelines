@@ -49,7 +49,8 @@ workflow HMM {
       mapq_file = mapq_file,
       sample_manifest = sample_manifest,
       gc_content_file = gc_content_file,
-      sample_group_id = sample_group_id
+      sample_group_id = sample_group_id,
+      output_dir = output_dir
   }
   
   output {
@@ -169,6 +170,7 @@ task CoverageSummary {
     File sample_manifest
     File gc_content_file
     String sample_group_id
+    String output_dir
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -196,10 +198,13 @@ task CoverageSummary {
             ~{mapq_file} \
             ~{sample_manifest} \
             ~{gc_content_file} \
-            coverage \
+            ~{output_dir} \
             ~{sample_group_id} \
             > calculate_mean_coverage_by_GC_~{sample_group_id}.log 2>&1
     ls -lht
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
+    #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
+    #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #TODO: Create output variables for the output of this script
   >>>
   runtime {
@@ -211,7 +216,12 @@ task CoverageSummary {
   }
   output {
     #log output
+    #${orig//[xyz]/_} ${~{accessibility_threshold}//./} ${~{mapq_threshold}//./}
+    #select_first(glob("~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"))
     File logs = "calculate_mean_coverage_by_GC_~{sample_group_id}.log"
+    File coverage_output = "~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"
+    File variance_output = "~{output_dir}/coverage_variance_masked_*_~{sample_group_id}.csv"
+    File output_gz = "~{output_dir}.tar.gz"
   }
 }
 
