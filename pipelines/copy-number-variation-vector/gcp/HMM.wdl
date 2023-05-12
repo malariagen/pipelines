@@ -54,7 +54,7 @@ workflow HMM {
   }
   
   output {
-    File output_gz = WindowedCoverage.output_gz
+    File output_gz = CoverageSummary.output_gz
   }
 }
 
