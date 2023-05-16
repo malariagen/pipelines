@@ -180,8 +180,8 @@ task CoverageSummary {
     Int preemptible = 3
   }
   
-  String acc_threshold = sub(accessibility_threshold + "_", ".", "")
-  String m_threshold = sub(mapq_threshold + "_", ".", "")
+  String acc_threshold = sub((accessibility_threshold + "_"), ".", "")
+  String m_threshold = sub((mapq_threshold + "_"), ".", "")
   String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   command <<<
@@ -208,6 +208,7 @@ task CoverageSummary {
             > calculate_mean_coverage_by_GC_~{sample_group_id}.log 2>&1
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
+    echo "Numbers: ~{acc_threshold} ~{m_threshold} ~{sample_group_id}"
     #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #TODO: Create output variables for the output of this script
