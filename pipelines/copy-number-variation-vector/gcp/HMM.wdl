@@ -178,6 +178,7 @@ task CoverageSummary {
     # TODO: Make disk space dynamic based on input size
     Int disk = 70
     Int preemptible = 3
+    String coverage_output_filename = ""
   }
   command <<<
     set -x
@@ -206,6 +207,12 @@ task CoverageSummary {
     #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #TODO: Create output variables for the output of this script
+    acc_threshold = ~{accessibility_threshold}
+    m_threshold = ~{mapq_threshold}
+    sg_id = ~{sample_group_id}
+    coverage_output_str="~{output_dir}/median_coverage_by_GC_masked_${acc_threshold//./_}_${m_threshold//./_}_${sg_id//./_}.csv"
+    echo "Coverage output string resolved: ${coverage_output_str}""
+    coverage_output_filename = "${coverage_output_str}""
   >>>
   runtime {
     docker: docker
@@ -219,8 +226,8 @@ task CoverageSummary {
     #${orig//[xyz]/_} ${~{accessibility_threshold}//./} ${~{mapq_threshold}//./}
     #select_first(glob("~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"))
     File logs = "calculate_mean_coverage_by_GC_~{sample_group_id}.log"
-    File coverage_output = "~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"
-    File variance_output = "~{output_dir}/coverage_variance_masked_*_~{sample_group_id}.csv"
+    File coverage_output = "~{coverage_output_filename}"
+    #File variance_output = "~{output_dir}/coverage_variance_masked_*_~{sample_group_id}.csv"
     File output_gz = "~{output_dir}.tar.gz"
   }
 }
