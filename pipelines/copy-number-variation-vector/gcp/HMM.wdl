@@ -209,7 +209,6 @@ task CoverageSummary {
             > calculate_mean_coverage_by_GC_~{sample_group_id}.log 2>&1
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
-    #echo "Temp variables: ~{at_temp} ~{mt_temp}"
     echo "Numbers: ~{acc_threshold} ~{m_threshold} ~{sample_group_id}"
     #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
