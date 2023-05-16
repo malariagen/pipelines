@@ -6,7 +6,6 @@ version 1.0
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
 ##.
 
-import "../../../structs/gcp/RunTimeSettings.wdl"
 import "../../../tasks/gcp/Tasks.wdl" as Tasks
 import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as StatisticalPhasingTasks
 
@@ -31,7 +30,15 @@ Steps in CNV_pipeline/scripts/coverage_CNVs_vobs.sh\
 
     File CNV_HMM_output
 
-    RunTimeSettings runTimeSettings
+    String chromosome
+    File sample_species_manifest
+    File coverage_variance_file
+    File gene_coordinates_file
+    File detox_genes_file
+    File HMM_working_dir_tar
+    File sample_metadata
+
+    Int preemptible_tries
     String runtime_zones
   }
 
@@ -40,12 +47,15 @@ Steps in CNV_pipeline/scripts/coverage_CNVs_vobs.sh\
   # Step 1: CNV Coverage Calls
   call CNVCoverageTasks.CNVCoverageCalls as CoverageCalls {
     input:
-      input_bam = input_bam,
-      input_bam_index = input_bam_index,
-      project_id = project_id,
-      output_basename = output_basename,
-      runTimeSettings = runTimeSettings,
-      runtime_zones = runtime_zones
+    chromosome = chromosome,
+    sample_species_manifest = sample_species_manifest,
+    coverage_variance_file = coverage_variance_file,
+    gene_coordinates_file = gene_coordinates_file,
+    detox_genes_file = detox_genes_file,
+    HMM_working_dir_tar = HMM_working_dir_tar,
+    sample_metadata = sample_metadata,
+    preemptible_tries = preemptible_tries,
+    runtime_zones = runtime_zones,
   }
 
   meta {
@@ -59,26 +69,29 @@ Steps in CNV_pipeline/scripts/coverage_CNVs_vobs.sh\
 
 task CNVCoverageCalls {
   input {
-    # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
-    # manifest: species specific manifest file - NOTE different from other manifests
-    # coverage_variance_file: output from CoverageSummary step in HMM pipeline
-    # gene_coordinates_file: pipeline input
-    # detox_genes_file: pipeline input
-    # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
-    # ncores: ??
-    # outputfolder: Make sure that the output name contains the name of the species (since this will be run once per species)
-    # metadata: pipeline input
+    String chromosome               # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
+    File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
+    File coverage_variance_file     # coverage_variance_file: output from CoverageSummary step in HMM pipeline
+    File gene_coordinates_file      # gene_coordinates_file: pipeline input
+    File detox_genes_file           # detox_genes_file: pipeline input
+    File HMM_working_dir_tar        # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File sample_metadata            # metadata: pipeline input
 
+    # Runtime Settings
+    Int preemptible_tries
+    String runtime_zones
     String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
     Int num_cpu = 1
-    RunTimeSettings runTimeSettings
-    Int preemptible_tries = runTimeSettings.preemptible_tries
-    String runtime_zones = "us-central1-b"
     Float mem_gb = 3.75
     Int disk_gb = 50
   }
+  # ncores: number of CPUs - has not been optimized
+  # outputfolder: Make sure that the output name contains the name of the species (since this will be run once per species)
+
 
   command <<<
+    # set up directories as needed
+
     R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args $chrom \
       $manifest \
       $coverage_variance_file \
