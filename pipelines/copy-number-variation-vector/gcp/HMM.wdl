@@ -179,8 +179,6 @@ task CoverageSummary {
     Int disk = 70
     Int preemptible = 3
   }
-  #String at_temp = accessibility_threshold + "_"
-  #String mt_temp = mapq_threshold + "_"
   String acc_threshold = sub(accessibility_threshold + "_", "\.", "")
   String m_threshold = sub(mapq_threshold + "_", "\.", "")
   String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
