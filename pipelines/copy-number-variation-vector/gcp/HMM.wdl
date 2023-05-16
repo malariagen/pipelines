@@ -181,8 +181,8 @@ task CoverageSummary {
   }
   String at_temp = accessibility_threshold + "_"
   String mt_temp = mapq_threshold + "_"
-  String acc_threshold = sub(at_temp, ".", "")
-  String m_threshold = sub(mt_temp, ".", "")
+  String acc_threshold = sub(at_temp, "\.", "")
+  String m_threshold = sub(mt_temp, "\.", "")
   String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   command <<<
