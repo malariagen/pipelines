@@ -212,7 +212,7 @@ task CoverageSummary {
     sg_id=~{sample_group_id}
     coverage_output_str="~{output_dir}/median_coverage_by_GC_masked_${acc_threshold//./_}_${m_threshold//./_}_${sg_id//./_}.csv"
     echo "Coverage output string resolved: ${coverage_output_str}"
-    coverage_output_filename="${coverage_output_str}""
+    coverage_output_filename="${coverage_output_str}"
   >>>
   runtime {
     docker: docker
