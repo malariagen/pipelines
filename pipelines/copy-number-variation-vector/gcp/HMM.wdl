@@ -180,10 +180,10 @@ task CoverageSummary {
     Int preemptible = 3
   }
   
-  String acc_threshold = sub(accessibility_threshold, ".", "_")
-  String m_threshold = sub(mapq_threshold, ".", "_")
-  String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + "_" + m_threshold + "_" + sample_group_id + ".csv"
-  String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + "_" + m_threshold + "_" + sample_group_id + ".csv"
+  String acc_threshold = sub(accessibility_threshold + "_", ".", "_")
+  String m_threshold = sub(mapq_threshold + "_", ".", "_")
+  String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
+  String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   command <<<
     set -x
     echo "Current directory: " 
