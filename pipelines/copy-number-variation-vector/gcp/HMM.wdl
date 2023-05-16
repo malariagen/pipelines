@@ -207,12 +207,12 @@ task CoverageSummary {
     #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
     #TODO: Create output variables for the output of this script
-    acc_threshold = ~{accessibility_threshold}
-    m_threshold = ~{mapq_threshold}
-    sg_id = ~{sample_group_id}
+    acc_threshold=~{accessibility_threshold}
+    m_threshold=~{mapq_threshold}
+    sg_id=~{sample_group_id}
     coverage_output_str="~{output_dir}/median_coverage_by_GC_masked_${acc_threshold//./_}_${m_threshold//./_}_${sg_id//./_}.csv"
-    echo "Coverage output string resolved: ${coverage_output_str}""
-    coverage_output_filename = "${coverage_output_str}""
+    echo "Coverage output string resolved: ${coverage_output_str}"
+    coverage_output_filename="${coverage_output_str}""
   >>>
   runtime {
     docker: docker
