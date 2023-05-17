@@ -18,7 +18,7 @@ workflow TargetRegions {
     File input_bam_index
     File sample_manifest
     File gene_coordinates_file
-    File metadata
+    File sample_metadata
     File species_id_file
 
     File CNV_HMM_output # zip of the coveragefolder
@@ -36,8 +36,8 @@ workflow TargetRegions {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
+      sample_name = sample_name,
       project_id = project_id,
-      output_basename = output_basename,
       preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
@@ -45,20 +45,15 @@ workflow TargetRegions {
   # Step 2: Target Regions CNV calling
   call TargetRegionsTasks.TargetRegionsCNVCalling as CNVCalling {
     input:
-      sample_manifest = sample_manifest
-      gene_coordinates_file
-      sample_metadata
-      species_id_file
-      coverage_variance_file
-      coverage_tar
-      diagnostic_reads_tar
-      plotting_functions_file
-
-      HMM = CNV_HMM_output,
-      discordant_reads = ExtractDiagnosticReads.discordant_reads_output,
-      breakpoint_reads = ExtractDiagnosticReads.breakpoint_reads_output,
-      output_basename = output_basename,
-      runTimeSettings = runTimeSettings,
+      sample_manifest = sample_manifest,
+      gene_coordinates_file = gene_coordinates_file,
+      sample_metadata = sample_metadata,
+      species_id_file = species_id_file,
+      coverage_variance_file = HMM_coverage_variance_file,
+      coverage_tar = CNV_HMM_output,
+      diagnostic_reads_tar = ExtractDiagnosticReads.diagnostic_reads_tar,
+      plotting_functions_file = plotting_functions_file,
+      preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
 
@@ -77,7 +72,6 @@ task ExtractDiagnosticReads {
     File input_bam_index
     String sample_name
     String project_id
-    String output_basename
 
     Int preemptible_tries
     String runtime_zones
@@ -87,27 +81,31 @@ task ExtractDiagnosticReads {
     Int disk_gb = 50
   }
 
+  String output_dir = project_id
+
   command <<<
     # Get the discordant reads
     # Runs SSFA.py for every chromosome: This script goes through an alignment file and records the positions of reads within a specified region whose mates map to a different chromosome or discordantly on the same chromosome
     SSFA_script=/cnv/scripts//SSFA.py
-    SSFAfolder=$outputfolder/diagnostic_reads/SSFA
-    python $SSFA_script ~{input_bam} 2R 3425000:3650000 ${SSFAfolder}/2R/Ace1_region/~{samplename}_Ace1_SSFA_output.csv 10 > ${SSFAfolder}/2R/Ace1_region/SSFAlogs/~{samplename}_Ace1_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 2R 28460000:28570000 ${SSFAfolder}/2R/Cyp6_region/~{samplename}_CYP6_SSFA_output.csv 10 > ${SSFAfolder}/2R/Cyp6_region/SSFAlogs/~{samplename}_CYP6_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 3R 6900000:7000000 ${SSFAfolder}/3R/Cyp6zm_region/~{samplename}_CYP6ZM_SSFA_output.csv 10 > ${SSFAfolder}/3R/Cyp6zm_region/SSFAlogs/~{samplename}_CYP6ZM_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 3R 28570000:28620000 ${SSFAfolder}/3R/Gste_region/~{samplename}_GST_SSFA_output.csv 10 > ${SSFAfolder}/3R/Gste_region/SSFAlogs/~{samplename}_GST_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} X 15220000:15255000 ${SSFAfolder}/X/Cyp9k1_region/~{samplename}_CYP9K1_SSFA_output.csv 10 > ${SSFAfolder}/X/Cyp9k1_region/SSFAlogs/~{samplename}_CYP9K1_SSFA_output.log 2>&1
+    SSFAfolder=~{output_dir}/diagnostic_reads/SSFA
+    python $SSFA_script ~{input_bam} 2R 3425000:3650000 ${SSFAfolder}/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > ${SSFAfolder}/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
+    python $SSFA_script ~{input_bam} 2R 28460000:28570000 ${SSFAfolder}/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > ${SSFAfolder}/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
+    python $SSFA_script ~{input_bam} 3R 6900000:7000000 ${SSFAfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > ${SSFAfolder}/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
+    python $SSFA_script ~{input_bam} 3R 28570000:28620000 ${SSFAfolder}/3R/Gste_region/~{sample_name}_GST_SSFA_output.csv 10 > ${SSFAfolder}/3R/Gste_region/SSFAlogs/~{sample_name}_GST_SSFA_output.log 2>&1
+    python $SSFA_script ~{input_bam} X 15220000:15255000 ${SSFAfolder}/X/Cyp9k1_region/~{sample_name}_CYP9K1_SSFA_output.csv 10 > ${SSFAfolder}/X/Cyp9k1_region/SSFAlogs/~{sample_name}_CYP9K1_SSFA_output.log 2>&1
 
     # Get the soft clipped reads
     # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
     breakpoints_script=/cnv/scripts//breakpoint_detector.py
-    breakpointsfolder=$outputfolder/diagnostic_reads/breakpoints
-    python $breakpoints_script ~{input_bam} 2R 3425000:3650000 ${breakpointsfolder}/2R/Ace1_region/~{samplename}_Ace1_breakpoints_output 10 > ${breakpointsfolder}/2R/Ace1_region/breakpointlogs/~{samplename}_Ace1_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 2R 28460000:28570000 ${breakpointsfolder}/2R/Cyp6_region/~{samplename}_CYP6_breakpoints_output 10 > ${breakpointsfolder}/2R/Cyp6_region/breakpointlogs/~{samplename}_CYP6_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 3R 6900000:7000000 ${breakpointsfolder}/3R/Cyp6zm_region/~{samplename}_CYP6ZM_breakpoints_output 10 > ${breakpointsfolder}/3R/Cyp6zm_region/breakpointlogs/~{samplename}_CYP6ZM_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 3R 28570000:28620000 ${breakpointsfolder}/3R/Gste_region/~{samplename}_GST_breakpoints_output 10 > ${breakpointsfolder}/3R/Gste_region/breakpointlogs/~{samplename}_GST_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} X 15220000:15255000 ${breakpointsfolder}/X/Cyp9k1_region/~{samplename}_CYP9K1_breakpoints_output 10 > ${breakpointsfolder}/X/Cyp9k1_region/breakpointlogs/~{samplename}_CYP9K1_breakpoints_output.log 2>&1
+    breakpointsfolder=~{output_dir}/diagnostic_reads/breakpoints
+    python $breakpoints_script ~{input_bam} 2R 3425000:3650000 ${breakpointsfolder}/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > ${breakpointsfolder}/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
+    python $breakpoints_script ~{input_bam} 2R 28460000:28570000 ${breakpointsfolder}/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > ${breakpointsfolder}/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
+    python $breakpoints_script ~{input_bam} 3R 6900000:7000000 ${breakpointsfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_breakpoints_output 10 > ${breakpointsfolder}/3R/Cyp6zm_region/breakpointlogs/~{sample_name}_CYP6ZM_breakpoints_output.log 2>&1
+    python $breakpoints_script ~{input_bam} 3R 28570000:28620000 ${breakpointsfolder}/3R/Gste_region/~{sample_name}_GST_breakpoints_output 10 > ${breakpointsfolder}/3R/Gste_region/breakpointlogs/~{sample_name}_GST_breakpoints_output.log 2>&1
+    python $breakpoints_script ~{input_bam} X 15220000:15255000 ${breakpointsfolder}/X/Cyp9k1_region/~{sample_name}_CYP9K1_breakpoints_output 10 > ${breakpointsfolder}/X/Cyp9k1_region/breakpointlogs/~{sample_name}_CYP9K1_breakpoints_output.log 2>&1
 
+    ls -lht
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
   >>>
   runtime {
     docker: docker
@@ -118,7 +116,7 @@ task ExtractDiagnosticReads {
     zones: runtime_zones
   }
   output {
-    File diagnostic_reads_tar = # zip of the directory structure for the extract diagnostic reads step
+    File diagnostic_reads_tar = "~{output_dir}.tar.gz"
   }
 }
 
@@ -133,9 +131,6 @@ task TargetRegionsCNVCalling {
     File diagnostic_reads_tar         # diagnostic_reads_folder: output of ExtractDiagnosticReads
     File plotting_functions_file      # plotting_functions_file
 
-    String project_id
-    String output_basename
-
     String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
     Int num_cpu = 8
     RunTimeSettings runTimeSettings
@@ -144,7 +139,6 @@ task TargetRegionsCNVCalling {
     Float mem_gb = 3.75
     Int disk_gb = 50
   }
-
 
   command <<<
     # need to unzip the tarred folders before passing them here
@@ -159,6 +153,7 @@ task TargetRegionsCNVCalling {
       ~{num_cpu} \                    # $ncores
       > target_regions_analysis/target_regions_analysis.log 2>&1
   >>>
+
   runtime {
     docker: docker
     preemptible: preemptible_tries
@@ -167,8 +162,10 @@ task TargetRegionsCNVCalling {
     disks: "local-disk " + disk_gb + " HDD"
     zones: runtime_zones
   }
+
   output {
-    File output_file = local_file
-    File output_index_file = "~{local_file}.tbi"
+    File focal_region_CNV_table = "target_regions_analysis/focal_region_CNV_table.csv"
+    File HMM_gene_copy_number = "target_regions_analysis/HMM_gene_copy_number.csv'"
+    File target_regions_Rdata = "target_regions_analysis/target_regions_analysis.Rdata"
   }
 }
