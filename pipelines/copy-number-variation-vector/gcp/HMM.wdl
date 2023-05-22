@@ -245,8 +245,8 @@ task CoverageSummary {
     #${orig//[xyz]/_} ${~{accessibility_threshold}//./} ${~{mapq_threshold}//./}
     #select_first(glob("~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"))
     File logs = "calculate_mean_coverage_by_GC_~{sample_group_id}.log"
-    File coverage_output = coverage_output_filename
-    File variance_output = variance_output_filename
+    File coverage_output = "~{output_dir}/coverage_output_filename"
+    File variance_output = "~{output_dir}/variance_output_filename"
     File output_gz = "~{output_dir}.tar.gz"
   }
 }
