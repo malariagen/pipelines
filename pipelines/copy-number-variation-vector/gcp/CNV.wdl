@@ -26,7 +26,7 @@ workflow CNV {
     Int interval = 300
     Int window_size = 300
     Int min_qual = 10
-    # coverage summary stats inputs
+    # coverage summary stats and coverage HMM inputs
     Float accessibility_threshold = 0.9
     Float mapq_threshold = 0.5
     File accessibility_mask_file
@@ -34,6 +34,8 @@ workflow CNV {
     File sample_manifest
     File gc_content_file
     String sample_group_id
+    #coverage HMM inputs
+    String species
   }
 
   # This is a wdl hack to create a pseudo None
@@ -59,7 +61,8 @@ workflow CNV {
         mapq_file = mapq_file,
         sample_manifest = sample_manifest,
         gc_content_file = gc_content_file,
-        sample_group_id = sample_group_id
+        sample_group_id = sample_group_id,
+        species = species
     }
   }
   output {

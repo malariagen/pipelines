@@ -27,6 +27,7 @@ workflow HMM {
     File sample_manifest
     File gc_content_file
     String sample_group_id
+    String species
   }
 
   call WindowedCoverage {
@@ -50,6 +51,28 @@ workflow HMM {
       sample_manifest = sample_manifest,
       gc_content_file = gc_content_file,
       sample_group_id = sample_group_id,
+      output_dir = output_dir
+  }
+
+  call CoverageHMM {
+    input:
+  #     # File sample_manifest
+  #     # String chrom
+  #     # File coverage_tarball
+  #     # File gc_content_file
+  #     # File coverage_gc
+  #     # File coverage_variance
+  #     # File mapq_file
+  #     # Float mapq_threshold
+  #     # String species
+      sample_manifest = sample_manifest,
+      coverage_tarball = CoverageSummary.output_gz,
+      gc_content_file = gc_content_file,
+      coverage_gc = CoverageSummary.coverage_output,
+      coverage_variance = CoverageSummary.variance_output,
+      mapq_file = mapq_file,
+      mapq_threshold = mapq_threshold,
+      species =  species,
       output_dir = output_dir
   }
   
@@ -181,8 +204,8 @@ task CoverageSummary {
   }
   String acc_threshold = sub(accessibility_threshold + "_", "[.]", "")
   String m_threshold = sub(mapq_threshold + "_", "[.]", "")
-  String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
-  String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
+  String coverage_output_filename = "median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
+  String variance_output_filename = "coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   command <<<
     set -x
     echo "Current directory: " 
@@ -208,9 +231,7 @@ task CoverageSummary {
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
     echo "Numbers: ~{acc_threshold} ~{m_threshold} ~{sample_group_id}"
-    #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
-    #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
-    #TODO: Create output variables for the output of this script
+  
   >>>
   runtime {
     docker: docker
@@ -236,7 +257,6 @@ task CoverageHMM {
   }
   parameter_meta {
     sample_manifest: "The sample manifest file to use for the HMM calculations. This is simply a list of all the sample names."
-    chrom: "The chromosome to run the coverage HMM on"
     coverage_tarball: "The input tarball containing the coverage files"
     gc_content_file: "The gc content file to use for the HMM calculations"
     coverage_gc: "The coverage gc file to use for the HMM calculations"
@@ -252,7 +272,6 @@ task CoverageHMM {
   }
   input {
     File sample_manifest
-    String chrom
     File coverage_tarball
     File gc_content_file
     File coverage_gc
@@ -260,7 +279,7 @@ task CoverageHMM {
     File mapq_file
     Float mapq_threshold
     String species
-
+    String output_dir
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -280,26 +299,43 @@ task CoverageHMM {
     allchrom=(2L 2R 3L 3R X)
     # Activate the conda environment
     source activate cnv37 
-    # Calculate median coverage by GC 
-    python /cnv/scripts/HMM_process.py \
-      ~{sample_manifest} \
-      ~{chrom} \
-      coverage \
-      ~{gc_content_file} \
-      ~{coverage_gc} \
-      ~{coverage_variance} \
-      ~{mapq_file} \
-      ~{mapq_threshold} \
-      > coverage/~{chrom}/HMM_logs_~{species}/HMM_~{chrom}.log 2>&1
+    for chrom in ${allchrom[@]}
+    do
+      # run an mHMM on coverage counts
+      python /cnv/scripts/HMM_process.py \
+        ~{sample_manifest} \
+        $chrom \
+        ~{output_dir} \
+        ~{gc_content_file} \
+        ~{coverage_gc} \
+        ~{coverage_variance} \
+        ~{mapq_file} \
+        ~{mapq_threshold} \
+        > ~{output_dir}/$chrom/HMM_logs_~{species}/HMM_$chrom.log 2>&1
 
-      #  $manifest \
-      #  $chrom \
-      #  $coveragefolder \
-      #  $GC_content_file \
-      #  $coverage_by_GC_file \
-      #  $coverage_variance_file \
-      #  $mapq_prop_file \
-      #  0.5 \
-      #  > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
+        #  $manifest \
+        #  $chrom \
+        #  $coveragefolder \
+        #  $GC_content_file \
+        #  $coverage_by_GC_file \
+        #  $coverage_variance_file \
+        #  $mapq_prop_file \
+        #  0.5 \
+        #  > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
+    done
+    ls -lht
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
   >>>
+  runtime {
+    docker: docker
+    memory: ram
+    disks: "local-disk ${disk} HDD"
+    cpu: cpu
+    preemptible: preemptible
+  }
+  output {
+    #log outputs
+    Array[File] logs = glob("*.log")
+    File output_gz = "~{output_dir}.tar.gz"
+  }
 }

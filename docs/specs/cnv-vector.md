@@ -41,7 +41,7 @@ cohort of multiple samples. The pipeline inclludes an HMM step followed by cover
 #### Step: Windowed Coverage
 **Description:** Divides the genome into 300bp windows and counts the number of reads for each window.\
 **Inputs:** Bam file, 1 per sample\
-**Outputs:** Windowed count reads file, 1 row per window, 1 file per sample \
+**Outputs:** Windowed count reads file, 1 row per window, 1 file per sample per chromosome. \
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 ```bash
@@ -58,7 +58,7 @@ Steps in CNV_pipeline/scripts/get_windowed_coverage_and_diagnostic_reads.sh\
 #### Step: Calculate Coverage Summary Stats
 **Description:** Analyzes the read count for each sample. Computes a GC normalization table that describes the mean read count for each percentile of GC. Computes overall coverage variance \
 **Inputs:** Windowed count reads file, 1 per sample\
-**Outputs:** Summary statistics file, 1 per sample\
+**Outputs:** Summary statistics files per sample: median_coverage_by_GC_masked and coverage_variance_masked CSVs \
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/get_coverage_stats_by_sample_set_vobs.sh\
 ```bash
@@ -76,7 +76,7 @@ Steps in CNV_pipeline/scripts/get_coverage_stats_by_sample_set_vobs.sh\
 
 #### Step: CNV HMM
 **Description:** Normalizes the read count for each sample by dividing by the modal coverage for each windw. Fits an HM to the normalized read counts , \
-**Inputs:** Windowed count reads file, 1 per sample. Coverage variance statistics, 1 per sample\
+**Inputs:** Windowed count reads file, 1 per sample per chromosome. Coverage variance statisticss, 2 CSVs per sample\
 **Outputs:** Normalized coverage values, 1 per window, per sample. Copy number state, 1 per window, per sample. \
 **Software:** Python virtualenv cnv37\
 Steps in CNV_pipeline/scripts/coverage_HMM_vobs.sh\
