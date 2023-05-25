@@ -299,6 +299,7 @@ task CoverageHMM {
     allchrom=(2L 2R 3L 3R X)
     # Activate the conda environment
     source activate cnv37 
+    mkdir -p ~{output_dir}/$chrom/HMM_logs_~{species}/
     for chrom in ${allchrom[@]}
     do
       # run an mHMM on coverage counts
