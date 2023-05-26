@@ -314,16 +314,6 @@ task CoverageHMM {
         ~{mapq_file} \
         ~{mapq_threshold} \
         > ~{output_dir}/$chrom/HMM_logs_~{species}/HMM_$chrom.log 2>&1
-
-        #  $manifest \
-        #  $chrom \
-        #  $coveragefolder \
-        #  $GC_content_file \
-        #  $coverage_by_GC_file \
-        #  $coverage_variance_file \
-        #  $mapq_prop_file \
-        #  0.5 \
-        #  > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
     done
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
