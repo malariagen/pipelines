@@ -302,6 +302,7 @@ task CoverageHMM {
     for chrom in ${allchrom[@]}
     do
       mkdir -p ~{output_dir}/$chrom/HMM_logs_~{species}/
+      mkdir -p ~{output_dir}/$chrom/HMM_output/
       # run an mHMM on coverage counts
       python /cnv/scripts/HMM_process.py \
         ~{sample_manifest} \
