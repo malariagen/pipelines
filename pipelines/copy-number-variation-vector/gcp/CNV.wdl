@@ -7,6 +7,8 @@ version 1.0
 ##.
 
 import "HMM.wdl" as HMM
+import "TargetRegions.wdl" as TargetRegions
+
 workflow CNV {
   meta {
     description: "This is a pipeline for calling Copy Number Variants (CNVs) for a cohort of multiple samples. This inclludes an HMM step followed by coverage calls and target regions pipelines to improve acuracy."
@@ -34,6 +36,14 @@ workflow CNV {
     File sample_manifest
     File gc_content_file
     String sample_group_id
+
+    File gene_coordinates_file
+    File sample_metadata
+    File species_id_file
+    File plotting_functions_file
+
+    Int preemptible_tries
+    String runtime_zones
   }
 
   # This is a wdl hack to create a pseudo None
@@ -61,7 +71,27 @@ workflow CNV {
         gc_content_file = gc_content_file,
         sample_group_id = sample_group_id
     }
+
+    call TargetRegions.TargetRegions as TargetRegions {
+      input:
+        sample_name = sample_names[idx],
+        input_bam = input_bams[idx],
+        input_bam_index = input_bais[idx],
+        sample_manifest = sample_manifest,
+        gene_coordinates_file = gene_coordinates_file,
+        sample_metadata = sample_metadata,
+        species_id_file = species_id_file,
+        CNV_HMM_output = HMM. ,# zip of the coveragefolder
+        HMM_coverage_variance_file = HMM. ,
+        plotting_functions_file = plotting_functions_file,
+        preemptible_tries = preemptible_tries,
+        runtime_zones = runtime_zones,
+    }
   }
+
+
+
+  # Step to merge folders for running the Co
   output {
     Array[File] hmm_outputs = HMM.output_gz
   }

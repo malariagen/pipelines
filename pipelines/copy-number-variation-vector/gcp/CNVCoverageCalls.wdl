@@ -86,8 +86,9 @@ task CNVCoverageCalls {
     String output_name = species + "_CNV"
     # coveragefolder example: /lustre/scratch118/malaria/team112/personal/el10/v3.7_1246-VO-TZ-KABULA-VMF00185/coverage
     # here I have just used "coverage"
-    String output_csv = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
-    String output_image = output_dir + '/CNV_analysis_' + chromosome +'.Rdata'
+    String full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
+    String full_raw_CNV_table = output_dir + '/full_raw_CNV_table_'+ chromosome + '.csv'
+    String Rdata = output_dir + '/CNV_analysis_' + chromosome +'.Rdata'
 
   command <<<
     # set up directories as needed
@@ -112,7 +113,8 @@ task CNVCoverageCalls {
     zones: runtime_zones
   }
   output {
-    File cnv_coverage_csv = output_csv
-    File cnv_coverage_Rdata = output_image
+    File full_coverage_CNV_table = full_coverage_CNV_table
+    File full_raw_CNV_table = full_raw_CNV_table
+    File coverage_CNV_Rdata = Rdata
   }
 }

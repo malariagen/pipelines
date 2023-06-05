@@ -12,7 +12,6 @@ workflow TargetRegions {
   String pipeline_version = "1.0.0"
 
   input {
-    String project_id
     String sample_name
     File input_bam
     File input_bam_index
@@ -29,15 +28,12 @@ workflow TargetRegions {
     String runtime_zones
   }
 
-  String output_basename = project_id + "_" + sample_name
-
   # Step 1: Extract Diagnostic Reads
   call TargetRegionsTasks.ExtractDiagnosticReads as ExtractDiagnosticReads {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
       sample_name = sample_name,
-      project_id = project_id,
       preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
@@ -71,7 +67,6 @@ task ExtractDiagnosticReads {
     File input_bam
     File input_bam_index
     String sample_name
-    String project_id
 
     Int preemptible_tries
     String runtime_zones
@@ -81,13 +76,12 @@ task ExtractDiagnosticReads {
     Int disk_gb = 50
   }
 
-  String output_dir = project_id
 
   command <<<
     # Get the discordant reads
     # Runs SSFA.py for every chromosome: This script goes through an alignment file and records the positions of reads within a specified region whose mates map to a different chromosome or discordantly on the same chromosome
     SSFA_script=/cnv/scripts//SSFA.py
-    SSFAfolder=~{output_dir}/diagnostic_reads/SSFA
+    SSFAfolder=diagnostic_reads/SSFA
     python $SSFA_script ~{input_bam} 2R 3425000:3650000 ${SSFAfolder}/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > ${SSFAfolder}/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
     python $SSFA_script ~{input_bam} 2R 28460000:28570000 ${SSFAfolder}/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > ${SSFAfolder}/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
     python $SSFA_script ~{input_bam} 3R 6900000:7000000 ${SSFAfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > ${SSFAfolder}/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
@@ -97,7 +91,7 @@ task ExtractDiagnosticReads {
     # Get the soft clipped reads
     # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
     breakpoints_script=/cnv/scripts//breakpoint_detector.py
-    breakpointsfolder=~{output_dir}/diagnostic_reads/breakpoints
+    breakpointsfolder=diagnostic_reads/breakpoints
     python $breakpoints_script ~{input_bam} 2R 3425000:3650000 ${breakpointsfolder}/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > ${breakpointsfolder}/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
     python $breakpoints_script ~{input_bam} 2R 28460000:28570000 ${breakpointsfolder}/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > ${breakpointsfolder}/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
     python $breakpoints_script ~{input_bam} 3R 6900000:7000000 ${breakpointsfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_breakpoints_output 10 > ${breakpointsfolder}/3R/Cyp6zm_region/breakpointlogs/~{sample_name}_CYP6ZM_breakpoints_output.log 2>&1
@@ -105,7 +99,7 @@ task ExtractDiagnosticReads {
     python $breakpoints_script ~{input_bam} X 15220000:15255000 ${breakpointsfolder}/X/Cyp9k1_region/~{sample_name}_CYP9K1_breakpoints_output 10 > ${breakpointsfolder}/X/Cyp9k1_region/breakpointlogs/~{sample_name}_CYP9K1_breakpoints_output.log 2>&1
 
     ls -lht
-    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
+    tar -zcvf diagnostic_reads.tar.gz diagnostic_reads
   >>>
   runtime {
     docker: docker
@@ -116,7 +110,7 @@ task ExtractDiagnosticReads {
     zones: runtime_zones
   }
   output {
-    File diagnostic_reads_tar = "~{output_dir}.tar.gz"
+    File diagnostic_reads_tar = "diagnostic_reads.tar.gz"
   }
 }
 
