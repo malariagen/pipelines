@@ -27,6 +27,7 @@ workflow HMM {
     File sample_manifest
     File gc_content_file
     String sample_group_id
+    String species
   }
 
   call WindowedCoverage {
@@ -50,11 +51,26 @@ workflow HMM {
       sample_manifest = sample_manifest,
       gc_content_file = gc_content_file,
       sample_group_id = sample_group_id,
-      output_dir = output_dir
+      output_dir = output_dir,
+      sample_name = sample_name
+  }
+
+  call CoverageHMM {
+    input:
+      sample_manifest = sample_manifest,
+      coverage_tarball = CoverageSummary.output_gz,
+      gc_content_file = gc_content_file,
+      coverage_gc = CoverageSummary.coverage_output,
+      coverage_variance = CoverageSummary.variance_output,
+      mapq_file = mapq_file,
+      mapq_threshold = mapq_threshold,
+      species =  species,
+      output_dir = output_dir,
+      sample_name = sample_name
   }
   
   output {
-    File output_gz = CoverageSummary.output_gz
+    File output_gz = CoverageHMM.output_gz
   }
 }
 
@@ -155,6 +171,7 @@ task CoverageSummary {
     sample_manifest: "The sample manifest file to use for the coverage summary calculations. This is simply a list of all the sample names."
     gc_content_file: "The gc content file to use for the coverage summary calculations"
     sample_group_id: "The sample group id to use for the coverage summary calculations"
+    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
     docker: "(optional) the docker image containing the runtime environment for this task"
     ram: "(optional) the amount of memory (MiB) to provision for this task"
     cpu: "(optional) the number of cpus to provision for this task"
@@ -171,6 +188,7 @@ task CoverageSummary {
     File gc_content_file
     String sample_group_id
     String output_dir
+    String sample_name
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -179,10 +197,10 @@ task CoverageSummary {
     Int disk = 70
     Int preemptible = 3
   }
-  String acc_threshold = sub(accessibility_threshold + "_", "\.", "")
-  String m_threshold = sub(mapq_threshold + "_", "\.", "")
-  String coverage_output_filename = output_dir + "/median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
-  String variance_output_filename = output_dir + "/coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
+  String acc_threshold = sub(accessibility_threshold + "_", "[.]", "")
+  String m_threshold = sub(mapq_threshold + "_", "[.]", "")
+  String coverage_output_filename = "median_coverage_by_GC_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
+  String variance_output_filename = "coverage_variance_masked_" + acc_threshold + m_threshold + sample_group_id + ".csv"
   command <<<
     set -x
     echo "Current directory: " 
@@ -190,6 +208,8 @@ task CoverageSummary {
     #unzip the tarball
     tar -zxvf ~{coverage_tarball}
     #cd /cnv/scripts/
+    echo "Creating temporary manifest: "
+    echo ~{sample_name} > manifest.txt
     ls -lht
     allchrom=(2L 2R 3L 3R X)
     source activate cnv37 
@@ -200,7 +220,7 @@ task CoverageSummary {
             ~{accessibility_mask_file} \
             ~{mapq_threshold} \
             ~{mapq_file} \
-            ~{sample_manifest} \
+            manifest.txt \
             ~{gc_content_file} \
             ~{output_dir} \
             ~{sample_group_id} \
@@ -208,9 +228,7 @@ task CoverageSummary {
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
     echo "Numbers: ~{acc_threshold} ~{m_threshold} ~{sample_group_id}"
-    #output_filename = working_folder + '/median_coverage_by_GC_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
-    #output_variance_filename = working_folder + '/coverage_variance_masked_' + sub('\.', '', str(accessibility_threshold)) + '_' + sub('\.', '', str(mapq0_threshold)) + '_' + output_file_key + '.csv'
-    #TODO: Create output variables for the output of this script
+  
   >>>
   runtime {
     docker: docker
@@ -224,8 +242,8 @@ task CoverageSummary {
     #${orig//[xyz]/_} ${~{accessibility_threshold}//./} ${~{mapq_threshold}//./}
     #select_first(glob("~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"))
     File logs = "calculate_mean_coverage_by_GC_~{sample_group_id}.log"
-    File coverage_output = coverage_output_filename
-    File variance_output = variance_output_filename
+    File coverage_output = "~{output_dir}/~{coverage_output_filename}"
+    File variance_output = "~{output_dir}/~{variance_output_filename}"
     File output_gz = "~{output_dir}.tar.gz"
   }
 }
@@ -236,7 +254,6 @@ task CoverageHMM {
   }
   parameter_meta {
     sample_manifest: "The sample manifest file to use for the HMM calculations. This is simply a list of all the sample names."
-    chrom: "The chromosome to run the coverage HMM on"
     coverage_tarball: "The input tarball containing the coverage files"
     gc_content_file: "The gc content file to use for the HMM calculations"
     coverage_gc: "The coverage gc file to use for the HMM calculations"
@@ -244,6 +261,7 @@ task CoverageHMM {
     mapq_file: "The mapq file to use for the HMM calculations"
     mapq_threshold: "The mapq threshold to use for the HMM calculations. Default is 0.5."
     species: "The species of the samples specified in the manifest."
+    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
     docker: "(optional) the docker image containing the runtime environment for this task"
     ram: "(optional) the amount of memory (MiB) to provision for this task"
     cpu: "(optional) the number of cpus to provision for this task"
@@ -252,7 +270,6 @@ task CoverageHMM {
   }
   input {
     File sample_manifest
-    String chrom
     File coverage_tarball
     File gc_content_file
     File coverage_gc
@@ -260,7 +277,8 @@ task CoverageHMM {
     File mapq_file
     Float mapq_threshold
     String species
-
+    String output_dir
+    String sample_name
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -276,30 +294,41 @@ task CoverageHMM {
     #unzip the tarball
     tar -zxvf ~{coverage_tarball}
     #cd /cnv/scripts/
+    echo "Creating temporary manifest: "
+    echo ~{sample_name} > manifest.txt
     ls -lht
     allchrom=(2L 2R 3L 3R X)
     # Activate the conda environment
     source activate cnv37 
-    # Calculate median coverage by GC 
-    python /cnv/scripts/HMM_process.py \
-      ~{sample_manifest} \
-      ~{chrom} \
-      coverage \
-      ~{gc_content_file} \
-      ~{coverage_gc} \
-      ~{coverage_variance} \
-      ~{mapq_file} \
-      ~{mapq_threshold} \
-      > coverage/~{chrom}/HMM_logs_~{species}/HMM_~{chrom}.log 2>&1
-
-      #  $manifest \
-      #  $chrom \
-      #  $coveragefolder \
-      #  $GC_content_file \
-      #  $coverage_by_GC_file \
-      #  $coverage_variance_file \
-      #  $mapq_prop_file \
-      #  0.5 \
-      #  > ${coveragefolder}/${chrom}/HMM_logs_${species}/HMM_${chrom}.log 2>&1
+    for chrom in ${allchrom[@]}
+    do
+      mkdir -p ~{output_dir}/$chrom/HMM_logs_~{species}/
+      mkdir -p ~{output_dir}/$chrom/HMM_output/
+      # run an mHMM on coverage counts
+      python /cnv/scripts/HMM_process.py \
+        manifest.txt \
+        $chrom \
+        ~{output_dir} \
+        ~{gc_content_file} \
+        ~{coverage_gc} \
+        ~{coverage_variance} \
+        ~{mapq_file} \
+        ~{mapq_threshold} \
+        > ~{output_dir}/$chrom/HMM_logs_~{species}/HMM_$chrom.log 2>&1
+    done
+    ls -lht
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
   >>>
+  runtime {
+    docker: docker
+    memory: ram
+    disks: "local-disk ${disk} HDD"
+    cpu: cpu
+    preemptible: preemptible
+  }
+  output {
+    #log outputs
+    Array[File] logs = glob("*.log")
+    File output_gz = "~{output_dir}.tar.gz"
+  }
 }
