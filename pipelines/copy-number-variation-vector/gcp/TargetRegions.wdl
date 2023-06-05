@@ -124,6 +124,7 @@ task TargetRegionsCNVCalling {
     File coverage_tar                 # coveragefolder: output from CoverageSummary step in HMM pipeline
     File diagnostic_reads_tar         # diagnostic_reads_folder: output of ExtractDiagnosticReads
     File plotting_functions_file      # plotting_functions_file
+    String output_dir                 # name of the zipped coverage directory
 
     String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
     Int num_cpu = 8
@@ -135,13 +136,15 @@ task TargetRegionsCNVCalling {
   }
 
   command <<<
-    # need to unzip the tarred folders before passing them here
+    # unzip the tarball - this will be named as the output_dir
+    tar -zxvf ~{coverage_tar}
+
     R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args ~{sample_manifest}# $manifest \
       ~{gene_coordinates_file} \      # $gene_coordinates_file
       ~{sample_metadata} \            # $metadata
       ~{species_id_file} \            # $species_id_file
       ~{coverage_variance_file} \     # $coverage_variance_file
-      ~{coverage_tar} \               # $coveragefolder
+      ~{output_dir} \                 # $coveragefolder
       ~{diagnostic_reads_tar} \       # $diagnostic_reads_folder
       ~{plotting_functions_file} \    # $plotting_functions_file
       ~{num_cpu} \                    # $ncores

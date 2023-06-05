@@ -71,6 +71,7 @@ workflow HMM {
   
   output {
     File output_gz = CoverageHMM.output_gz
+    File coverage_variance = CoverageSummary.variance_output
   }
 }
 
