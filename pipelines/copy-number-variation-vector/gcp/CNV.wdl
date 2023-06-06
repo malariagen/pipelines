@@ -89,6 +89,7 @@ workflow CNV {
         plotting_functions_file = plotting_functions_file,
         preemptible_tries = preemptible_tries,
         runtime_zones = runtime_zones,
+        output_dir = output_dir
     }
   }
 
