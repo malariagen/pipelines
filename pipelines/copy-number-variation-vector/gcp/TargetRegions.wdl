@@ -18,6 +18,7 @@ workflow TargetRegions {
     File gene_coordinates_file
     File sample_metadata
     File species_id_file
+    String output_dir
 
     File CNV_HMM_output # zip of the coveragefolder
     File HMM_coverage_variance_file
@@ -49,7 +50,8 @@ workflow TargetRegions {
       diagnostic_reads_tar = ExtractDiagnosticReads.diagnostic_reads_tar,
       plotting_functions_file = plotting_functions_file,
       preemptible_tries = preemptible_tries,
-      runtime_zones = runtime_zones
+      runtime_zones = runtime_zones,
+      output_dir = output_dir
   }
 
   meta {
@@ -130,8 +132,7 @@ task TargetRegionsCNVCalling {
 
     String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
     Int num_cpu = 8
-    RunTimeSettings runTimeSettings
-    Int preemptible_tries = runTimeSettings.preemptible_tries
+    Int preemptible_tries
     String runtime_zones = "us-central1-b"
     Float mem_gb = 3.75
     Int disk_gb = 50
