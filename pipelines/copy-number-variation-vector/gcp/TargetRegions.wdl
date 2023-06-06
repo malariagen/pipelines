@@ -6,7 +6,6 @@ version 1.0
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
 ##.
 
-import "../../../tasks/gcp/Tasks.wdl" as Tasks
 
 workflow TargetRegions {
   String pipeline_version = "1.0.0"
@@ -29,7 +28,7 @@ workflow TargetRegions {
   }
 
   # Step 1: Extract Diagnostic Reads
-  call TargetRegionsTasks.ExtractDiagnosticReads as ExtractDiagnosticReads {
+  call ExtractDiagnosticReads as ExtractDiagnosticReads {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
@@ -39,7 +38,7 @@ workflow TargetRegions {
   }
 
   # Step 2: Target Regions CNV calling
-  call TargetRegionsTasks.TargetRegionsCNVCalling as CNVCalling {
+  call TargetRegionsCNVCalling as CNVCalling {
     input:
       sample_manifest = sample_manifest,
       gene_coordinates_file = gene_coordinates_file,
@@ -58,7 +57,10 @@ workflow TargetRegions {
   }
 
   output {
-    File output_file = CNVCalling.output_file
+    File diagnostic_reads_tar = ExtractDiagnosticReads.diagnostic_reads_tar
+    File focal_region_CNV_table = CNVCalling.focal_region_CNV_table
+    File HMM_gene_copy_number = CNVCalling.HMM_gene_copy_number
+    File target_regions_Rdata = CNVCalling.target_regions_Rdata
   }
 }
 
