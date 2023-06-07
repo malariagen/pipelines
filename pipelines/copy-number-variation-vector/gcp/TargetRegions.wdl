@@ -84,23 +84,35 @@ task ExtractDiagnosticReads {
   command <<<
     # Get the discordant reads
     # Runs SSFA.py for every chromosome: This script goes through an alignment file and records the positions of reads within a specified region whose mates map to a different chromosome or discordantly on the same chromosome
-    SSFA_script=/cnv/scripts//SSFA.py
-    SSFAfolder=diagnostic_reads/SSFA
-    python $SSFA_script ~{input_bam} 2R 3425000:3650000 ${SSFAfolder}/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > ${SSFAfolder}/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 2R 28460000:28570000 ${SSFAfolder}/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > ${SSFAfolder}/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 3R 6900000:7000000 ${SSFAfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > ${SSFAfolder}/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} 3R 28570000:28620000 ${SSFAfolder}/3R/Gste_region/~{sample_name}_GST_SSFA_output.csv 10 > ${SSFAfolder}/3R/Gste_region/SSFAlogs/~{sample_name}_GST_SSFA_output.log 2>&1
-    python $SSFA_script ~{input_bam} X 15220000:15255000 ${SSFAfolder}/X/Cyp9k1_region/~{sample_name}_CYP9K1_SSFA_output.csv 10 > ${SSFAfolder}/X/Cyp9k1_region/SSFAlogs/~{sample_name}_CYP9K1_SSFA_output.log 2>&1
+
+    # create directories for diagnostic reads output files and logs
+    mkdir -p diagnostic_reads/SSFA/2R/Ace1_region/SSFAlogs
+    mkdir -p diagnostic_reads/SSFA/2R/Cyp6_region/SSFAlogs
+    mkdir -p diagnostic_reads/SSFA/3R/Cyp6zm_region/SSFAlogs
+    mkdir -p diagnostic_reads/SSFA/3R/Gste_region/SSFAlogs
+    mkdir -p diagnostic_reads/SSFA/X/Cyp9k1_region/SSFAlogs
+
+    python /cnv/scripts/SSFA.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/SSFA/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/SSFA/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/SSFA/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/SSFA/3R/Gste_region/~{sample_name}_GST_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Gste_region/SSFAlogs/~{sample_name}_GST_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} X 15220000:15255000 diagnostic_reads/SSFA/X/Cyp9k1_region/~{sample_name}_CYP9K1_SSFA_output.csv 10 > diagnostic_reads/SSFA/X/Cyp9k1_region/SSFAlogs/~{sample_name}_CYP9K1_SSFA_output.log 2>&1
 
     # Get the soft clipped reads
     # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
-    breakpoints_script=/cnv/scripts//breakpoint_detector.py
-    breakpointsfolder=diagnostic_reads/breakpoints
-    python $breakpoints_script ~{input_bam} 2R 3425000:3650000 ${breakpointsfolder}/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > ${breakpointsfolder}/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 2R 28460000:28570000 ${breakpointsfolder}/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > ${breakpointsfolder}/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 3R 6900000:7000000 ${breakpointsfolder}/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_breakpoints_output 10 > ${breakpointsfolder}/3R/Cyp6zm_region/breakpointlogs/~{sample_name}_CYP6ZM_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} 3R 28570000:28620000 ${breakpointsfolder}/3R/Gste_region/~{sample_name}_GST_breakpoints_output 10 > ${breakpointsfolder}/3R/Gste_region/breakpointlogs/~{sample_name}_GST_breakpoints_output.log 2>&1
-    python $breakpoints_script ~{input_bam} X 15220000:15255000 ${breakpointsfolder}/X/Cyp9k1_region/~{sample_name}_CYP9K1_breakpoints_output 10 > ${breakpointsfolder}/X/Cyp9k1_region/breakpointlogs/~{sample_name}_CYP9K1_breakpoints_output.log 2>&1
+
+    # create directories for diagnostic reads output files and logs
+    mkdir -p diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs
+
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/breakpoints/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/breakpoints/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/breakpoints/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs/~{sample_name}_CYP6ZM_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/breakpoints/3R/Gste_region/~{sample_name}_GST_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs/~{sample_name}_GST_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} X 15220000:15255000 diagnostic_reads/breakpoints/X/Cyp9k1_region/~{sample_name}_CYP9K1_breakpoints_output 10 > diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs/~{sample_name}_CYP9K1_breakpoints_output.log 2>&1
 
     ls -lht
     tar -zcvf diagnostic_reads.tar.gz diagnostic_reads
