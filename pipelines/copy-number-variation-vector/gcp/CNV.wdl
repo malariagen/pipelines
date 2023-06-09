@@ -21,7 +21,6 @@ workflow CNV {
     Array[File] input_bams
     Array[File] input_bais
     Array[String] sample_names
-    #String scripts_folder="/cnv/scripts"
     String output_dir="coverage"
     Int interval = 300
     Int window_size = 300
@@ -65,6 +64,8 @@ workflow CNV {
         species = species
     }
   }
+  # TODO: gather all tarballs and combine into one
+
   output {
     Array[File] hmm_outputs = HMM.output_gz
   }

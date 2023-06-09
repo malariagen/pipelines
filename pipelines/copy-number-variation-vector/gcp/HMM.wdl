@@ -117,15 +117,12 @@ task WindowedCoverage {
     echo "Current directory: " 
     pwd
     ls -lht
-    #cd /cnv/scripts/
-    ls -lht /cnv
-    #bash get_windowed_coverage_and_diagnostic_reads.sh ~{input_bam} ~{sample_name} ~{output_dir}
+    # Make the output directory
     mkdir -p ~{output_dir}
     # Start the conda env
     source activate cnv37 
-    # Get the coverage data
+    # Get the coverage data for each chromosome
     allchrom=(2L 2R 3L 3R X)
-    #coveragefolder=~{output_dir}/coverage
     for chrom in ${allchrom[@]}
     do
       #create the directory structure needed (this was likely pre-provisioned in the baremetal version of this pipeline)
@@ -137,6 +134,7 @@ task WindowedCoverage {
             ~{output_dir}/${chrom}/counts_for_HMM_~{sample_name}_${chrom}_output.csv \
             > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_~{sample_name}_${chrom}.log 2>&1
     done
+    # Compress the output directory
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
     ls -lht
   >>>
@@ -150,11 +148,6 @@ task WindowedCoverage {
   output {
     #Compressed output directory
     File output_gz = "~{output_dir}.tar.gz"
-    #String message = read_string(stdout())
-    #Return an array of Files representing the contents of the output directory
-    # Array[File] coverage_files = glob("~{output_dir}/*.csv")
-    #Return an array of Files representing the logs of the coverage calculations
-    # Array[File] coverage_logs = glob("~{output_dir}/*.log")
   }
 }
 
@@ -172,6 +165,7 @@ task CoverageSummary {
     gc_content_file: "The gc content file to use for the coverage summary calculations"
     sample_group_id: "The sample group id to use for the coverage summary calculations"
     sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
+    output_dir: "The output directory name. This is set to `coverage` by default."
     docker: "(optional) the docker image containing the runtime environment for this task"
     ram: "(optional) the amount of memory (MiB) to provision for this task"
     cpu: "(optional) the number of cpus to provision for this task"
