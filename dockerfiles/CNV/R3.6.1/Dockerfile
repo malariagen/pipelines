@@ -21,8 +21,9 @@ RUN apt-get build-dep -y r-base \
     && cd "R-${R_VERSION}" \
     && ./configure --prefix=/opt/R/${R_VERSION}/ --enable-R-shlib --with-blas --with-lapack \
     && make \
-    && make install \
-    && rm -r R-${R_VERSION} \
+    && make install
+
+RUN rm -r R-${R_VERSION} \
     && rm R-${R_VERSION}.tar.gz
 
 # Run an R script to install several libraries
