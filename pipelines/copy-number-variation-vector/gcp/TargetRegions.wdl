@@ -142,7 +142,7 @@ task TargetRegionsCNVCalling {
     File plotting_functions_file      # plotting_functions_file
     String output_dir                 # name of the zipped coverage directory
 
-    String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-16865957241"
+    String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1686595724"
     Int num_cpu = 8
     Int preemptible_tries
     String runtime_zones = "us-central1-b"
