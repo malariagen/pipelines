@@ -153,8 +153,9 @@ task TargetRegionsCNVCalling {
   command <<<
     # unzip the tarball - this will be named as the output_dir
     tar -zxvf ~{coverage_tar}
+    mkdir target_regions_analysis
 
-    R-3.6.1 --slave -f $scriptsfolder/target_regions_analysis.r --args ~{sample_manifest}# $manifest \
+    /opt/R/3.6.1/bin/R --slave -f Rscripts/target_regions_analysis.r --args ~{sample_manifest} \ # $manifest
       ~{gene_coordinates_file} \      # $gene_coordinates_file
       ~{sample_metadata} \            # $metadata
       ~{species_id_file} \            # $species_id_file
