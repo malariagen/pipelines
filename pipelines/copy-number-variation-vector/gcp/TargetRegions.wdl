@@ -155,6 +155,7 @@ task TargetRegionsCNVCalling {
     tar -zxvf ~{coverage_tar}
     mkdir target_regions_analysis
 
+    echo "Starting R script"
     /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_manifest} \
       ~{gene_coordinates_file} \
       ~{sample_metadata} \
@@ -165,6 +166,9 @@ task TargetRegionsCNVCalling {
       ~{plotting_functions_file} \
       ~{num_cpu} \
       > target_regions_analysis/target_regions_analysis.log 2>&1
+    ehco $?
+    echo "R script complete"
+
   >>>
 
   runtime {
