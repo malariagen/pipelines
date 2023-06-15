@@ -155,15 +155,15 @@ task TargetRegionsCNVCalling {
     tar -zxvf ~{coverage_tar}
     mkdir target_regions_analysis
 
-    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_manifest} \ # $manifest
-      ~{gene_coordinates_file} \      # $gene_coordinates_file
-      ~{sample_metadata} \            # $metadata
-      ~{species_id_file} \            # $species_id_file
-      ~{coverage_variance_file} \     # $coverage_variance_file
-      ~{output_dir} \                 # $coveragefolder
-      ~{diagnostic_reads_tar} \       # $diagnostic_reads_folder
-      ~{plotting_functions_file} \    # $plotting_functions_file
-      ~{num_cpu} \                    # $ncores
+    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_manifest} \
+      ~{gene_coordinates_file} \
+      ~{sample_metadata} \
+      ~{species_id_file} \
+      ~{coverage_variance_file} \
+      ~{output_dir} \
+      ~{diagnostic_reads_tar} \
+      ~{plotting_functions_file} \
+      ~{num_cpu} \
       > target_regions_analysis/target_regions_analysis.log 2>&1
   >>>
 
