@@ -58,7 +58,7 @@ dir.create(output.folder, showWarnings = FALSE)
 	# These are the minimum copy number states required to consider a duplication (2 = "normal" diploid state).
 {if (chrom == 'X'){
 	metafile <- arg.values[9]
-	meta <- read.table(metafile, sep = '\t', header = T, row.names = 1, quote = '', comment.char = '')[sample.names, ]
+	meta <- read.table(metafile, sep = '\t', header = T, row.names = 1, quote = '"', comment.char = '')[sample.names, ]
 	threshold.copy.number <- c(3, 2)[(meta$sex_call == 'M') + 1]
 }
 else {

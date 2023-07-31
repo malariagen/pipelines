@@ -142,7 +142,7 @@ task TargetRegionsCNVCalling {
     File plotting_functions_file      # plotting_functions_file
     String output_dir                 # name of the zipped coverage directory
 
-    String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1686595724"
+    String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1690810739"
     Int num_cpu = 8
     Int preemptible_tries
     String runtime_zones = "us-central1-b"
@@ -151,8 +151,15 @@ task TargetRegionsCNVCalling {
   }
 
   command <<<
-    # unzip the tarball - this will be named as the output_dir
+    # unzip the coverage tarball and get the directory name
     tar -zxvf ~{coverage_tar}
+    COVERAGE_DIR=$(echo "~{coverage_tar}" | sed 's/\.tar\.gz//')
+
+    # unzip the diagnostic reads tarball and get the directory name
+    tar -zxvf ~{diagnostic_reads_tar}
+    DIAGNOSTIC_READS_DIR=$(echo "~{diagnostic_reads_tar}" | sed 's/\.tar\.gz//')
+
+    #create output directory
     mkdir target_regions_analysis
 
     echo "Starting R script"
@@ -161,8 +168,8 @@ task TargetRegionsCNVCalling {
       ~{sample_metadata} \
       ~{species_id_file} \
       ~{coverage_variance_file} \
-      ~{output_dir} \
-      ~{diagnostic_reads_tar} \
+      $COVERAGE_DIR \
+      $DIAGNOSTIC_READS_DIR \
       ~{plotting_functions_file} \
       ~{num_cpu} \
       > target_regions_analysis/target_regions_analysis.log 2>&1

@@ -15,7 +15,7 @@ gene.regions.file <- arg.values[2]
 all.gene.coordinates <- read.table(gene.regions.file, sep = '\t', header = T, row.names = 1)
 
 meta.file <- arg.values[3]
-meta <- read.table(meta.file, sep = '\t', header = T, row.names = 1, quote = '', comment.char = '')[sample.names, ]
+meta <- read.table(meta.file, sep = '\t', header = T, row.names = 1, quote = '"', comment.char = '')[sample.names, ]
 expected.copy.number.on.X <- c(2, 1)[(meta$sex_call == 'M') + 1]
 
 # Get the species calls
@@ -621,7 +621,7 @@ cnv.sample.lists <- lapply(read.based.cnvs, function(m) apply(m, 2, function(x) 
 
 # Get a vector of samples that carry at least one CNV based on read calls.
 # Dup0 is always the first column, so the -1 index removes Dup0
-read.cnv.samples <- lapply(read.based.cnvs, function(x) rownames(x)[apply(x[, -1], 1, any)])
+read.cnv.samples <- lapply(read.based.cnvs, function(x) rownames(x)[apply(x[, -1, drop = F], 1, any)])
 
 # For each cluster, get a vector of samples that have been called as carrying a cnv by reads but not coverage,
 # ignoring samples with high variance.
