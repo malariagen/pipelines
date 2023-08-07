@@ -82,6 +82,7 @@ task ExtractDiagnosticReads {
 
 
   command <<<
+    set -euo pipefail
     # Get the discordant reads
     # Runs SSFA.py for every chromosome: This script goes through an alignment file and records the positions of reads within a specified region whose mates map to a different chromosome or discordantly on the same chromosome
 
@@ -92,6 +93,16 @@ task ExtractDiagnosticReads {
     mkdir -p diagnostic_reads/SSFA/3R/Gste_region/SSFAlogs
     mkdir -p diagnostic_reads/SSFA/X/Cyp9k1_region/SSFAlogs
 
+    # create directories for diagnostic reads output files and logs
+    mkdir -p diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs
+    mkdir -p diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs
+
+    #activate the conda environment
+    source activate cnv37
+
     python /cnv/scripts/SSFA.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/SSFA/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
     python /cnv/scripts/SSFA.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/SSFA/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
     python /cnv/scripts/SSFA.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/SSFA/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
@@ -100,13 +111,6 @@ task ExtractDiagnosticReads {
 
     # Get the soft clipped reads
     # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
-
-    # create directories for diagnostic reads output files and logs
-    mkdir -p diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs
-    mkdir -p diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs
-    mkdir -p diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs
-    mkdir -p diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs
-    mkdir -p diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs
 
     python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/breakpoints/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
     python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/breakpoints/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
