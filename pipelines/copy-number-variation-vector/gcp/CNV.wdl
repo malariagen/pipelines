@@ -95,7 +95,7 @@ task ConsolidateHMMOutput {
     echo "Current directory: " 
     pwd
     #For each file in hmm_tarballs, extract the tarball and move the contents to the output directory
-    for tarball in ~{hmm_tarballs}; do
+    for tarball in ~{sep=' ' hmm_tarballs} ; do
       echo "Extracting tarball: " $tarball
       tar -zxvf $tarball
       echo "Moving contents to output directory: " ~{output_dir}
