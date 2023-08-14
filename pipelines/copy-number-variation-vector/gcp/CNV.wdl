@@ -70,3 +70,48 @@ workflow CNV {
     Array[File] hmm_outputs = HMM.output_gz
   }
 }
+
+task ConsolidateHMMOutput {
+  meta {
+    description: "This task takes the output from the HMM step and combines it into a single tarball."
+  }
+  parameter_meta {
+    hmm_tarballs: "The output from the HMM sub-pipeline. This is an array of tarballs, one for each sample."
+    output_dir: "The output directory for the tarball."
+  }
+  input {
+    Array[File] hmm_tarballs
+    String output_dir
+    # runtime values
+    String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
+    String ram = "8000 MiB"
+    Int cpu = 16
+    # TODO: Make disk space dynamic based on input size
+    Int disk = 70
+    Int preemptible = 3
+  }
+  command <<<
+    set -x
+    echo "Current directory: " 
+    pwd
+    #For each file in hmm_tarballs, extract the tarball and move the contents to the output directory
+    for tarball in ~{hmm_tarballs}; do
+      echo "Extracting tarball: " $tarball
+      tar -zxvf $tarball
+      echo "Moving contents to output directory: " ~{output_dir}
+      mv * ~{output_dir}
+    done
+    ls -lht
+    tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
+  >>>
+  runtime {
+    docker: docker
+    memory: ram
+    disks: "local-disk ${disk} HDD"
+    cpu: cpu
+    preemptible: preemptible
+  }
+  output {
+    File consolidated_gz = "~{output_dir}.tar.gz"
+  }
+}
