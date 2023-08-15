@@ -65,18 +65,23 @@ workflow CNV {
     }
   }
   # TODO: gather all tarballs and combine into one
-
+  call ConsolidateHMMOutput as CHMM {
+    input:
+      hmm_tarballs = HMM.output_gz,
+      output_dir = output_dir
+  }
+  
   output {
-    Array[File] hmm_outputs = HMM.output_gz
+    File hmm_tar = CHMM.consolidated_gz
   }
 }
 
 task ConsolidateHMMOutput {
   meta {
-    description: "This task takes the output from the HMM step and combines it into a single tarball."
+    description: "This task takes the output from the HMM subpipeline and combines it into a single tarball."
   }
   parameter_meta {
-    hmm_tarballs: "The output from the HMM sub-pipeline. This is an array of tarballs, one for each sample."
+    hmm_tarballs: "The output files from the HMM sub-pipeline. This is an array of tarballs, one for each sample."
     output_dir: "The output directory for the tarball."
   }
   input {
@@ -98,8 +103,10 @@ task ConsolidateHMMOutput {
     for tarball in ~{sep=' ' hmm_tarballs} ; do
       echo "Extracting tarball: " $tarball
       tar -zxvf $tarball
-      echo "Moving contents to output directory: " ~{output_dir}
-      mv * ~{output_dir}
+      ls -lht
+      #checking first if a manual move is necessary, tar may be able to merge these automatically because they have the same internal structure
+      #echo "Moving contents to output directory: " ~{output_dir}
+      #mv * ~{output_dir}
     done
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
