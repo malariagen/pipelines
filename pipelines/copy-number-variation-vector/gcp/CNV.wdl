@@ -102,7 +102,7 @@ task ConsolidateHMMOutput {
     #For each file in hmm_tarballs, extract the tarball and move the contents to the output directory
     for tarball in ~{sep=' ' hmm_tarballs} ; do
       echo "Extracting tarball: " $tarball
-      tar -zxvf --backup=numbered $tarball
+      tar --backup=numbered -zxvf $tarball
       ls -lht
       #checking first if a manual move is necessary, tar may be able to merge these automatically because they have the same internal structure
       #echo "Moving contents to output directory: " ~{output_dir}
