@@ -104,9 +104,6 @@ task ConsolidateHMMOutput {
       echo "Extracting tarball: " $tarball
       tar --backup=numbered -zxvf $tarball
       ls -lht
-      #checking first if a manual move is necessary, tar may be able to merge these automatically because they have the same internal structure
-      #echo "Moving contents to output directory: " ~{output_dir}
-      #mv * ~{output_dir}
     done
     ls -lht
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
