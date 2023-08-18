@@ -59,10 +59,10 @@ function main(){
 
     echo "building and pushing GCR Image - $GCR_URL:$IMAGE_TAG"
 
-    if [[ "$CACHING" == "ON" ]]; then
-        docker build -t "$GCR_URL:$IMAGE_TAG" "$DIR"
+    if [[ "$CACHING" == "OFF" ]]; then
+        docker  build -t "$GCR_URL:$IMAGE_TAG" --no-cache "$DIR"
     else
-        docker build -t "$GCR_URL:$IMAGE_TAG" --no-cache "$DIR"
+        docker build -t "$GCR_URL:$IMAGE_TAG" "$DIR"
     fi
     docker push "$GCR_URL:$IMAGE_TAG"
 

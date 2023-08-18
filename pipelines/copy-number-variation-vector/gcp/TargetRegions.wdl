@@ -41,6 +41,7 @@ workflow TargetRegions {
   # Step 2: Target Regions CNV calling
   call TargetRegionsCNVCalling as CNVCalling {
     input:
+      sample_name = sample_name,
       sample_manifest = sample_manifest,
       gene_coordinates_file = gene_coordinates_file,
       sample_metadata = sample_metadata,
@@ -136,6 +137,7 @@ task ExtractDiagnosticReads {
 
 task TargetRegionsCNVCalling {
   input {
+    String sample_name
     File sample_manifest              # manifest: pipeline input
     File gene_coordinates_file        # gene_coordinates_file: pipeline input
     File sample_metadata              # metadata: pipeline input
@@ -155,6 +157,15 @@ task TargetRegionsCNVCalling {
   }
 
   command <<<
+    # get the manifest, metadata, and species_id files for just this sample
+    echo "~{sample_name}" > ~{sample_name}_manifest.tsv
+
+    head -n 1 ~{sample_metadata} >> ~{sample_name}_metadata.tsv
+    grep "~{sample_name}" ~{sample_metadata} >> ~{sample_name}_metadata.tsv
+
+    head -n 1 ~{species_id_file} >> ~{sample_name}_species_id.tsv
+    grep "~{sample_name}" ~{species_id_file} >> ~{sample_name}_species_id.tsv
+
     # unzip the coverage tarball and get the directory name
     tar -zxvf ~{coverage_tar}
     COVERAGE_DIR=$(echo "~{coverage_tar}" | sed 's/\.tar\.gz//')
@@ -167,10 +178,10 @@ task TargetRegionsCNVCalling {
     mkdir target_regions_analysis
 
     echo "Starting R script"
-    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_manifest} \
+    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_name}_manifest.tsv \
       ~{gene_coordinates_file} \
-      ~{sample_metadata} \
-      ~{species_id_file} \
+      ~{sample_name}_metadata.tsv \
+      ~{sample_name}_species_id.tsv \
       ~{coverage_variance_file} \
       $COVERAGE_DIR \
       $DIAGNOSTIC_READS_DIR \
