@@ -63,7 +63,7 @@ workflow TargetRegions {
     File diagnostic_reads_tar = ExtractDiagnosticReads.diagnostic_reads_tar
     File focal_region_CNV_table = CNVCalling.focal_region_CNV_table
     File HMM_gene_copy_number = CNVCalling.HMM_gene_copy_number
-    File target_regions_Rdata = CNVCalling.target_regions_Rdata
+    #File target_regions_Rdata = CNVCalling.target_regions_Rdata
   }
 }
 
