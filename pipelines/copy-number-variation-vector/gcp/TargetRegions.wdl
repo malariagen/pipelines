@@ -188,8 +188,6 @@ task TargetRegionsCNVCalling {
       ~{plotting_functions_file} \
       ~{num_cpu} \
       > target_regions_analysis/target_regions_analysis.log 2>&1
-    ehco $?
-    echo "R script complete"
 
   >>>
 
