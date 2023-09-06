@@ -157,6 +157,8 @@ task TargetRegionsCNVCalling {
   }
 
   command <<<
+    set -euo pipefail
+
     # get the manifest, metadata, and species_id files for just this sample
     echo "~{sample_name}" > ~{sample_name}_manifest.tsv
 
@@ -188,7 +190,7 @@ task TargetRegionsCNVCalling {
       ~{plotting_functions_file} \
       ~{num_cpu} \
       > target_regions_analysis/target_regions_analysis.log 2>&1
-
+    echo "R script complete"
   >>>
 
   runtime {
@@ -203,6 +205,6 @@ task TargetRegionsCNVCalling {
   output {
     File focal_region_CNV_table = "target_regions_analysis/focal_region_CNV_table.csv"
     File HMM_gene_copy_number = "target_regions_analysis/HMM_gene_copy_number.csv'"
-    File target_regions_Rdata = "target_regions_analysis/target_regions_analysis.Rdata"
+    # File target_regions_Rdata = "target_regions_analysis/target_regions_analysis.Rdata"
   }
 }
