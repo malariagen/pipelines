@@ -185,10 +185,10 @@ task TargetRegionsCNVCalling {
       ~{sample_name}_metadata.tsv \
       ~{sample_name}_species_id.tsv \
       ~{coverage_variance_file} \
-      $COVERAGE_DIR \
-      $DIAGNOSTIC_READS_DIR \
+      coverage \ # $COVERAGE_DIR \
+      diagnostic_reads \ #$DIAGNOSTIC_READS_DIR \
       ~{plotting_functions_file} \
-      ~{num_cpu} \
+      ~{num_cpu}
     echo "R script complete"
   >>>
 
