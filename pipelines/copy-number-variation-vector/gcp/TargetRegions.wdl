@@ -179,14 +179,17 @@ task TargetRegionsCNVCalling {
     #create output directory
     mkdir target_regions_analysis
 
+    #$COVERAGE_DIR \
+    #$DIAGNOSTIC_READS_DIR \
+
     echo "Starting R script"
     /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_name}_manifest.tsv \
       ~{gene_coordinates_file} \
       ~{sample_name}_metadata.tsv \
       ~{sample_name}_species_id.tsv \
       ~{coverage_variance_file} \
-      coverage \ # $COVERAGE_DIR \
-      diagnostic_reads \ #$DIAGNOSTIC_READS_DIR \
+      coverage \
+      diagnostic_reads \
       ~{plotting_functions_file} \
       ~{num_cpu}
     echo "R script complete"
