@@ -100,6 +100,8 @@ workflow CNV {
 
   output {
     File hmm_tar = CHMM.consolidated_gz
+    Array[File] targeted_regions_focal_region_cnv_table = TargetRegions.focal_region_CNV_table
+    Array[File] targeted_regions_hmm_gene_copy_number = TargetRegions.HMM_gene_copy_number
   }
 }
 
