@@ -18,7 +18,6 @@ workflow TargetRegions {
     File gene_coordinates_file
     File sample_metadata
     File species_id_file
-    String output_dir
 
     File CNV_HMM_output # zip of the coveragefolder
     File HMM_coverage_variance_file
@@ -51,8 +50,7 @@ workflow TargetRegions {
       diagnostic_reads_tar = ExtractDiagnosticReads.diagnostic_reads_tar,
       plotting_functions_file = plotting_functions_file,
       preemptible_tries = preemptible_tries,
-      runtime_zones = runtime_zones,
-      output_dir = output_dir
+      runtime_zones = runtime_zones
   }
 
   meta {
@@ -146,7 +144,6 @@ task TargetRegionsCNVCalling {
     File coverage_tar                 # coveragefolder: output from CoverageSummary step in HMM pipeline
     File diagnostic_reads_tar         # diagnostic_reads_folder: output of ExtractDiagnosticReads
     File plotting_functions_file      # plotting_functions_file
-    String output_dir                 # name of the zipped coverage directory
 
     String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1692386236"
     Int num_cpu = 8
@@ -155,6 +152,9 @@ task TargetRegionsCNVCalling {
     Float mem_gb = 3.75
     Int disk_gb = 50
   }
+
+  String coverage_dir = basename(coverage_tar, ".tar.gz")
+  String diagnostic_reads_dir = basename(diagnostic_reads_tar, ".tar.gz")
 
   command <<<
     set -euo pipefail
@@ -179,17 +179,14 @@ task TargetRegionsCNVCalling {
     #create output directory
     mkdir target_regions_analysis
 
-    #$COVERAGE_DIR \
-    #$DIAGNOSTIC_READS_DIR \
-
     echo "Starting R script"
     /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_name}_manifest.tsv \
       ~{gene_coordinates_file} \
       ~{sample_name}_metadata.tsv \
       ~{sample_name}_species_id.tsv \
       ~{coverage_variance_file} \
-      coverage \
-      diagnostic_reads \
+      ~{coverage_dir} \
+      ~{diagnostic_reads_dir} \
       ~{plotting_functions_file} \
       ~{num_cpu}
     echo "R script complete"

@@ -87,11 +87,10 @@ workflow CNV {
         HMM_coverage_variance_file = HMM.coverage_variance ,
         plotting_functions_file = plotting_functions_file,
         preemptible_tries = preemptible_tries,
-        runtime_zones = runtime_zones,
-        output_dir = output_dir
+        runtime_zones = runtime_zones
     }
   }
-  # TODO: gather all tarballs and combine into one
+
   call ConsolidateHMMOutput as CHMM {
     input:
       hmm_tarballs = HMM.output_gz,
