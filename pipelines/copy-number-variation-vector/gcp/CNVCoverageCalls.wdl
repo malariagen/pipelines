@@ -15,39 +15,27 @@ workflow CNVCoverageCalls {
   ## Sub-pipeline: CNV Coverage Calls
 
   input {
-    String project_id
-    String sample_name
-    File input_bam
-    File input_bam_index
-
-    File CNV_HMM_output
-
-    String chromosome
-    File sample_species_manifest
-    File coverage_variance_file
-    File gene_coordinates_file
-    File detox_genes_file
-    File HMM_working_dir_tar
-    File sample_metadata
-
+    String chromosome # good              # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
+    File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
+    File gene_coordinates_file  # good    # gene_coordinates_file: pipeline input
+    File detox_genes_file  # good         # detox_genes_file: pipeline input
+    File consolidated_HMM_working_dir_tar # good       # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File sample_metadata # good           # metadata: pipeline input
     Int preemptible_tries
     String runtime_zones
   }
 
-  String output_basename = project_id + "_" + sample_name
-
   # Step 1: CNV Coverage Calls
   call CNVCoverageTasks.CNVCoverageCalls as CoverageCalls {
     input:
-    chromosome = chromosome,
-    sample_species_manifest = sample_species_manifest,
-    coverage_variance_file = coverage_variance_file,
-    gene_coordinates_file = gene_coordinates_file,
-    detox_genes_file = detox_genes_file,
-    HMM_working_dir_tar = HMM_working_dir_tar,
-    sample_metadata = sample_metadata,
-    preemptible_tries = preemptible_tries,
-    runtime_zones = runtime_zones,
+      chromosome = chromosome,
+      sample_species_manifest = sample_species_manifest,
+      gene_coordinates_file = gene_coordinates_file,
+      detox_genes_file = detox_genes_file,
+      consolidated_HMM_working_dir_tar = consolidated_HMM_working_dir_tar,
+      sample_metadata = sample_metadata,
+      preemptible_tries = preemptible_tries,
+      runtime_zones = runtime_zones
   }
 
   meta {
@@ -64,12 +52,10 @@ task CNVCoverageCalls {
   input {
     String chromosome               # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
     File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
-    File coverage_variance_file     # coverage_variance_file: output from CoverageSummary step in HMM pipeline
     File gene_coordinates_file      # gene_coordinates_file: pipeline input
     File detox_genes_file           # detox_genes_file: pipeline input
-    File HMM_working_dir_tar        # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File consolidated_coverage_dir_tar # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
     File sample_metadata            # metadata: pipeline input
-    String project_id
     String species
 
     # Runtime Settings
@@ -81,28 +67,50 @@ task CNVCoverageCalls {
     Int disk_gb = 50
   }
   # ncores: number of CPUs - has not been optimized
-  # outputfolder: Make sure that the output name contains the name of the species (since this will be run once per species)
-    String output_dir = project_id + "_" + species
-    String output_name = species + "_CNV"
-    # coveragefolder example: /lustre/scratch118/malaria/team112/personal/el10/v3.7_1246-VO-TZ-KABULA-VMF00185/coverage
-    # here I have just used "coverage"
-    String full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
-    String full_raw_CNV_table = output_dir + '/full_raw_CNV_table_'+ chromosome + '.csv'
-    String Rdata = output_dir + '/CNV_analysis_' + chromosome +'.Rdata'
+  String output_dir = "CNV_coverage_calls"
+
+  # These will be named by the script and cannot be changed here
+  String full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
+  String full_raw_CNV_table = output_dir + '/full_raw_CNV_table_'  + chromosome + '.csv'
+  String Rdata = output_dir + '/CNV_analysis_' + chromosome +'.Rdata'
+  # Since I am not outputting the full directory with the species included in the folder structure, I am renaming the output file to include the species name
+  String species_full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + species + '_' + chromosome + '.csv'
+  String species_full_raw_CNV_table = output_dir + '/full_raw_CNV_table_' + species + '_' + chromosome + '.csv'
+  String species_Rdata = output_dir + '/CNV_analysis_' + species + '_' + chromosome +'.Rdata'
+
+  # once we untarr the HMM dir, the path to the untarred dir will be local to where the command runs
+  String coverage_dir = basename(consolidated_coverage_dir_tar, ".tar.gz")
+  String HMM_working_dir = coverage_dir + '/' + chromosome + 'HMM_output'
+
+
 
   command <<<
-    # set up directories as needed
+    # unzip the coverage tarball and get the directory name
+    tar -zxvf ~{consolidated_coverage_dir_tar}
 
-    R-3.6.1 --slave -f $scriptsfolder/CNV_analysis.r --args ~{chromosome} \
+    # The following combines the coverage_variance files into a signle file
+    # Get the name of the first coverage variance file - doesn't matter which one
+    FIRST_COVERAGE_VARIANCE_FILE=$(ls ~{coverage_dir}/coverage_variance_masked_* | head -n 1)
+    # Add the header to the new combined file (the header is in every file, but we only want it once in the combined file)
+    HEADER=$(head -n 1 $FIRST_COVERAGE_VARIANCE_FILE)
+    cat HEADER >  single_coverage_variance_masked.csv
+    # Skip the header and add the remaining contents of each coverage variance file to the combined file
+    for f in $(ls ~{coverage_dir}/coverage_variance_masked_*); do grep -v $HEADER $f >> single_coverage_variance_masked.csv; done
+
+    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/CNV_analysis.r --args ~{chromosome} \
       ~{sample_species_manifest} \
-      ~{coverage_variance_file} \
+      single_coverage_variance_masked.csv \
       ~{gene_coordinates_file} \
       ~{detox_genes_file} \
-      ~{HMM_working_dir_tar} \
+      ~{HMM_working_dir} \
       ~{num_cpu} \
       ~{output_dir}\
-      ~{sample_metadata} \
-      > coverage/~{chromosome}/CNV_analysis_logs/CNV_analysis_${output_name}.log 2>&1
+      ~{sample_metadata}
+    echo "R script complete"
+
+    mv ~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
+    mv ~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
+    mv ~{Rdata} ~{species_Rdata}
   >>>
   runtime {
     docker: docker
@@ -113,8 +121,8 @@ task CNVCoverageCalls {
     zones: runtime_zones
   }
   output {
-    File full_coverage_CNV_table = full_coverage_CNV_table
-    File full_raw_CNV_table = full_raw_CNV_table
-    File coverage_CNV_Rdata = Rdata
+    File full_coverage_CNV_table = species_full_coverage_CNV_table
+    File full_raw_CNV_table = species_full_raw_CNV_table
+    File coverage_CNV_Rdata = species_Rdata
   }
 }

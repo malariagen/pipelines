@@ -11,7 +11,7 @@ workflow TargetRegions {
   String pipeline_version = "1.0.0"
 
   input {
-    String sample_name
+    String sample_id
     File input_bam
     File input_bam_index
     File sample_manifest
@@ -32,7 +32,7 @@ workflow TargetRegions {
     input:
       input_bam = input_bam,
       input_bam_index = input_bam_index,
-      sample_name = sample_name,
+      sample_id = sample_id,
       preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
@@ -40,7 +40,7 @@ workflow TargetRegions {
   # Step 2: Target Regions CNV calling
   call TargetRegionsCNVCalling as CNVCalling {
     input:
-      sample_name = sample_name,
+      sample_id = sample_id,
       sample_manifest = sample_manifest,
       gene_coordinates_file = gene_coordinates_file,
       sample_metadata = sample_metadata,
@@ -69,7 +69,7 @@ task ExtractDiagnosticReads {
   input {
     File input_bam
     File input_bam_index
-    String sample_name
+    String sample_id
 
     Int preemptible_tries
     String runtime_zones
@@ -102,20 +102,20 @@ task ExtractDiagnosticReads {
     #activate the conda environment
     source activate cnv37
 
-    python /cnv/scripts/SSFA.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/SSFA/2R/Ace1_region/~{sample_name}_Ace1_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Ace1_region/SSFAlogs/~{sample_name}_Ace1_SSFA_output.log 2>&1
-    python /cnv/scripts/SSFA.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/SSFA/2R/Cyp6_region/~{sample_name}_CYP6_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Cyp6_region/SSFAlogs/~{sample_name}_CYP6_SSFA_output.log 2>&1
-    python /cnv/scripts/SSFA.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/SSFA/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Cyp6zm_region/SSFAlogs/~{sample_name}_CYP6ZM_SSFA_output.log 2>&1
-    python /cnv/scripts/SSFA.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/SSFA/3R/Gste_region/~{sample_name}_GST_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Gste_region/SSFAlogs/~{sample_name}_GST_SSFA_output.log 2>&1
-    python /cnv/scripts/SSFA.py ~{input_bam} X 15220000:15255000 diagnostic_reads/SSFA/X/Cyp9k1_region/~{sample_name}_CYP9K1_SSFA_output.csv 10 > diagnostic_reads/SSFA/X/Cyp9k1_region/SSFAlogs/~{sample_name}_CYP9K1_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/SSFA/2R/Ace1_region/~{sample_id}_Ace1_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Ace1_region/SSFAlogs/~{sample_id}_Ace1_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/SSFA/2R/Cyp6_region/~{sample_id}_CYP6_SSFA_output.csv 10 > diagnostic_reads/SSFA/2R/Cyp6_region/SSFAlogs/~{sample_id}_CYP6_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/SSFA/3R/Cyp6zm_region/~{sample_id}_CYP6ZM_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Cyp6zm_region/SSFAlogs/~{sample_id}_CYP6ZM_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/SSFA/3R/Gste_region/~{sample_id}_GST_SSFA_output.csv 10 > diagnostic_reads/SSFA/3R/Gste_region/SSFAlogs/~{sample_id}_GST_SSFA_output.log 2>&1
+    python /cnv/scripts/SSFA.py ~{input_bam} X 15220000:15255000 diagnostic_reads/SSFA/X/Cyp9k1_region/~{sample_id}_CYP9K1_SSFA_output.csv 10 > diagnostic_reads/SSFA/X/Cyp9k1_region/SSFAlogs/~{sample_id}_CYP9K1_SSFA_output.log 2>&1
 
     # Get the soft clipped reads
     # Runs breakpoint_detector.py for every chrom: This script goes through an alignment file and records the positions at which soft_clipping is detected in the aligned reads
 
-    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/breakpoints/2R/Ace1_region/~{sample_name}_Ace1_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs/~{sample_name}_Ace1_breakpoints_output.log 2>&1
-    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/breakpoints/2R/Cyp6_region/~{sample_name}_CYP6_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs/~{sample_name}_CYP6_breakpoints_output.log 2>&1
-    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/breakpoints/3R/Cyp6zm_region/~{sample_name}_CYP6ZM_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs/~{sample_name}_CYP6ZM_breakpoints_output.log 2>&1
-    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/breakpoints/3R/Gste_region/~{sample_name}_GST_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs/~{sample_name}_GST_breakpoints_output.log 2>&1
-    python /cnv/scripts/breakpoint_detector.py ~{input_bam} X 15220000:15255000 diagnostic_reads/breakpoints/X/Cyp9k1_region/~{sample_name}_CYP9K1_breakpoints_output 10 > diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs/~{sample_name}_CYP9K1_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 3425000:3650000 diagnostic_reads/breakpoints/2R/Ace1_region/~{sample_id}_Ace1_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Ace1_region/breakpointlogs/~{sample_id}_Ace1_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 2R 28460000:28570000 diagnostic_reads/breakpoints/2R/Cyp6_region/~{sample_id}_CYP6_breakpoints_output 10 > diagnostic_reads/breakpoints/2R/Cyp6_region/breakpointlogs/~{sample_id}_CYP6_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 6900000:7000000 diagnostic_reads/breakpoints/3R/Cyp6zm_region/~{sample_id}_CYP6ZM_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Cyp6zm_region/breakpointlogs/~{sample_id}_CYP6ZM_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} 3R 28570000:28620000 diagnostic_reads/breakpoints/3R/Gste_region/~{sample_id}_GST_breakpoints_output 10 > diagnostic_reads/breakpoints/3R/Gste_region/breakpointlogs/~{sample_id}_GST_breakpoints_output.log 2>&1
+    python /cnv/scripts/breakpoint_detector.py ~{input_bam} X 15220000:15255000 diagnostic_reads/breakpoints/X/Cyp9k1_region/~{sample_id}_CYP9K1_breakpoints_output 10 > diagnostic_reads/breakpoints/X/Cyp9k1_region/breakpointlogs/~{sample_id}_CYP9K1_breakpoints_output.log 2>&1
 
     ls -lht
     tar -zcvf diagnostic_reads.tar.gz diagnostic_reads
@@ -135,7 +135,7 @@ task ExtractDiagnosticReads {
 
 task TargetRegionsCNVCalling {
   input {
-    String sample_name
+    String sample_id
     File sample_manifest              # manifest: pipeline input
     File gene_coordinates_file        # gene_coordinates_file: pipeline input
     File sample_metadata              # metadata: pipeline input
@@ -160,36 +160,33 @@ task TargetRegionsCNVCalling {
     set -euo pipefail
 
     # get the manifest, metadata, and species_id files for just this sample
-    echo "~{sample_name}" > ~{sample_name}_manifest.tsv
+    echo "~{sample_id}" > ~{sample_id}_manifest.tsv
 
-    head -n 1 ~{sample_metadata} >> ~{sample_name}_metadata.tsv
-    grep "~{sample_name}" ~{sample_metadata} >> ~{sample_name}_metadata.tsv
+    head -n 1 ~{sample_metadata} >> ~{sample_id}_metadata.tsv
+    grep "~{sample_id}" ~{sample_metadata} >> ~{sample_id}_metadata.tsv
 
-    head -n 1 ~{species_id_file} >> ~{sample_name}_species_id.tsv
-    grep "~{sample_name}" ~{species_id_file} >> ~{sample_name}_species_id.tsv
+    head -n 1 ~{species_id_file} >> ~{sample_id}_species_id.tsv
+    grep "~{sample_id}" ~{species_id_file} >> ~{sample_id}_species_id.tsv
 
     # unzip the coverage tarball and get the directory name
     tar -zxvf ~{coverage_tar}
-    COVERAGE_DIR=$(echo "~{coverage_tar}" | sed 's/\.tar\.gz//')
 
     # unzip the diagnostic reads tarball and get the directory name
     tar -zxvf ~{diagnostic_reads_tar}
-    DIAGNOSTIC_READS_DIR=$(echo "~{diagnostic_reads_tar}" | sed 's/\.tar\.gz//')
 
     #create output directory
     mkdir target_regions_analysis
 
     echo "Starting R script"
-    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_name}_manifest.tsv \
+    /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/target_regions_analysis.r --args ~{sample_id}_manifest.tsv \
       ~{gene_coordinates_file} \
-      ~{sample_name}_metadata.tsv \
-      ~{sample_name}_species_id.tsv \
+      ~{sample_id}_metadata.tsv \
+      ~{sample_id}_species_id.tsv \
       ~{coverage_variance_file} \
       ~{coverage_dir} \
       ~{diagnostic_reads_dir} \
       ~{plotting_functions_file} \
       ~{num_cpu}
-    echo "R script complete"
   >>>
 
   runtime {

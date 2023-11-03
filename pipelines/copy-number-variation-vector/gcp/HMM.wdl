@@ -14,7 +14,7 @@ workflow HMM {
     #windowed coverage parameters
     File input_bam
     File input_bai
-    String sample_name
+    String sample_id
     String output_dir
     Int interval
     Int window_size
@@ -28,17 +28,19 @@ workflow HMM {
     File gc_content_file
     String sample_group_id
     String species
+    String runtime_zones
   }
 
   call WindowedCoverage {
     input:
       input_bam = input_bam,
       input_bai = input_bai,
-      sample_name = sample_name,
+      sample_id = sample_id,
       output_dir = output_dir,
       interval = interval,
       window_size = window_size,
-      min_qual = min_qual
+      min_qual = min_qual,
+      runtime_zones = runtime_zones
   }
 
   call CoverageSummary {
@@ -52,7 +54,8 @@ workflow HMM {
       gc_content_file = gc_content_file,
       sample_group_id = sample_group_id,
       output_dir = output_dir,
-      sample_name = sample_name
+      sample_id = sample_id,
+      runtime_zones = runtime_zones
   }
 
   call CoverageHMM {
@@ -66,7 +69,8 @@ workflow HMM {
       mapq_threshold = mapq_threshold,
       species =  species,
       output_dir = output_dir,
-      sample_name = sample_name
+      sample_id = sample_id,
+      runtime_zones = runtime_zones
   }
   
   output {
@@ -79,7 +83,7 @@ task WindowedCoverage {
   input {
     File input_bam
     File input_bai
-    String sample_name
+    String sample_id
     String output_dir
     Int interval
     Int window_size
@@ -92,6 +96,7 @@ task WindowedCoverage {
     # TODO: Make disk space dynamic based on input size
     Int disk = 70
     Int preemptible = 3
+    String runtime_zones
   }
   meta {
     description: "Compute aligned read counts across the genome in 300 bp windows. The output is a set of Windowed count reads file, 1 row per window, 1 file per sample - compressed in a tar.gz file to keep the directory structure."
@@ -99,7 +104,7 @@ task WindowedCoverage {
   parameter_meta {
     input_bam: "The input BAM file"
     input_bai: "The BAM file's corresponding index file"
-    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
+    sample_id: "The sample name. This is typically the same as the input bam file name but without the extension."
     output_dir: "The output directory name. This is set to `coverage` by default."
     interval: "The interval size (bp) to use for the coverage calculations. Default is 300."
     window_size: "The window size (bp) to use for the coverage calculations. Default is 300."
@@ -109,12 +114,13 @@ task WindowedCoverage {
     cpu: "(optional) the number of cpus to provision for this task"
     disk: "(optional) the amount of disk space (GiB) to provision for this task"
     preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+    runtime_zones: "The ordered list of zone preference for running in GCP"
   }
   command <<<
     set -x
     echo "Calculating coverage for: " 
     basename ~{input_bam}
-    echo "Sample Name: ~{sample_name}"
+    echo "Sample Name: ~{sample_id}"
     echo "Current directory: " 
     pwd
     ls -lht
@@ -132,8 +138,8 @@ task WindowedCoverage {
             ~{input_bam} \
             $chrom \
             ~{interval} ~{window_size} ~{min_qual} \
-            ~{output_dir}/${chrom}/counts_for_HMM_~{sample_name}_${chrom}_output.csv \
-            > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_~{sample_name}_${chrom}.log 2>&1
+            ~{output_dir}/${chrom}/counts_for_HMM_~{sample_id}_${chrom}_output.csv \
+            > ~{output_dir}/${chrom}/coveragelogs/counts_for_HMM_~{sample_id}_${chrom}.log 2>&1
     done
     # Compress the output directory
     tar -zcvf ~{output_dir}.tar.gz ~{output_dir}
@@ -145,6 +151,7 @@ task WindowedCoverage {
     disks: "local-disk ${disk} HDD"
     cpu: cpu
     preemptible: preemptible
+    zones: runtime_zones
   }
   output {
     #Compressed output directory
@@ -165,13 +172,14 @@ task CoverageSummary {
     sample_manifest: "The sample manifest file to use for the coverage summary calculations. This is simply a list of all the sample names."
     gc_content_file: "The gc content file to use for the coverage summary calculations"
     sample_group_id: "The sample group id to use for the coverage summary calculations"
-    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
+    sample_id: "The sample name. This is typically the same as the input bam file name but without the extension."
     output_dir: "The output directory name. This is set to `coverage` by default."
     docker: "(optional) the docker image containing the runtime environment for this task"
     ram: "(optional) the amount of memory (MiB) to provision for this task"
     cpu: "(optional) the number of cpus to provision for this task"
     disk: "(optional) the amount of disk space (GiB) to provision for this task"
     preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+    runtime_zones: "The ordered list of zone preference for running in GCP"
   }
   input {
     File coverage_tarball
@@ -183,7 +191,7 @@ task CoverageSummary {
     File gc_content_file
     String sample_group_id
     String output_dir
-    String sample_name
+    String sample_id
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -191,6 +199,7 @@ task CoverageSummary {
     # TODO: Make disk space dynamic based on input size
     Int disk = 70
     Int preemptible = 3
+    String runtime_zones
   }
   String acc_threshold = sub(accessibility_threshold + "_", "[.]", "")
   String m_threshold = sub(mapq_threshold + "_", "[.]", "")
@@ -204,7 +213,7 @@ task CoverageSummary {
     tar -zxvf ~{coverage_tarball}
     #cd /cnv/scripts/
     echo "Creating temporary manifest: "
-    echo ~{sample_name} > manifest.txt
+    echo ~{sample_id} > manifest.txt
     ls -lht
     allchrom=(2L 2R 3L 3R X)
     source activate cnv37 
@@ -231,6 +240,7 @@ task CoverageSummary {
     disks: "local-disk ${disk} HDD"
     cpu: cpu
     preemptible: preemptible
+    zones: runtime_zones
   }
   output {
     #log output
@@ -256,12 +266,13 @@ task CoverageHMM {
     mapq_file: "The mapq file to use for the HMM calculations"
     mapq_threshold: "The mapq threshold to use for the HMM calculations. Default is 0.5."
     species: "The species of the samples specified in the manifest."
-    sample_name: "The sample name. This is typically the same as the input bam file name but without the extension."
+    sample_id: "The sample name. This is typically the same as the input bam file name but without the extension."
     docker: "(optional) the docker image containing the runtime environment for this task"
     ram: "(optional) the amount of memory (MiB) to provision for this task"
     cpu: "(optional) the number of cpus to provision for this task"
     disk: "(optional) the amount of disk space (GiB) to provision for this task"
     preemptible: "(optional) if non-zero, request a pre-emptible instance and allow for this number of preemptions before running the task on a non preemptible machine"
+    runtime_zones: "The ordered list of zone preference for running in GCP"
   }
   input {
     File sample_manifest
@@ -273,7 +284,7 @@ task CoverageHMM {
     Float mapq_threshold
     String species
     String output_dir
-    String sample_name
+    String sample_id
     # runtime values
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
@@ -281,6 +292,7 @@ task CoverageHMM {
     # TODO: Make disk space dynamic based on input size
     Int disk = 70
     Int preemptible = 3
+    String runtime_zones
   }
   command <<<
     set -x
@@ -290,7 +302,7 @@ task CoverageHMM {
     tar -zxvf ~{coverage_tarball}
     #cd /cnv/scripts/
     echo "Creating temporary manifest: "
-    echo ~{sample_name} > manifest.txt
+    echo ~{sample_id} > manifest.txt
     ls -lht
     allchrom=(2L 2R 3L 3R X)
     # Activate the conda environment
@@ -320,6 +332,7 @@ task CoverageHMM {
     disks: "local-disk ${disk} HDD"
     cpu: cpu
     preemptible: preemptible
+    zones: runtime_zones
   }
   output {
     #log outputs
