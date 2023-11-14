@@ -120,6 +120,7 @@ workflow CNV {
         detox_genes_file = detox_genes_file,
         consolidated_coverage_dir_tar = CHMM.consolidated_gz,
         sample_metadata = sample_metadata,
+        species = species,
         preemptible_tries = preemptible_tries,
         runtime_zones = runtime_zones
     }
@@ -129,8 +130,8 @@ workflow CNV {
     File hmm_tar = CHMM.consolidated_gz
     Array[File] targeted_regions_focal_region_cnv_table = TargetRegions.focal_region_CNV_table
     Array[File] targeted_regions_hmm_gene_copy_number = TargetRegions.HMM_gene_copy_number
-    File cnv_coverage_calls_coverage_CNV_table = CNVCoverageCalls.full_coverage_CNV_table
-    File cnv_coverage_calls_raw_CNV_table = CNVCoverageCalls.full_raw_CNV_table
-    File cnv_coverage_calls_Rdata = CNVCoverageCalls.coverage_CNV_Rdata
+    Array[File] cnv_coverage_calls_tables = CNVCoverageCalls.cnv_coverage_table
+    Array[File] cnv_coverage_calls_raw_tables = CNVCoverageCalls.cnv_coverage_raw_table
+    Array[File] cnv_coverage_calls_Rdata = CNVCoverageCalls.cnv_coverage_Rdata
   }
 }

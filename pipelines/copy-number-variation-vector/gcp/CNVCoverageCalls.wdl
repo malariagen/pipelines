@@ -6,9 +6,6 @@ version 1.0
 ## https://github.com/malariagen/pipelines/blob/add_cnv_vector_spec/docs/specs/cnv-vector.md
 ##.
 
-import "../../../tasks/gcp/Tasks.wdl" as Tasks
-import "../../../tasks/gcp/StatisticalPhasingTasks.wdl" as StatisticalPhasingTasks
-
 workflow CNVCoverageCalls {
   String pipeline_version = "1.0.0"
 
@@ -19,21 +16,23 @@ workflow CNVCoverageCalls {
     File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
     File gene_coordinates_file  # good    # gene_coordinates_file: pipeline input
     File detox_genes_file  # good         # detox_genes_file: pipeline input
-    File consolidated_HMM_working_dir_tar # good       # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File consolidated_coverage_dir_tar # good       # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
     File sample_metadata # good           # metadata: pipeline input
+    String species
     Int preemptible_tries
     String runtime_zones
   }
 
   # Step 1: CNV Coverage Calls
-  call CNVCoverageTasks.CNVCoverageCalls as CoverageCalls {
+  call CoverageCalls {
     input:
       chromosome = chromosome,
       sample_species_manifest = sample_species_manifest,
       gene_coordinates_file = gene_coordinates_file,
       detox_genes_file = detox_genes_file,
-      consolidated_HMM_working_dir_tar = consolidated_HMM_working_dir_tar,
+      consolidated_coverage_dir_tar = consolidated_coverage_dir_tar,
       sample_metadata = sample_metadata,
+      species = species,
       preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
@@ -43,12 +42,13 @@ workflow CNVCoverageCalls {
   }
 
   output {
-    File cnv_coverage_csv = CoverageCalls.cnv_coverage_csv
-    File cnv_coverage_Rdata = CoverageCalls.cnv_coverage_Rdata
+    File cnv_coverage_table = CoverageCalls.full_coverage_CNV_table
+    File cnv_coverage_raw_table = CoverageCalls.full_raw_CNV_table
+    File cnv_coverage_Rdata = CoverageCalls.coverage_CNV_Rdata
   }
 }
 
-task CNVCoverageCalls {
+task CoverageCalls {
   input {
     String chromosome               # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
     File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
