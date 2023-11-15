@@ -45,7 +45,6 @@ workflow CNV {
     File plotting_functions_file
     # coverage calls inputs
     Array[String] chromosomes = ["2L", "2R", "3L", "3R", "X"]
-    File sample_species_manifest
     File detox_genes_file
     # runtime inputs
     Int preemptible_tries
