@@ -61,7 +61,7 @@ task CoverageCalls {
     # Runtime Settings
     Int preemptible_tries
     String runtime_zones
-    String docker = "us.gcr.io/broad-gotc-prod/r:3.6.1"
+    String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1692386236"
     Int num_cpu = 1
     Float mem_gb = 3.75
     Int disk_gb = 50
