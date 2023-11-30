@@ -96,8 +96,8 @@ task CoverageCalls {
     FIRST_COVERAGE_VARIANCE_FILE=$(ls ~{coverage_dir}/coverage_variance_masked_* | head -n 1)
 
     # Add the header to the new combined file (the header is in every file, but we only want it once in the combined file)
-    HEADER="sample_id$(head -n 1 $FIRST_COVERAGE_VARIANCE_FILE)"
-    echo $HEADER >  single_coverage_variance_masked.csv
+    HEADER=$(head -n 1 $FIRST_COVERAGE_VARIANCE_FILE)
+    echo "sample_id$HEADER" >  single_coverage_variance_masked.csv
 
     # Skip the header and add the remaining contents of each coverage variance file to the combined file
     for f in $(ls ~{coverage_dir}/coverage_variance_masked_*); do grep -v "$HEADER" $f >> single_coverage_variance_masked.csv; done
