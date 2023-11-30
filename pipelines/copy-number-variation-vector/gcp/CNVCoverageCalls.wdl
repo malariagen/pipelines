@@ -67,7 +67,7 @@ task CoverageCalls {
     Int disk_gb = 50
   }
   # ncores: number of CPUs - has not been optimized
-  String output_dir = "CNV_coverage_calls"
+  String output_dir = species + "_CNV"
 
   # These will be named by the script and cannot be changed here
   String full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
@@ -80,7 +80,7 @@ task CoverageCalls {
 
   # once we untarr the HMM dir, the path to the untarred dir will be local to where the command runs
   String coverage_dir = basename(consolidated_coverage_dir_tar, ".tar.gz")
-  String HMM_working_dir = coverage_dir + '/' + chromosome + 'HMM_output'
+  String HMM_working_dir = coverage_dir + '/' + chromosome + '/HMM_output'
 
 
 
@@ -88,14 +88,19 @@ task CoverageCalls {
     # unzip the coverage tarball and get the directory name
     tar -zxvf ~{consolidated_coverage_dir_tar}
 
+    # set up the output dir
+    mkdir ~{HMM_working_dir}/~{output_dir}
+
     # The following combines the coverage_variance files into a signle file
     # Get the name of the first coverage variance file - doesn't matter which one
     FIRST_COVERAGE_VARIANCE_FILE=$(ls ~{coverage_dir}/coverage_variance_masked_* | head -n 1)
+
     # Add the header to the new combined file (the header is in every file, but we only want it once in the combined file)
-    HEADER=$(head -n 1 $FIRST_COVERAGE_VARIANCE_FILE)
+    HEADER="sample_id$(head -n 1 $FIRST_COVERAGE_VARIANCE_FILE)"
     echo $HEADER >  single_coverage_variance_masked.csv
+
     # Skip the header and add the remaining contents of each coverage variance file to the combined file
-    for f in $(ls ~{coverage_dir}/coverage_variance_masked_*); do grep -v $HEADER $f >> single_coverage_variance_masked.csv; done
+    for f in $(ls ~{coverage_dir}/coverage_variance_masked_*); do grep -v "$HEADER" $f >> single_coverage_variance_masked.csv; done
 
     echo "Starting R script"
     /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/CNV_analysis.r --args ~{chromosome} \
@@ -109,9 +114,9 @@ task CoverageCalls {
       ~{sample_metadata}
     echo "R script complete"
 
-    mv ~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
-    mv ~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
-    mv ~{Rdata} ~{species_Rdata}
+    mv ~{HMM_working_dir}/~{output_dir}/~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
+    mv ~{HMM_working_dir}/~{output_dir}/~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
+    mv ~{HMM_working_dir}/~{output_dir}/~{Rdata} ~{species_Rdata}
   >>>
   runtime {
     docker: docker
