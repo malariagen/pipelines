@@ -102,6 +102,9 @@ task CoverageCalls {
     # Skip the header and add the remaining contents of each coverage variance file to the combined file
     for f in $(ls ~{coverage_dir}/coverage_variance_masked_*); do grep -v "$HEADER" $f >> single_coverage_variance_masked.csv; done
 
+    echo "single_coverage_variance_masked.csv"
+    cat single_coverage_variance_masked.csv
+
     echo "Starting R script"
     /opt/R/3.6.1/bin/R --slave -f /usr/local/Rscripts/CNV_analysis.r --args ~{chromosome} \
       ~{sample_species_manifest} \
