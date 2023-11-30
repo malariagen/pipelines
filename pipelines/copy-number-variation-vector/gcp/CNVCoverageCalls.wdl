@@ -117,9 +117,9 @@ task CoverageCalls {
       ~{sample_metadata}
     echo "R script complete"
 
-    mv ~{HMM_working_dir}/~{output_dir}/~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
-    mv ~{HMM_working_dir}/~{output_dir}/~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
-    mv ~{HMM_working_dir}/~{output_dir}/~{Rdata} ~{species_Rdata}
+    mv ~{HMM_working_dir}/~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
+    mv ~{HMM_working_dir}/~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
+    mv ~{HMM_working_dir}/~{Rdata} ~{species_Rdata}
   >>>
   runtime {
     docker: docker
