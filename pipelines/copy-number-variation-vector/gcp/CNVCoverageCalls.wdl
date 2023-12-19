@@ -12,13 +12,14 @@ workflow CNVCoverageCalls {
   ## Sub-pipeline: CNV Coverage Calls
 
   input {
-    String chromosome # good              # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
+    String chromosome               # chrom: Runs separately for each species and chromosome (2L, 2R, 3L, 3R, X)
     File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
-    File gene_coordinates_file  # good    # gene_coordinates_file: pipeline input
-    File detox_genes_file  # good         # detox_genes_file: pipeline input
-    File consolidated_coverage_dir_tar # good       # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
-    File sample_metadata # good           # metadata: pipeline input
-    String species
+    File gene_coordinates_file      # gene_coordinates_file: pipeline input
+    File detox_genes_file           # detox_genes_file: pipeline input
+    File consolidated_coverage_dir_tar # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File sample_metadata            # metadata: pipeline input
+    String species                  # species: pipeline input
+    Int num_samples                 # number of samples - used to calucluate the memory and disk requested for coverage calls step
     Int preemptible_tries
     String runtime_zones
   }
@@ -33,6 +34,7 @@ workflow CNVCoverageCalls {
       consolidated_coverage_dir_tar = consolidated_coverage_dir_tar,
       sample_metadata = sample_metadata,
       species = species,
+      num_samples = num_samples,
       preemptible_tries = preemptible_tries,
       runtime_zones = runtime_zones
   }
@@ -56,15 +58,16 @@ task CoverageCalls {
     File detox_genes_file           # detox_genes_file: pipeline input
     File consolidated_coverage_dir_tar # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
     File sample_metadata            # metadata: pipeline input
-    String species
+    String species                  # species: pipeline input
+    Int num_samples                 # number of samples - used to calucluate the memory and disk requested for coverage calls step
 
     # Runtime Settings
     Int preemptible_tries
     String runtime_zones
     String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1692386236"
     Int num_cpu = 1
-    Float mem_gb = 3.75
-    Int disk_gb = 50
+    Int memory_gb = if (floor(num_samples * 0.2) + 3.75) < 120 then (floor(num_samples * 0.2) + 3.75) else 120
+    Int disk_size_gb = if (ceil(num_samples * 0.75) + 10) < 1200 then (ceil(num_samples * 0.75) + 10) else 1200
   }
   # ncores: number of CPUs - has not been optimized
   String output_dir = species + "_CNV"
@@ -125,8 +128,8 @@ task CoverageCalls {
     docker: docker
     preemptible: preemptible_tries
     cpu: num_cpu
-    memory: mem_gb + " GiB"
-    disks: "local-disk " + disk_gb + " HDD"
+    memory: memory_gb + " GiB"
+    disks: "local-disk " + disk_size_gb + " HDD"
     zones: runtime_zones
   }
   output {

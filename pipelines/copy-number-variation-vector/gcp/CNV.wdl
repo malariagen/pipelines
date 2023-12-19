@@ -120,6 +120,7 @@ workflow CNV {
         consolidated_coverage_dir_tar = CHMM.consolidated_gz,
         sample_metadata = sample_metadata,
         species = species,
+        num_samples = length(sample_ids),
         preemptible_tries = preemptible_tries,
         runtime_zones = runtime_zones
     }
