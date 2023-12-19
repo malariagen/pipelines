@@ -66,7 +66,7 @@ task CoverageCalls {
     String runtime_zones
     String docker = "us.gcr.io/broad-gotc-prod/cnv/r:1.0.0-1692386236"
     Int num_cpu = 1
-    Int memory_gb = if (floor(num_samples * 0.2) + 3.75) < 120 then (floor(num_samples * 0.2) + 3.75) else 120
+    Int memory_gb = if (ceil(num_samples * 0.2) + 3) < 120 then (ceil(num_samples * 0.2) + 3) else 120
     Int disk_size_gb = if (ceil(num_samples * 0.75) + 10) < 1200 then (ceil(num_samples * 0.75) + 10) else 1200
   }
   # ncores: number of CPUs - has not been optimized
