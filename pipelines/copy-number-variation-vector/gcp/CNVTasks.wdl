@@ -11,7 +11,7 @@ task ConsolidateHMMOutput {
     input {
         Array[File] hmm_tarballs
         String output_dir
-        String dependency_string
+        Array[String] dependency_string
         # runtime values
         String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
         String ram = "8000 MiB"
