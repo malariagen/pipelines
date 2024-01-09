@@ -88,8 +88,8 @@ workflow CNV {
         gene_coordinates_file = gene_coordinates_file,
         sample_metadata = sample_metadata,
         species_id_file = species_id_file,
-        CNV_HMM_output = HMM.output_gz ,# zip of the coveragefolder
-        HMM_coverage_variance_file = HMM.coverage_variance ,
+        CNV_HMM_output = HMM.output_gz, # zip of the coveragefolder
+        HMM_coverage_variance_file = HMM.coverage_variance,
         plotting_functions_file = plotting_functions_file,
         preemptible_tries = preemptible_tries,
         runtime_zones = runtime_zones
