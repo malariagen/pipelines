@@ -14,7 +14,6 @@ workflow TargetRegions {
     String sample_id
     File input_bam
     File input_bam_index
-    File sample_manifest
     File gene_coordinates_file
     File sample_metadata
     File species_id_file
@@ -41,7 +40,6 @@ workflow TargetRegions {
   call TargetRegionsCNVCalling as CNVCalling {
     input:
       sample_id = sample_id,
-      sample_manifest = sample_manifest,
       gene_coordinates_file = gene_coordinates_file,
       sample_metadata = sample_metadata,
       species_id_file = species_id_file,
@@ -136,7 +134,6 @@ task ExtractDiagnosticReads {
 task TargetRegionsCNVCalling {
   input {
     String sample_id
-    File sample_manifest              # manifest: pipeline input
     File gene_coordinates_file        # gene_coordinates_file: pipeline input
     File sample_metadata              # metadata: pipeline input
     File species_id_file              # species_id_file: pipeine input

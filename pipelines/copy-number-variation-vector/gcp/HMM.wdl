@@ -24,7 +24,6 @@ workflow HMM {
     Float mapq_threshold
     File accessibility_mask_file
     File mapq_file
-    File sample_manifest
     File gc_content_file
     String sample_group_id
     String species
@@ -50,7 +49,6 @@ workflow HMM {
       mapq_threshold = mapq_threshold,
       accessibility_mask_file = accessibility_mask_file,
       mapq_file = mapq_file,
-      sample_manifest = sample_manifest,
       gc_content_file = gc_content_file,
       sample_group_id = sample_group_id,
       output_dir = output_dir,
@@ -60,7 +58,6 @@ workflow HMM {
 
   call CoverageHMM {
     input:
-      sample_manifest = sample_manifest,
       coverage_tarball = CoverageSummary.output_gz,
       gc_content_file = gc_content_file,
       coverage_gc = CoverageSummary.coverage_output,
@@ -76,7 +73,6 @@ workflow HMM {
   output {
     File output_gz = CoverageHMM.output_gz
     File coverage_variance = CoverageSummary.variance_output
-    String dependency_string = "Run this first!"
   }
 }
 
@@ -170,7 +166,6 @@ task CoverageSummary {
     mapq_threshold: "The mapq threshold to use for the coverage summary calculations. Default is 0.5."
     accessibility_mask_file: "The accessibility mask file to use for the coverage summary calculations"
     mapq_file: "The mapq file to use for the coverage summary calculations"
-    sample_manifest: "The sample manifest file to use for the coverage summary calculations. This is simply a list of all the sample names."
     gc_content_file: "The gc content file to use for the coverage summary calculations"
     sample_group_id: "The sample group id to use for the coverage summary calculations"
     sample_id: "The sample name. This is typically the same as the input bam file name but without the extension."
@@ -188,7 +183,6 @@ task CoverageSummary {
     Float mapq_threshold
     File accessibility_mask_file
     File mapq_file
-    File sample_manifest
     File gc_content_file
     String sample_group_id
     String output_dir
@@ -259,7 +253,6 @@ task CoverageHMM {
     description: "Runs an mHMM on coverage counts obtained from a bamfile, using normalisation based on the mean coverage per GC bin over the whole genome of the individual. The outputs are normalized coverage values, 1 per window, per sample. Copy number state, 1 per window, per sample."
   }
   parameter_meta {
-    sample_manifest: "The sample manifest file to use for the HMM calculations. This is simply a list of all the sample names."
     coverage_tarball: "The input tarball containing the coverage files"
     gc_content_file: "The gc content file to use for the HMM calculations"
     coverage_gc: "The coverage gc file to use for the HMM calculations"
@@ -276,7 +269,6 @@ task CoverageHMM {
     runtime_zones: "The ordered list of zone preference for running in GCP"
   }
   input {
-    File sample_manifest
     File coverage_tarball
     File gc_content_file
     File coverage_gc

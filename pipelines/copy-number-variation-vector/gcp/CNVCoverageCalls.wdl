@@ -73,12 +73,12 @@ task CoverageCalls {
   String output_dir = species + "_CNV"
 
   # These will be named by the script and cannot be changed here
-  String full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
-  String full_raw_CNV_table = output_dir + '/full_raw_CNV_table_'  + chromosome + '.csv'
+  String full_coverage_CNV = output_dir + '/full_coverage_CNV_table_' + chromosome + '.csv'
+  String full_raw_CNV = output_dir + '/full_raw_CNV_table_'  + chromosome + '.csv'
   String Rdata = output_dir + '/CNV_analysis_' + chromosome +'.Rdata'
   # Since I am not outputting the full directory with the species included in the folder structure, I am renaming the output file to include the species name
-  String species_full_coverage_CNV_table = output_dir + '/full_coverage_CNV_table_' + species + '_' + chromosome + '.csv'
-  String species_full_raw_CNV_table = output_dir + '/full_raw_CNV_table_' + species + '_' + chromosome + '.csv'
+  String species_full_coverage_CNV = output_dir + '/full_coverage_CNV_table_' + species + '_' + chromosome + '.csv'
+  String species_full_raw_CNV = output_dir + '/full_raw_CNV_table_' + species + '_' + chromosome + '.csv'
   String species_Rdata = output_dir + '/CNV_analysis_' + species + '_' + chromosome +'.Rdata'
 
   # once we untarr the HMM dir, the path to the untarred dir will be local to where the command runs
@@ -120,8 +120,8 @@ task CoverageCalls {
       ~{sample_metadata}
     echo "R script complete"
 
-    mv ~{HMM_working_dir}/~{full_coverage_CNV_table} ~{species_full_coverage_CNV_table}
-    mv ~{HMM_working_dir}/~{full_raw_CNV_table} ~{species_full_raw_CNV_table}
+    mv ~{HMM_working_dir}/~{full_coverage_CNV} ~{species_full_coverage_CNV}
+    mv ~{HMM_working_dir}/~{full_raw_CNV} ~{species_full_raw_CNV}
     mv ~{HMM_working_dir}/~{Rdata} ~{species_Rdata}
   >>>
   runtime {
@@ -133,8 +133,8 @@ task CoverageCalls {
     zones: runtime_zones
   }
   output {
-    File full_coverage_CNV_table = species_full_coverage_CNV_table
-    File full_raw_CNV_table = species_full_raw_CNV_table
+    File full_coverage_CNV_table = species_full_coverage_CNV
+    File full_raw_CNV_table = species_full_raw_CNV
     File coverage_CNV_Rdata = species_Rdata
   }
 }
