@@ -99,6 +99,7 @@ workflow CNV {
   call CNVTasks.ConsolidateHMMOutput as CHMM {
     input:
       hmm_tarballs = HMM.output_gz,
+      dependency_string = HMM.dependency_string,
       output_dir = output_dir,
       runtime_zones = runtime_zones
   }
