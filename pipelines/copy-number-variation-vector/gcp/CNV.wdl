@@ -13,7 +13,7 @@ import "CNVTasks.wdl" as CNVTasks
 
 workflow CNV {
   meta {
-    description: "This is a pipeline for calling Copy Number Variants (CNVs) for a cohort of multiple samples. This inclludes an HMM step followed by coverage calls and target regions pipelines to improve acuracy."
+    description: "This is a pipeline for calling Copy Number Variants (CNVs) for a cohort of multiple samples. This includes an HMM step followed by coverage calls and target regions pipelines to improve accuracy."
     allowNestedInputs: true
   }
 
