@@ -90,8 +90,7 @@ task WindowedCoverage {
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
     Int cpu = 16
-    # TODO: Make disk space dynamic based on input size
-    Int disk = 70
+    Int disk = ceil(size(input_bam, "GiB")) + 50
     Int preemptible = 3
     String runtime_zones
   }
@@ -238,9 +237,6 @@ task CoverageSummary {
     zones: runtime_zones
   }
   output {
-    #log output
-    #${orig//[xyz]/_} ${~{accessibility_threshold}//./} ${~{mapq_threshold}//./}
-    #select_first(glob("~{output_dir}/median_coverage_by_GC_masked_*_~{sample_group_id}.csv"))
     File logs = "calculate_mean_coverage_by_GC_~{sample_group_id}.log"
     File coverage_output = "~{output_dir}/~{coverage_output_filename}"
     File variance_output = "~{output_dir}/~{variance_output_filename}"
@@ -282,7 +278,6 @@ task CoverageHMM {
     String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
     String ram = "8000 MiB"
     Int cpu = 16
-    # TODO: Make disk space dynamic based on input size
     Int disk = 70
     Int preemptible = 3
     String runtime_zones
@@ -293,7 +288,6 @@ task CoverageHMM {
     pwd
     #unzip the tarball
     tar -zxvf ~{coverage_tarball}
-    #cd /cnv/scripts/
     echo "Creating temporary manifest: "
     echo ~{sample_id} > manifest.txt
     ls -lht

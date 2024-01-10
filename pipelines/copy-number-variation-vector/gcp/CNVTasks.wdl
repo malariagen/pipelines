@@ -13,10 +13,9 @@ task ConsolidateHMMOutput {
         String output_dir
         # runtime values
         String docker = "us.gcr.io/broad-gotc-prod/cnv:1.0.0-1679431881"
-        String ram = "8000 MiB"
+        Int ram = if (ceil(size(hmm_tarballs, "MiB") * 5) + 8000) < 120000 then (ceil(size(hmm_tarballs, "MiB") * 5) + 8000) else 120000
         Int cpu = 16
-        # TODO: Make disk space dynamic based on input size
-        Int disk = 70
+        Int disk =  ceil(size(hmm_tarballs, "GiB") * 10) + 50
         Int preemptible = 3
         String runtime_zones
     }
@@ -35,7 +34,7 @@ task ConsolidateHMMOutput {
     >>>
     runtime {
         docker: docker
-        memory: ram
+        memory: "${ram} MiB"
         disks: "local-disk ${disk} HDD"
         cpu: cpu
         preemptible: preemptible
