@@ -198,6 +198,5 @@ task TargetRegionsCNVCalling {
   output {
     File focal_region_CNV_table = "target_regions_analysis/focal_region_CNV_table.csv"
     File HMM_gene_copy_number = "target_regions_analysis/HMM_gene_copy_number.csv"
-    # File target_regions_Rdata = "target_regions_analysis/target_regions_analysis.Rdata"
   }
 }
