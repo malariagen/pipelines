@@ -56,7 +56,7 @@ task CoverageCalls {
     File sample_species_manifest    # manifest: species specific manifest file - NOTE different from other manifests
     File gene_coordinates_file      # gene_coordinates_file: pipeline input
     File detox_genes_file           # detox_genes_file: pipeline input
-    File consolidated_coverage_dir_tar # workingfolder: Specifies the folder containing the HMM output files - will be a tarred output here
+    File consolidated_coverage_dir_tar # working folder: Specifies the folder containing the HMM output files - will be a tarred output here
     File sample_metadata            # metadata: pipeline input
     String species                  # species: pipeline input
     Int num_samples                 # number of samples - used to calucluate the memory and disk requested for coverage calls step
