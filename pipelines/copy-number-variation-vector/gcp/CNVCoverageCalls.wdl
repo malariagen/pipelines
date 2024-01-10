@@ -94,7 +94,7 @@ task CoverageCalls {
     # set up the output dir
     mkdir ~{HMM_working_dir}/~{output_dir}
 
-    # The following combines the coverage_variance files into a signle file
+    # The following combines the coverage_variance files into a single file
     # Get the name of the first coverage variance file - doesn't matter which one
     FIRST_COVERAGE_VARIANCE_FILE=$(ls ~{coverage_dir}/coverage_variance_masked_* | head -n 1)
 
