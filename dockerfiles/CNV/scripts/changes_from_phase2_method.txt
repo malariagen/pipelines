@@ -1,0 +1,16 @@
+Differences in the methods in phase3 compared to phase2:
+
+
+We now calculate median instead of mean coverage to get the normalisation per GC windows. Windows used for calculation of median coverage and coverage variance are filtered based on having at least 90% accessible sites (same as for phase 2), but we now also add a mapq0 filter (windows are excluded in they have > 50% mapq0 reads). 
+
+Coverage variance is calculated after excluding the 1% highest coverage windows.
+
+HMM process filtered with mapq0 <= 50%, rather than 2%. 
+
+Coverage-based CNV calls for each of the focal genes (Ace-1, Cyp6 regions, Gste regions, Cyp9k1 region) are made using the mode of CNV state for each gene, instead of using the definition of encompassed gene duplications. 
+
+Dup0 now means any coverage-based call for the focal region, instead of coverage-based call and lack of discordant read based call. 
+
+When matching CNVs across samples, in phase2 there was a sanity check that the same CNV allele was never called twice in the same sample. But it is actually possible for this to happen if the range of start and end positions for a given CNV allele becomes wide enough. That sanity check has therefore been removed, and instead a measure of how consistent the start and end points are is given by the 90% quantile range size of the start and end points. 
+
+Read-based calling is more stringent, requiring 4 supporting diagnostic reads instead of 2. 
