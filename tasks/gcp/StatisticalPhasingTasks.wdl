@@ -58,6 +58,7 @@ task ShapeIt4 {
     Int preemptible_tries = 2
     Int num_cpu = 4
     Float mem_gb = 15
+    Int max_retries = 3
     RunTimeSettings runTimeSettings
     String runtime_zones
   }
@@ -89,6 +90,7 @@ task ShapeIt4 {
     preemptible: preemptible_tries
     cpu: num_cpu
     memory: mem_gb + " GiB"
+    maxRetries: max_retries
     disks: "local-disk " + total_disk_size + " HDD"
     zones: runtime_zones
   }
