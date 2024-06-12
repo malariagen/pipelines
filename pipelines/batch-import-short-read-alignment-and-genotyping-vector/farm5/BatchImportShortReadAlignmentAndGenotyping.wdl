@@ -19,6 +19,9 @@ import "../../../pipelines/SNP-genotyping-vector/farm5/SNPGenotyping.wdl" as SNP
 workflow BatchImportShortReadAlignmentAndGenotyping {
   String pipeline_version = "1.0.0"
 
+  String LANELET_INFO_COLNAME_SAMPLE_ID = "sample_id"
+
+
   input {
     File batch_sample_manifest_file
 
@@ -39,9 +42,18 @@ workflow BatchImportShortReadAlignmentAndGenotyping {
 
   scatter (per_sample_manifest_file in BatchSplitUpInputFile.per_sample_manifest_files) {
 
-    Array[Array[String]] lanelet_infos = read_tsv(per_sample_manifest_file)
-    String sample_id = lanelet_infos[0][0]
+    # Assume first row is the header and
+    # remaining rows are lanelet rows giving info about sample_id and irods_path.
+    # Take the sample ID from the first lanelet row.
+    Array[Object] lanelet_infos = read_objects(per_sample_manifest_file)
+    String sample_id = lanelet_infos[0][LANELET_INFO_COLNAME_SAMPLE_ID]
     String output_basename = sample_id
+
+    call ImportTask.ValidatePerSampleManifestFile {
+      input:
+        per_sample_manifest_file = per_sample_manifest_file,
+        runTimeSettings = runTimeSettings
+    }
 
     call ImportShortReadAlignment.ImportShortReadAlignment {
       input:
