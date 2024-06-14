@@ -1,0 +1,15 @@
+# Order of launchers that were run for the first pass of phase3 (run_windowed_accessibility.sh and run_coverage_stats_by_species.sh will not need to be run for future sample sets, as the plan is to use the data from phase3 for all subsequent analyses of gambiae and arabiensis)
+
+~/scripts/CNV_scripts/launchers/run_coverage.sh ~/personal/phase3_data/phase3_manifest.txt phase3_cnv
+~/scripts/CNV_scripts/launchers/run_diagnostic_reads.sh ~/personal/phase3_data/phase3_manifest.txt phase3_cnv
+~/scripts/CNV_scripts/launchers/run_windowed_accessibility.sh
+~/scripts/CNV_scripts/launchers/run_coverage_stats_by_species.sh phase3_cnv arabiensis gambcolu
+~/scripts/CNV_scripts/launchers/run_HMM.sh ~/personal/phase3_data/phase3_manifest_arabiensis.txt ~/personal/phase3_data/phase3_manifest_gambcolu.txt phase3_cnv
+bsub -o temp.log -e temp.error ~/scripts/CNV_scripts/scripts/join_gambiae_arabiensis_coverage_variance_files.sh phase3_cnv
+~/scripts/CNV_scripts/launchers/run_coverage_CNVs.sh ~/personal/phase3_data/phase3_manifest_gambcolu.txt ~/personal/phase3_data/phase3_manifest_arabiensis.txt ~/personal/phase3_data/phase3.samples.meta.csv phase3_cnv 
+# The following bsub was really confusing to me. If I run it with no memory requirement (or with memory requirement of 500M), it fails because of excess memory usage. But if I run it like this with a 1Gb memory requirement, it runs fine and its maximum memory usage is 11M. 
+bsub -o temp.log -e temp.error -R"select[mem>1000] rusage[mem=1000]" -M1000 ~/scripts/CNV_scripts/scripts/join_CNV_output_files.sh phase3_cnv 
+~/scripts/CNV_scripts/launchers/run_target_regions_analysis.sh ~/personal/phase3_data/phase3_manifest_known_species.txt ~/personal/phase3_data/samples.species_aim.csv ~/personal/phase3_data/phase3.samples.meta.csv phase3_cnv 
+~/scripts/CNV_scripts/launchers/run_modal_CNVs.sh ~/personal/phase3_data/phase3_manifest_gambcolu.txt ~/personal/phase3_data/phase3_manifest_arabiensis.txt ~/personal/phase3_data/phase3.samples.meta.csv phase3_cnv 
+
+# Note. Later, the run_target_regions_analysis script was rerun in order to fix the Cyp6mz_Dupz labelling issue. Another small change was also made to the target_regions_analysis.r script (changing one the 5 nucleotide sequence used to detect Dup10). This doesn't make any difference to any of the results in the .csv files (just in the number of supporting reads, which is recorded in the Rdata file, but not in any of the presence / absence results which are in the csv). The old scripts were moved to target_regions_anlaysis_old.*. The old results were moved into the folder target_regions_analysis_old.
